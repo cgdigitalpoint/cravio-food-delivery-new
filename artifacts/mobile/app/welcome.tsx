@@ -1,14 +1,13 @@
 // ─── Route: /welcome ─────────────────────────────────────────────────────────
 import React from 'react';
+import { useRouter } from 'expo-router';
 import { WelcomeScreen } from '@/screens';
 
 export default function WelcomeRoute() {
+  const router = useRouter();
+
   const handleStartDevelopment = () => {
-    // Phase 2: navigate to /auth/login
-    // router.push('/auth/login');
-    if (__DEV__) {
-      console.log('[Cravio] Phase 1 complete — architecture ready for Phase 2');
-    }
+    router.push('/design-system');
   };
 
   return <WelcomeScreen onStartDevelopment={handleStartDevelopment} />;

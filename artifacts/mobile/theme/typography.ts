@@ -1,10 +1,74 @@
 // ─── Typography Scale ─────────────────────────────────────────────────────────
-// Uses Inter font family (pre-loaded in _layout.tsx).
+// Inter font family (pre-loaded in _layout.tsx).
+// Named variants match the Cravio Design System spec.
 
 import { StyleSheet } from 'react-native';
 
 export const typography = StyleSheet.create({
-  // Display — hero text, splash screens
+  // ── Design System names ─────────────────────────────────────────────────────
+
+  /** Display — hero text, splash screens */
+  display: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 36,
+    lineHeight: 44,
+    letterSpacing: -0.5,
+  },
+  /** Heading 1 — primary screen titles */
+  heading1: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 28,
+    lineHeight: 36,
+    letterSpacing: -0.3,
+  },
+  /** Heading 2 — section headings */
+  heading2: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 24,
+    lineHeight: 32,
+    letterSpacing: -0.2,
+  },
+  /** Heading 3 — card titles, dialog headings */
+  heading3: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 20,
+    lineHeight: 28,
+  },
+  /** Title — list items, sheet headers */
+  title: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 18,
+    lineHeight: 26,
+  },
+  /** Subtitle — supporting titles, section labels */
+  subtitle: {
+    fontFamily: 'Inter_500Medium',
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  /** Body — content text, descriptions */
+  body: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    lineHeight: 22,
+  },
+  /** Caption — timestamps, metadata, helper text */
+  caption: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.2,
+  },
+  /** Button Text — interactive labels */
+  buttonText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 15,
+    lineHeight: 22,
+    letterSpacing: 0.1,
+  },
+
+  // ── Legacy / extended variants (kept for compatibility) ─────────────────────
+
   displayLarge: {
     fontFamily: 'Inter_700Bold',
     fontSize: 48,
@@ -23,8 +87,6 @@ export const typography = StyleSheet.create({
     lineHeight: 36,
     letterSpacing: -0.5,
   },
-
-  // Headings — section titles, card headers
   headingXL: {
     fontFamily: 'Inter_700Bold',
     fontSize: 24,
@@ -46,8 +108,6 @@ export const typography = StyleSheet.create({
     fontSize: 16,
     lineHeight: 22,
   },
-
-  // Body — content text
   bodyLG: {
     fontFamily: 'Inter_400Regular',
     fontSize: 16,
@@ -63,8 +123,6 @@ export const typography = StyleSheet.create({
     fontSize: 13,
     lineHeight: 20,
   },
-
-  // UI labels, buttons
   label: {
     fontFamily: 'Inter_500Medium',
     fontSize: 14,
@@ -77,16 +135,6 @@ export const typography = StyleSheet.create({
     lineHeight: 18,
     letterSpacing: 0.2,
   },
-
-  // Captions, timestamps, metadata
-  caption: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 11,
-    lineHeight: 16,
-    letterSpacing: 0.4,
-  },
-
-  // Overline — category labels, chip text
   overline: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 11,

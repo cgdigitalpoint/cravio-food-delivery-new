@@ -24,6 +24,7 @@ function RootLayoutNav() {
     <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="welcome" />
+      <Stack.Screen name="design-system" options={{ animation: 'slide_from_right' }} />
     </Stack>
   );
 }

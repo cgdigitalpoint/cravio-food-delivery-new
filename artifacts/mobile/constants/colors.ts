@@ -1,85 +1,99 @@
 // ─── Cravio Design Tokens ─────────────────────────────────────────────────────
-// Brand palette for the Cravio food delivery platform.
+// Brand palette: Primary #FF6B00, Secondary #16A34A
 // Both light and dark themes are defined; useColors() picks the active one.
 
 const colors = {
   light: {
-    // Legacy aliases
-    text: '#1A1A1A',
-    tint: '#FF5722',
+    // ── Aliases ─────────────────────────────────────────────────────────────
+    text: '#111827',
+    tint: '#FF6B00',
 
-    // Core surfaces
-    background: '#FAFAF8',
-    foreground: '#1A1A1A',
-
-    // Cards / elevated surfaces
+    // ── Core surfaces ────────────────────────────────────────────────────────
+    background: '#F8F9FB',
+    foreground: '#111827',
     card: '#FFFFFF',
-    cardForeground: '#1A1A1A',
+    cardForeground: '#111827',
+    surface: '#FFFFFF',
+    surfaceVariant: '#F3F4F6',
 
-    // Primary — Cravio orange
-    primary: '#FF5722',
+    // ── Brand ────────────────────────────────────────────────────────────────
+    primary: '#FF6B00',
     primaryForeground: '#FFFFFF',
+    secondary: '#16A34A',
+    secondaryForeground: '#FFFFFF',
 
-    // Secondary
-    secondary: '#FFF3E0',
-    secondaryForeground: '#E64A19',
+    // ── Muted ────────────────────────────────────────────────────────────────
+    muted: '#F3F4F6',
+    mutedForeground: '#6B7280',
 
-    // Muted / subdued elements
-    muted: '#F5F5F0',
-    mutedForeground: '#9E9E9E',
+    // ── Accent ───────────────────────────────────────────────────────────────
+    accent: '#FFF7ED',
+    accentForeground: '#FF6B00',
 
-    // Accent — amber gold
-    accent: '#FFC107',
-    accentForeground: '#1A1A1A',
-
-    // Destructive
+    // ── Semantic ─────────────────────────────────────────────────────────────
     destructive: '#EF4444',
     destructiveForeground: '#FFFFFF',
+    success: '#22C55E',
+    successForeground: '#FFFFFF',
+    warning: '#F59E0B',
+    warningForeground: '#FFFFFF',
+    error: '#EF4444',
+    errorForeground: '#FFFFFF',
 
-    // Borders and inputs
-    border: '#EBEBEB',
-    input: '#EBEBEB',
+    // ── Borders & inputs ─────────────────────────────────────────────────────
+    border: '#E5E7EB',
+    input: '#E5E7EB',
+
+    // ── Text helpers ─────────────────────────────────────────────────────────
+    textSecondary: '#6B7280',
   },
 
   dark: {
-    // Legacy aliases
-    text: '#FAFAFA',
-    tint: '#FF7043',
+    // ── Aliases ─────────────────────────────────────────────────────────────
+    text: '#F9FAFB',
+    tint: '#FF6B00',
 
-    // Core surfaces
-    background: '#0F0F0F',
-    foreground: '#FAFAFA',
+    // ── Core surfaces ────────────────────────────────────────────────────────
+    background: '#111827',
+    foreground: '#F9FAFB',
+    card: '#1F2937',
+    cardForeground: '#F9FAFB',
+    surface: '#1F2937',
+    surfaceVariant: '#374151',
 
-    // Cards / elevated surfaces
-    card: '#1A1A1A',
-    cardForeground: '#FAFAFA',
-
-    // Primary — lighter orange for dark bg
-    primary: '#FF7043',
+    // ── Brand ────────────────────────────────────────────────────────────────
+    primary: '#FF6B00',
     primaryForeground: '#FFFFFF',
+    secondary: '#16A34A',
+    secondaryForeground: '#FFFFFF',
 
-    // Secondary
-    secondary: '#2A1810',
-    secondaryForeground: '#FFAB91',
+    // ── Muted ────────────────────────────────────────────────────────────────
+    muted: '#374151',
+    mutedForeground: '#9CA3AF',
 
-    // Muted / subdued elements
-    muted: '#2A2A2A',
-    mutedForeground: '#737373',
+    // ── Accent ───────────────────────────────────────────────────────────────
+    accent: '#1C1917',
+    accentForeground: '#FF8C38',
 
-    // Accent — amber gold
-    accent: '#FFC107',
-    accentForeground: '#1A1A1A',
-
-    // Destructive
+    // ── Semantic ─────────────────────────────────────────────────────────────
     destructive: '#EF4444',
     destructiveForeground: '#FFFFFF',
+    success: '#22C55E',
+    successForeground: '#FFFFFF',
+    warning: '#F59E0B',
+    warningForeground: '#FFFFFF',
+    error: '#EF4444',
+    errorForeground: '#FFFFFF',
 
-    // Borders and inputs
-    border: '#2A2A2A',
-    input: '#2A2A2A',
+    // ── Borders & inputs ─────────────────────────────────────────────────────
+    border: '#374151',
+    input: '#374151',
+
+    // ── Text helpers ─────────────────────────────────────────────────────────
+    textSecondary: '#9CA3AF',
   },
 
-  // Border radius in px — applied to cards, buttons, inputs, modals
+  // Default border radius (used by legacy useColors().radius)
   radius: 12,
 };
 
