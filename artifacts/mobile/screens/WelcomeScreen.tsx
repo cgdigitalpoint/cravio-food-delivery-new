@@ -53,8 +53,7 @@ export function WelcomeScreen({ onGetStarted, onLogIn }: WelcomeScreenProps) {
   const card2X = useSharedValue(20);
   const card3Opacity = useSharedValue(0);
   const card3X = useSharedValue(-20);
-  const bottomOpacity = useSharedValue(0);
-  const bottomY = useSharedValue(30);
+  const bottomY = useSharedValue(50);
 
   useEffect(() => {
     heroOpacity.value = withTiming(1, { duration: 700 });
@@ -69,8 +68,7 @@ export function WelcomeScreen({ onGetStarted, onLogIn }: WelcomeScreenProps) {
     card3Opacity.value = withDelay(550, withTiming(1, { duration: 500 }));
     card3X.value = withDelay(550, withSpring(0, { damping: 16, stiffness: 100 }));
 
-    bottomOpacity.value = withDelay(600, withTiming(1, { duration: 500 }));
-    bottomY.value = withDelay(600, withSpring(0, { damping: 18, stiffness: 100 }));
+    bottomY.value = withDelay(150, withSpring(0, { damping: 20, stiffness: 130 }));
   }, []);
 
   const heroStyle = useAnimatedStyle(() => ({
@@ -91,7 +89,6 @@ export function WelcomeScreen({ onGetStarted, onLogIn }: WelcomeScreenProps) {
   }));
   const cardStyles = [c1Style, c2Style, c3Style];
   const bottomStyle = useAnimatedStyle(() => ({
-    opacity: bottomOpacity.value,
     transform: [{ translateY: bottomY.value }],
   }));
 
