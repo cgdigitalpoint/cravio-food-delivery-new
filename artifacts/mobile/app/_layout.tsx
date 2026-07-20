@@ -9,12 +9,19 @@ import {
   Inter_500Medium,
   Inter_600SemiBold,
   Inter_700Bold,
-  useFonts,
 } from '@expo-google-fonts/inter';
+import {
+  Poppins_400Regular,
+  Poppins_500Medium,
+  Poppins_600SemiBold,
+  Poppins_700Bold,
+  Poppins_800ExtraBold,
+  useFonts,
+} from '@expo-google-fonts/poppins';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+// Prevent the native splash screen from auto-hiding before assets load.
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
@@ -22,19 +29,51 @@ const queryClient = new QueryClient();
 function RootLayoutNav() {
   return (
     <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
+      {/* ── Phase 1 / Phase 3 screens ── */}
       <Stack.Screen name="index" />
+      <Stack.Screen name="onboarding" />
       <Stack.Screen name="welcome" />
-      <Stack.Screen name="design-system" options={{ animation: 'slide_from_right' }} />
+
+      {/* ── Auth screens ── */}
+      <Stack.Screen
+        name="auth/login"
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="auth/signup"
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="auth/otp"
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="auth/forgot-password"
+        options={{ animation: 'slide_from_right' }}
+      />
+
+      {/* ── Design system (Phase 2) ── */}
+      <Stack.Screen
+        name="design-system"
+        options={{ animation: 'slide_from_right' }}
+      />
     </Stack>
   );
 }
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
+    // Phase 2 – Inter (Design System components)
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
+    // Phase 3 – Poppins (Premium UI screens)
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_600SemiBold,
+    Poppins_700Bold,
+    Poppins_800ExtraBold,
   });
 
   useEffect(() => {

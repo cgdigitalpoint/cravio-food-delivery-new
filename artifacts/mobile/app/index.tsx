@@ -7,7 +7,7 @@ export default function SplashRoute() {
   const router = useRouter();
 
   const handleComplete = () => {
-    router.replace('/welcome');
+    router.replace('/onboarding');
   };
 
   return <SplashScreen onComplete={handleComplete} />;

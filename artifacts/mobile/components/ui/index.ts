@@ -78,6 +78,10 @@ export type { SnackbarProps, SnackbarType } from './Snackbar';
 export { Toast } from './Toast';
 export type { ToastProps, ToastType } from './Toast';
 
+// ── Phase 3 Premium Components ─────────────────────────────────────────────────
+export { PremiumButton } from './PremiumButton';
+export type { PremiumButtonProps, PremiumButtonVariant } from './PremiumButton';
+
 // ── Typography & Layout helpers ────────────────────────────────────────────────
 export { Typography } from './Typography';
 export type { TypographyProps } from './Typography';

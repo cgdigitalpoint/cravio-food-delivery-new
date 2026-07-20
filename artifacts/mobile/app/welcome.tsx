@@ -6,9 +6,10 @@ import { WelcomeScreen } from '@/screens';
 export default function WelcomeRoute() {
   const router = useRouter();
 
-  const handleStartDevelopment = () => {
-    router.push('/design-system');
-  };
-
-  return <WelcomeScreen onStartDevelopment={handleStartDevelopment} />;
+  return (
+    <WelcomeScreen
+      onGetStarted={() => router.push('/auth/signup')}
+      onLogIn={() => router.push('/auth/login')}
+    />
+  );
 }
