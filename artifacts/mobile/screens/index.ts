@@ -1,4 +1,5 @@
 // ─── Screens Barrel ───────────────────────────────────────────────────────────
+export { HomeScreen } from './HomeScreen';
 export { SplashScreen } from './SplashScreen';
 export { OnboardingScreen } from './OnboardingScreen';
 export { WelcomeScreen } from './WelcomeScreen';

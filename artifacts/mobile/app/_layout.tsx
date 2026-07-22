@@ -52,6 +52,12 @@ function RootLayoutNav() {
         options={{ animation: 'slide_from_right' }}
       />
 
+      {/* ── Phase 4: Home screen ── */}
+      <Stack.Screen
+        name="home"
+        options={{ animation: 'slide_from_right' }}
+      />
+
       {/* ── Design system (Phase 2) ── */}
       <Stack.Screen
         name="design-system"
