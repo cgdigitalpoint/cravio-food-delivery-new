@@ -1,36 +1,38 @@
-# [Project name]
+# Cravio
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A food delivery mobile app (Expo / React Native) with a full pre-auth flow, premium UI, and a design system — ready for Phase 4 (Home Screen & Restaurant Discovery).
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- **Mobile app:** workflow `Cravio Mobile` — `PORT=18115 pnpm --filter @workspace/mobile run dev`
 - `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
 
 ## Stack
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- pnpm workspaces, Node.js, TypeScript
+- Mobile: Expo ~54 + Expo Router (file-based routing), React Native
+- UI: Reanimated, Linear Gradient, Blur, Lucide icons, Poppins + Inter fonts
+- State: Zustand
+- pnpm monorepo with `artifacts/mobile` as the main artifact
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/mobile/app/` — Expo Router file-based routes
+- `artifacts/mobile/screens/` — screen components (SplashScreen, OnboardingScreen, WelcomeScreen, auth/*)
+- `artifacts/mobile/components/` — 35+ reusable UI components (Phase 2 design system)
+- `artifacts/mobile/app/(tabs)/` — orphaned tab scaffold, will be activated in Phase 4
+- `PROJECT_STATUS.md` — detailed phase tracker, known issues, and next steps
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- File-based routing via Expo Router; screens live in `screens/` and are rendered by thin route files in `app/`
+- Design tokens and brand colors defined in `constants/`; all Phase 2+ components use them
+- Supabase client stubbed in `services/supabase.ts` — install and wire in Phase 6
+- NativeWind config present but not activated — activate if Tailwind utility classes are needed
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+Pre-auth flow fully built: Splash → Onboarding (3 slides) → Welcome → Login / Sign Up / OTP / Forgot Password. Phase 4 next: tab navigator, Home screen with restaurant discovery using dummy data.
 
 ## User preferences
 
@@ -38,8 +40,11 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- `$PORT` is not injected automatically in a manually-configured workflow; the dev command must set `PORT=18115` explicitly
+- `app/(tabs)/` scaffold is unregistered until Phase 4 wires it into `app/_layout.tsx`
+- `shadow*` props and `props.pointerEvents` show deprecation warnings on web — non-blocking, native works fine
 
 ## Pointers
 
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- See `PROJECT_STATUS.md` for completed phases, verified screens, pending phases, and known issues
+- See the `pnpm-workspace` skill for workspace structure and TypeScript setup
