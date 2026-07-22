@@ -13,6 +13,8 @@ export interface RestaurantCardProps {
   rating: number;
   deliveryTime: number;
   deliveryFee?: number;
+  distance?: string;
+  isVeg?: boolean;
   imageUri?: string;
   isNew?: boolean;
   offerText?: string;
@@ -27,6 +29,8 @@ export function RestaurantCard({
   rating,
   deliveryTime,
   deliveryFee = 0,
+  distance,
+  isVeg,
   imageUri,
   isNew,
   offerText,
@@ -94,12 +98,31 @@ export function RestaurantCard({
 
       {/* Info area */}
       <View style={styles.info}>
-        <Text
-          style={[typography.title, { color: colors.foreground }]}
-          numberOfLines={1}
-        >
-          {name}
-        </Text>
+        {/* Name row with veg/non-veg indicator */}
+        <View style={styles.nameRow}>
+          {isVeg !== undefined && (
+            <View
+              style={[
+                styles.vegIndicator,
+                { borderColor: isVeg ? '#22C55E' : '#EF4444' },
+              ]}
+            >
+              <View
+                style={[
+                  styles.vegDot,
+                  { backgroundColor: isVeg ? '#22C55E' : '#EF4444' },
+                ]}
+              />
+            </View>
+          )}
+          <Text
+            style={[typography.title, { color: colors.foreground, flex: 1 }]}
+            numberOfLines={1}
+          >
+            {name}
+          </Text>
+        </View>
+
         <Text
           style={[typography.caption, { color: colors.mutedForeground, marginTop: 2 }]}
           numberOfLines={1}
@@ -124,10 +147,20 @@ export function RestaurantCard({
             {deliveryTime} min
           </Text>
 
+          {distance != null && (
+            <>
+              <View style={[styles.dot, { backgroundColor: colors.border }]} />
+              <Ionicons name="location-outline" size={13} color={colors.mutedForeground} />
+              <Text style={[typography.caption, { color: colors.mutedForeground, marginLeft: 2 }]}>
+                {distance}
+              </Text>
+            </>
+          )}
+
           <View style={[styles.dot, { backgroundColor: colors.border }]} />
 
           <Text style={[typography.caption, { color: colors.mutedForeground }]}>
-            {deliveryFee === 0 ? 'Free delivery' : `$${deliveryFee.toFixed(2)} delivery`}
+            {deliveryFee === 0 ? 'Free delivery' : `$${deliveryFee.toFixed(2)} del`}
           </Text>
         </View>
       </View>
@@ -182,11 +215,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   info: { padding: spacing.md, gap: 4 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  vegIndicator: {
+    width: 14,
+    height: 14,
+    borderRadius: 2,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  vegDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
   meta: {
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
-    gap: 6,
+    gap: 5,
     marginTop: spacing.sm,
   },
   ratingPill: {

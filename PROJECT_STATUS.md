@@ -1,6 +1,6 @@
 # Cravio — Project Status
 
-> Last updated: 2026-07-20
+> Last updated: 2026-07-22
 > App: Food Delivery Mobile App (Expo / React Native / TypeScript)
 > Artifact: `artifacts/mobile` · Workflow: `artifacts/mobile: expo` (RUNNING)
 
@@ -235,13 +235,31 @@ artifacts/mobile/
 
 ---
 
-## ⏳ Pending Phases
+## ✅ Phase 4 — Premium Home Screen (Complete ✅)
 
-### Phase 4 — Home Screen & Restaurant Discovery
-- Activate `app/(tabs)/` tab navigator
-- Home tab: SearchBar · CategoryChip scroll · OfferCard banners · RestaurantCard list
-- Restaurant detail screen
-- All using dummy data arrays
+Built the full Home Screen at `screens/HomeScreen.tsx` · route `app/home.tsx`.
+
+| Feature | Detail |
+|---|---|
+| Header | Location selector · delivery address · notification badge (3) · avatar |
+| Search | Rounded pill search bar · search icon · voice hint row with Mic |
+| Categories | Horizontal scroll · 9 chips: All, Pizza, Burger, Biryani, Chinese, South Indian, North Indian, Cafe, Desserts |
+| Offer Banners | Auto-sliding carousel (3.2 s) · 4 banners: 50% OFF · Free Delivery · Buy 1 Get 1 · Weekend Special · dot indicator |
+| Restaurant Sections | Featured · Popular Near You (category-filterable) · Fast Delivery · Top Rated · Recommended — each scrolls horizontally |
+| Restaurant Card | Image · name · veg/non-veg indicator · rating pill · delivery time · distance · delivery fee · offer badge · NEW badge · heart favourite |
+| Food Cards | Image · veg indicator · name · restaurant name · description · rating · price · Add button |
+| Floating Cart | Orange gradient pill · item count · price · spring animation — visible only when cart > 0 |
+| Bottom Nav | 4 tabs: Home · Search · Orders · Profile · Orders badge |
+| Skeleton Loaders | Premium animated skeletons during 1.5 s simulated load |
+| Light / Dark | Full theme support via `useColors()` |
+| NativeWind | Installed and activated (v4) · tailwind.config.js · metro.config.js · global.css |
+| Dummy Data | `data/homeData.ts` — 10 restaurants · 6 food items · 9 categories · 4 banners |
+
+**Navigation:** Post-auth screens redirect to `/home` (placeholder — final wiring in Phase 6).
+
+---
+
+## ⏳ Pending Phases
 
 ### Phase 5 — Cart & Checkout
 - Cart screen with QuantitySelector per item

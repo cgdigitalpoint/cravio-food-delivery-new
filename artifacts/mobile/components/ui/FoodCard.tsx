@@ -12,6 +12,8 @@ export interface FoodCardProps {
   name: string;
   description?: string;
   price: number;
+  rating?: number;
+  restaurantName?: string;
   imageUri?: string;
   isVeg?: boolean;
   isPopular?: boolean;
@@ -24,6 +26,8 @@ export function FoodCard({
   name,
   description,
   price,
+  rating,
+  restaurantName,
   imageUri,
   isVeg = true,
   isPopular,
@@ -48,7 +52,7 @@ export function FoodCard({
     >
       {/* Left content */}
       <View style={styles.content}>
-        {/* Veg / Non-veg indicator */}
+        {/* Veg / Non-veg + badges */}
         <View style={styles.chips}>
           <Chip variant={isVeg ? 'veg' : 'nonVeg'} />
           {isPopular === true && <Chip variant="popular" />}
@@ -61,6 +65,19 @@ export function FoodCard({
         >
           {name}
         </Text>
+
+        {/* Restaurant name */}
+        {restaurantName != null && (
+          <View style={styles.restaurantRow}>
+            <Ionicons name="storefront-outline" size={11} color={colors.mutedForeground} />
+            <Text
+              style={[typography.caption, { color: colors.mutedForeground, marginLeft: 3 }]}
+              numberOfLines={1}
+            >
+              {restaurantName}
+            </Text>
+          </View>
+        )}
 
         {description != null && (
           <Text
@@ -75,14 +92,30 @@ export function FoodCard({
         )}
 
         <View style={styles.priceRow}>
-          <Text
-            style={[
-              typography.title,
-              { color: colors.foreground, fontFamily: 'Inter_700Bold' },
-            ]}
-          >
-            ${price.toFixed(2)}
-          </Text>
+          <View style={styles.priceBlock}>
+            <Text
+              style={[
+                typography.title,
+                { color: colors.foreground, fontFamily: 'Inter_700Bold' },
+              ]}
+            >
+              ${price.toFixed(2)}
+            </Text>
+            {/* Rating */}
+            {rating != null && (
+              <View style={[styles.ratingPill, { backgroundColor: '#22C55E' }]}>
+                <Ionicons name="star" size={9} color="#FFFFFF" />
+                <Text
+                  style={[
+                    typography.caption,
+                    { color: '#FFFFFF', fontFamily: 'Inter_600SemiBold', marginLeft: 2, fontSize: 10 },
+                  ]}
+                >
+                  {rating.toFixed(1)}
+                </Text>
+              </View>
+            )}
+          </View>
 
           <TouchableOpacity
             onPress={onAddPress}
@@ -135,13 +168,30 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  content: { flex: 1, gap: 4 },
+  content: { flex: 1, gap: 3 },
   chips: { flexDirection: 'row', gap: 6 },
+  restaurantRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
+  },
   priceRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: spacing.sm,
+  },
+  priceBlock: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  ratingPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: 8,
   },
   addBtn: {
     width: 32,

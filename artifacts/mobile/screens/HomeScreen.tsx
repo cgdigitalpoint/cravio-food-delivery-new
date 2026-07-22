@@ -75,10 +75,6 @@ const NAV_ITEMS: BottomNavItem[] = [
     badge: 1,
   },
   {
-    label: 'Offers',
-    icon: (active, c) => <Ionicons name={active ? 'pricetag' : 'pricetag-outline'} size={22} color={c} />,
-  },
-  {
     label: 'Profile',
     icon: (active, c) => <Ionicons name={active ? 'person' : 'person-outline'} size={22} color={c} />,
   },
@@ -382,6 +378,8 @@ function HorizontalRestaurantScroll({
             rating={r.rating}
             deliveryTime={r.deliveryTime}
             deliveryFee={r.deliveryFee}
+            distance={r.distance}
+            isVeg={r.isVeg}
             imageUri={r.imageUri}
             offerText={r.offerText}
             isNew={r.isNew}
@@ -411,6 +409,8 @@ function FoodRecommendationScroll({ data }: { data: FoodItem[] }) {
             name={item.name}
             description={item.description}
             price={item.price}
+            rating={item.rating}
+            restaurantName={item.restaurantName}
             imageUri={item.imageUri}
             isVeg={item.isVeg}
             isPopular={item.isPopular}
@@ -444,6 +444,8 @@ function VerticalRestaurantList({
           rating={r.rating}
           deliveryTime={r.deliveryTime}
           deliveryFee={r.deliveryFee}
+          distance={r.distance}
+          isVeg={r.isVeg}
           imageUri={r.imageUri}
           offerText={r.offerText}
           isNew={r.isNew}
@@ -782,8 +784,6 @@ export function HomeScreen() {
       case 2:
         return <PlaceholderTab iconName="receipt-outline" title="Orders" />;
       case 3:
-        return <PlaceholderTab iconName="pricetag-outline" title="Offers" />;
-      case 4:
         return <PlaceholderTab iconName="person-outline" title="Profile" />;
       default:
         return null;

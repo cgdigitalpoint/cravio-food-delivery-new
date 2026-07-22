@@ -10,15 +10,15 @@ export interface Category {
 }
 
 export const CATEGORIES: Category[] = [
-  { id: 'all',        name: 'All',         emoji: '🍽️', color: '#FF6B00' },
-  { id: 'pizza',      name: 'Pizza',       emoji: '🍕', color: '#EF4444' },
-  { id: 'burger',     name: 'Burger',      emoji: '🍔', color: '#F59E0B' },
-  { id: 'biryani',    name: 'Biryani',     emoji: '🍛', color: '#8B5CF6' },
-  { id: 'chinese',    name: 'Chinese',     emoji: '🍜', color: '#EC4899' },
-  { id: 'south',      name: 'South Indian',emoji: '🥘', color: '#10B981' },
-  { id: 'desserts',   name: 'Desserts',    emoji: '🧁', color: '#F97316' },
-  { id: 'drinks',     name: 'Drinks',      emoji: '☕', color: '#6366F1' },
-  { id: 'healthy',    name: 'Healthy',     emoji: '🥗', color: '#22C55E' },
+  { id: 'all',        name: 'All',          emoji: '🍽️', color: '#FF6B00' },
+  { id: 'pizza',      name: 'Pizza',        emoji: '🍕', color: '#EF4444' },
+  { id: 'burger',     name: 'Burger',       emoji: '🍔', color: '#F59E0B' },
+  { id: 'biryani',    name: 'Biryani',      emoji: '🍛', color: '#8B5CF6' },
+  { id: 'chinese',    name: 'Chinese',      emoji: '🍜', color: '#EC4899' },
+  { id: 'south',      name: 'South Indian', emoji: '🥘', color: '#10B981' },
+  { id: 'north',      name: 'North Indian', emoji: '🫕', color: '#F97316' },
+  { id: 'cafe',       name: 'Cafe',         emoji: '☕', color: '#6366F1' },
+  { id: 'desserts',   name: 'Desserts',     emoji: '🧁', color: '#EC4899' },
 ];
 
 // ─── Offer Banners ────────────────────────────────────────────────────────────
@@ -60,6 +60,15 @@ export const BANNERS: OfferBanner[] = [
     emoji: '🎁',
     gradient: ['#3730A3', '#4338CA', '#6366F1'],
   },
+  {
+    id: 'b4',
+    title: 'Weekend Special',
+    subtitle: 'Extra 20% off Sat & Sun',
+    cta: 'Grab Deal',
+    code: 'WKND20',
+    emoji: '🎊',
+    gradient: ['#BE185D', '#DB2777', '#F472B6'],
+  },
 ];
 
 // ─── Restaurants ──────────────────────────────────────────────────────────────
@@ -75,6 +84,7 @@ export interface Restaurant {
   isNew?: boolean;
   isFavorite?: boolean;
   isOpen: boolean;
+  isVeg?: boolean;
   distance: string;
   category: string;
 }
@@ -90,6 +100,7 @@ export const RESTAURANTS: Restaurant[] = [
     imageUri: 'https://picsum.photos/seed/burger-republic/400/220',
     offerText: '20% OFF',
     isOpen: true,
+    isVeg: false,
     distance: '1.2 km',
     category: 'burger',
   },
@@ -103,6 +114,7 @@ export const RESTAURANTS: Restaurant[] = [
     imageUri: 'https://picsum.photos/seed/pizza-palace/400/220',
     offerText: 'BOGO',
     isOpen: true,
+    isVeg: true,
     distance: '2.0 km',
     category: 'pizza',
   },
@@ -115,6 +127,7 @@ export const RESTAURANTS: Restaurant[] = [
     deliveryFee: 2,
     imageUri: 'https://picsum.photos/seed/sushi-garden/400/220',
     isOpen: true,
+    isVeg: false,
     distance: '3.1 km',
     category: 'chinese',
   },
@@ -128,6 +141,7 @@ export const RESTAURANTS: Restaurant[] = [
     imageUri: 'https://picsum.photos/seed/spice-route/400/220',
     offerText: '30% OFF',
     isOpen: true,
+    isVeg: false,
     distance: '0.8 km',
     category: 'biryani',
   },
@@ -141,6 +155,7 @@ export const RESTAURANTS: Restaurant[] = [
     imageUri: 'https://picsum.photos/seed/noodle-house/400/220',
     isNew: true,
     isOpen: true,
+    isVeg: false,
     distance: '1.5 km',
     category: 'chinese',
   },
@@ -154,8 +169,9 @@ export const RESTAURANTS: Restaurant[] = [
     imageUri: 'https://picsum.photos/seed/green-bowl/400/220',
     isNew: true,
     isOpen: true,
+    isVeg: true,
     distance: '1.8 km',
-    category: 'healthy',
+    category: 'north',
   },
   {
     id: 'r7',
@@ -166,6 +182,7 @@ export const RESTAURANTS: Restaurant[] = [
     deliveryFee: 0,
     imageUri: 'https://picsum.photos/seed/sweet-spot/400/220',
     isOpen: true,
+    isVeg: true,
     distance: '0.5 km',
     category: 'desserts',
   },
@@ -178,8 +195,37 @@ export const RESTAURANTS: Restaurant[] = [
     deliveryFee: 0,
     imageUri: 'https://picsum.photos/seed/brew-bites/400/220',
     isOpen: false,
+    isVeg: true,
     distance: '2.3 km',
-    category: 'drinks',
+    category: 'cafe',
+  },
+  {
+    id: 'r9',
+    name: 'Tandoor Tales',
+    cuisine: 'North Indian · Tandoor · Curry',
+    rating: 4.6,
+    deliveryTime: 30,
+    deliveryFee: 0,
+    imageUri: 'https://picsum.photos/seed/tandoor-tales/400/220',
+    offerText: '15% OFF',
+    isOpen: true,
+    isVeg: false,
+    distance: '2.5 km',
+    category: 'north',
+  },
+  {
+    id: 'r10',
+    name: 'The Corner Cafe',
+    cuisine: 'Cafe · Sandwiches · Coffee',
+    rating: 4.5,
+    deliveryTime: 18,
+    deliveryFee: 0,
+    imageUri: 'https://picsum.photos/seed/corner-cafe/400/220',
+    isNew: true,
+    isOpen: true,
+    isVeg: true,
+    distance: '1.0 km',
+    category: 'cafe',
   },
 ];
 
@@ -189,6 +235,7 @@ export interface FoodItem {
   name: string;
   description: string;
   price: number;
+  rating: number;
   imageUri?: string;
   isVeg: boolean;
   isPopular?: boolean;
@@ -202,6 +249,7 @@ export const FOOD_ITEMS: FoodItem[] = [
     name: 'Margherita Pizza',
     description: 'Classic tomato, mozzarella & fresh basil',
     price: 12.99,
+    rating: 4.8,
     imageUri: 'https://picsum.photos/seed/margherita/200/200',
     isVeg: true,
     isPopular: true,
@@ -212,6 +260,7 @@ export const FOOD_ITEMS: FoodItem[] = [
     name: 'Classic Cheeseburger',
     description: 'Beef patty, cheddar, lettuce & secret sauce',
     price: 10.99,
+    rating: 4.7,
     imageUri: 'https://picsum.photos/seed/cheeseburger/200/200',
     isVeg: false,
     isPopular: true,
@@ -222,6 +271,7 @@ export const FOOD_ITEMS: FoodItem[] = [
     name: 'Chicken Biryani',
     description: 'Aromatic basmati rice with spiced chicken',
     price: 14.99,
+    rating: 4.9,
     imageUri: 'https://picsum.photos/seed/biryani/200/200',
     isVeg: false,
     isPopular: true,
@@ -232,6 +282,7 @@ export const FOOD_ITEMS: FoodItem[] = [
     name: 'Veg Fried Rice',
     description: 'Wok-tossed rice with seasonal vegetables',
     price: 9.99,
+    rating: 4.4,
     imageUri: 'https://picsum.photos/seed/friedrice/200/200',
     isVeg: true,
     restaurantName: 'Noodle House',
@@ -241,6 +292,7 @@ export const FOOD_ITEMS: FoodItem[] = [
     name: 'Chocolate Lava Cake',
     description: 'Warm chocolate cake with molten centre',
     price: 6.99,
+    rating: 4.6,
     imageUri: 'https://picsum.photos/seed/lavacake/200/200',
     isVeg: true,
     isPopular: true,
@@ -251,6 +303,7 @@ export const FOOD_ITEMS: FoodItem[] = [
     name: 'Green Power Bowl',
     description: 'Quinoa, avocado, greens & tahini dressing',
     price: 11.99,
+    rating: 4.5,
     imageUri: 'https://picsum.photos/seed/greenbowl/200/200',
     isVeg: true,
     isNew: true,
@@ -271,4 +324,4 @@ export const TOP_RATED_RESTAURANTS = RESTAURANTS.filter(
   r => r.rating >= 4.5 && r.isOpen,
 );
 
-export const POPULAR_RESTAURANTS = RESTAURANTS.filter(r => r.isOpen).slice(0, 4);
+export const POPULAR_RESTAURANTS = RESTAURANTS.filter(r => r.isOpen).slice(0, 5);

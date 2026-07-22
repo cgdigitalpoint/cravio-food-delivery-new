@@ -1,38 +1,28 @@
 /** @type {import('tailwindcss').Config} */
-// NativeWind v4 configuration for Cravio
-// To activate NativeWind:
-//   pnpm --filter @workspace/mobile add nativewind@^4 tailwindcss
-//   Then uncomment `require('nativewind/preset')` below and update metro.config.js.
-
 module.exports = {
   content: [
     './app/**/*.{js,jsx,ts,tsx}',
     './screens/**/*.{js,jsx,ts,tsx}',
     './components/**/*.{js,jsx,ts,tsx}',
   ],
-  // presets: [require('nativewind/preset')],   // uncomment after install
+  presets: [require('nativewind/preset')],
   theme: {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#FF5722',
+          DEFAULT: '#FF6B00',
           foreground: '#FFFFFF',
-          light: '#FF7043',
-          dark: '#E64A19',
+          light: '#FF8530',
+          dark: '#E55A00',
         },
-        accent: {
-          DEFAULT: '#FFC107',
-          foreground: '#1A1A1A',
-        },
-        surface: {
-          DEFAULT: '#1A1A1A',
-          muted: '#2A2A2A',
+        secondary: {
+          DEFAULT: '#16A34A',
+          foreground: '#FFFFFF',
         },
         cravio: {
-          orange: '#FF5722',
-          amber: '#FFC107',
-          dark: '#0F0F0F',
-          card: '#1A1A1A',
+          orange: '#FF6B00',
+          dark: '#111827',
+          card: '#1F2937',
         },
       },
       fontFamily: {
@@ -40,6 +30,10 @@ module.exports = {
         medium: ['Inter_500Medium'],
         semibold: ['Inter_600SemiBold'],
         bold: ['Inter_700Bold'],
+        'poppins-regular': ['Poppins_400Regular'],
+        'poppins-medium': ['Poppins_500Medium'],
+        'poppins-semibold': ['Poppins_600SemiBold'],
+        'poppins-bold': ['Poppins_700Bold'],
       },
       borderRadius: {
         cravio: '12px',

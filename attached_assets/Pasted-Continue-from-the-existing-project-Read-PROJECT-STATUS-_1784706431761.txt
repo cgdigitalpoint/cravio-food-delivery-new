@@ -1,0 +1,141 @@
+Continue from the existing project.
+
+Read PROJECT_STATUS.md before making any changes.
+
+Do NOT restart the project.
+Do NOT modify any completed authentication screens.
+
+Build ONLY the Premium Customer Home Screen.
+
+Requirements:
+
+## Header
+- Current location selector
+- Delivery address
+- Notification icon with badge
+- User profile avatar
+- Premium modern layout
+
+## Search
+- Rounded premium search bar
+- Search icon
+- Voice search button
+- Placeholder:
+  "Search restaurants, food & dishes"
+
+## Categories
+Horizontal scrolling categories with icons.
+
+Include:
+- Pizza
+- Burger
+- Biryani
+- Chinese
+- South Indian
+- North Indian
+- Cafe
+- Desserts
+
+Use premium circular cards.
+
+## Offer Banner
+Auto sliding promotional banners.
+
+Include:
+- 50% OFF
+- Free Delivery
+- Buy 1 Get 1
+- Weekend Specials
+
+Add smooth animation.
+
+## Restaurant Sections
+
+Create these sections:
+
+- Featured Restaurants
+- Popular Near You
+- Fast Delivery
+- Top Rated
+- Recommended
+
+Each section should scroll horizontally.
+
+## Restaurant Card
+
+Each card must include:
+
+- Restaurant image
+- Restaurant name
+- Rating
+- Delivery time
+- Distance
+- Delivery fee
+- Veg / Non Veg indicator
+- Discount badge
+- Favourite (heart) button
+- Shadow
+- Rounded corners
+
+## Recommended Food
+
+Create premium food cards with:
+
+- Food Image
+- Name
+- Restaurant
+- Rating
+- Price
+- Add button
+
+## Floating Cart Button
+
+Bottom right floating cart.
+
+Show:
+- Cart icon
+- Item count badge
+
+## Bottom Navigation
+
+Include:
+
+- Home
+- Search
+- Orders
+- Profile
+
+Highlight Home.
+
+## Loading State
+
+Create premium Skeleton Loaders.
+
+## Theme
+
+Support:
+
+- Light Mode
+- Dark Mode
+
+## Dummy Data
+
+Use local dummy data only.
+
+Do NOT connect APIs.
+
+Do NOT use Supabase yet.
+
+## Code Quality
+
+Use reusable components.
+
+Use TypeScript.
+
+Use NativeWind.
+
+Use clean folder structure.
+
+Update PROJECT_STATUS.md after completion.
+
+Stop after Phase 4 is complete.
