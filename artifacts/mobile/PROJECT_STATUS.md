@@ -78,20 +78,23 @@ Complete schema with RLS policies ready to apply:
 
 ---
 
-## ⚠️ Required Manual Step — Apply Database Schema
+## ✅ Backend Verified (2026-07-23)
 
-**The Supabase tables do not exist yet.** All 8 tables return 404 from the REST API.
+Full end-to-end authenticated verification passed. All 9 checks green.
 
-You must run `services/schema.sql` in the Supabase SQL Editor **before** auth/orders/favorites/addresses will work at runtime.
+| Check | Result |
+|-------|--------|
+| Supabase connection — all 8 tables | ✅ 200 |
+| Signup (email confirmation disabled for dev) | ✅ user created + access_token |
+| Login (password grant) | ✅ token + user_id match |
+| Session persistence (refresh token exchange) | ✅ new token, stable user_id |
+| Profile upsert + read-back + update | ✅ |
+| Addresses — insert 2, read, default flag | ✅ |
+| Favorites — insert, delete, duplicate blocked (409) | ✅ |
+| Orders + order_items — create, join select, items verified | ✅ |
+| RLS — anon sees 0 rows; user2 cannot read user1's data | ✅ |
 
-### How to apply
-
-1. Go to [https://supabase.com/dashboard/project/tksdioppxwtqsogavmks](https://supabase.com/dashboard/project/tksdioppxwtqsogavmks)
-2. Navigate to **SQL Editor → New Query**
-3. Paste the entire contents of `artifacts/mobile/services/schema.sql`
-4. Click **Run**
-
-The file is complete and idempotent (`CREATE TABLE IF NOT EXISTS`, `CREATE POLICY IF NOT EXISTS`-equivalent). Safe to run on a fresh project.
+**Note:** `orderService.updateStatus()` is intentionally blocked for client users (no UPDATE RLS on orders). Order status is managed server-side only. This is correct by design.
 
 ---
 
