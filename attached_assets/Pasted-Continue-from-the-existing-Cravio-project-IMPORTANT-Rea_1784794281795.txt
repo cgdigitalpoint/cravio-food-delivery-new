@@ -1,0 +1,300 @@
+Continue from the existing Cravio project.
+
+IMPORTANT:
+
+Read PROJECT_STATUS.md first.
+
+Do NOT regenerate the project.
+Do NOT modify completed Phases 1–5.
+Do NOT redesign the UI.
+Continue only from the latest checkpoint.
+
+========================================
+PHASE 6
+Backend + Authentication
+========================================
+
+Use Supabase as the backend.
+
+Tech Stack
+
+- Supabase
+- Expo Router
+- TypeScript
+- NativeWind
+- Zustand
+- Reusable Components
+
+========================================
+AUTHENTICATION
+========================================
+
+Implement:
+
+- Sign Up
+- Login
+- Logout
+- Forgot Password
+- Reset Password
+- Session Persistence
+- Auto Login
+- Secure Auth State
+
+Use Supabase Auth.
+
+For now:
+
+OTP and Email Verification can remain disabled in development.
+
+Authentication should be production-ready.
+
+========================================
+DATABASE
+========================================
+
+Create database structure for:
+
+Users
+
+id
+name
+email
+phone
+profile_image
+created_at
+
+Addresses
+
+id
+user_id
+title
+house
+street
+city
+state
+pincode
+latitude
+longitude
+
+Restaurants
+
+id
+name
+rating
+delivery_time
+delivery_fee
+image
+is_open
+
+Foods
+
+id
+restaurant_id
+name
+price
+description
+image
+veg
+rating
+
+Orders
+
+id
+user_id
+restaurant_id
+status
+total
+payment_method
+created_at
+
+Order Items
+
+id
+order_id
+food_id
+quantity
+price
+
+Favorites
+
+id
+user_id
+restaurant_id
+
+Cart
+
+user_id
+food_id
+quantity
+
+========================================
+USER PROFILE
+========================================
+
+Create Profile Screen.
+
+Features:
+
+Profile Photo
+
+Name
+
+Phone
+
+Email
+
+Saved Addresses
+
+My Orders
+
+Favorites
+
+Payment Methods (placeholder)
+
+Settings
+
+Logout
+
+========================================
+MY ORDERS
+========================================
+
+Create:
+
+Active Orders
+
+Completed Orders
+
+Cancelled Orders
+
+Order Details
+
+Track Order placeholder
+
+========================================
+FAVORITES
+========================================
+
+Users can:
+
+Add Restaurant
+
+Remove Restaurant
+
+Favorite icon animation
+
+Realtime update
+
+========================================
+ADDRESS MANAGEMENT
+========================================
+
+Users can:
+
+Add Address
+
+Edit Address
+
+Delete Address
+
+Set Default Address
+
+========================================
+STATE MANAGEMENT
+========================================
+
+Create:
+
+Auth Store
+
+User Store
+
+Order Store
+
+Favorite Store
+
+Address Store
+
+Use Zustand.
+
+========================================
+SUPABASE STRUCTURE
+========================================
+
+Create:
+
+supabase.ts
+
+Auth Service
+
+User Service
+
+Restaurant Service
+
+Order Service
+
+Favorite Service
+
+Address Service
+
+Use reusable architecture.
+
+========================================
+ERROR HANDLING
+========================================
+
+Create:
+
+Loading States
+
+Empty States
+
+Offline Handling
+
+Retry Button
+
+Toast Messages
+
+========================================
+SECURITY
+========================================
+
+Environment Variables
+
+Secure Keys
+
+Do not hardcode secrets.
+
+========================================
+FINAL TASK
+========================================
+
+Run:
+
+TypeScript Check
+
+Fix all errors.
+
+Verify:
+
+Authentication
+
+Profile
+
+Orders
+
+Favorites
+
+Address Management
+
+Session Persistence
+
+Update PROJECT_STATUS.md
+
+Mark:
+
+✅ Phase 6 Complete
+
+STOP.
+
+Do NOT start Phase 7.
