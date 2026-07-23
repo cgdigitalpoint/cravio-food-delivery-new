@@ -30,7 +30,7 @@ SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
 
 // Protected route segments — redirect to /welcome if unauthenticated
-const PROTECTED = new Set(['home', 'profile', 'orders', 'favorites', 'address', 'restaurant', 'cart', 'checkout']);
+const PROTECTED = new Set(['home', 'search', 'profile', 'orders', 'favorites', 'address', 'restaurant', 'cart', 'checkout']);
 // Auth-only segments — redirect to /home if already authenticated
 const AUTH_ONLY = new Set(['auth']);
 
@@ -85,6 +85,9 @@ function RootLayoutNav() {
 
         {/* ── Phase 4: Home ── */}
         <Stack.Screen name="home" options={{ animation: 'slide_from_right' }} />
+
+        {/* ── Phase 7: Search & Discovery ── */}
+        <Stack.Screen name="search" options={{ animation: 'fade' }} />
 
         {/* ── Phase 5: Restaurant · Cart · Checkout ── */}
         <Stack.Screen name="restaurant/[id]" options={{ animation: 'slide_from_right' }} />

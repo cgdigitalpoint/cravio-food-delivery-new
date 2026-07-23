@@ -2,7 +2,7 @@
 
 > Last updated: 2026-07-23
 > App: Food Delivery Mobile App (Expo / React Native / TypeScript)
-> Artifact: `artifacts/mobile` · Workflow: `Cravio Mobile` (RUNNING)
+> Artifact: `artifacts/mobile` · Workflow: `artifacts/mobile: expo` (RUNNING)
 
 ---
 
@@ -11,17 +11,74 @@
 | Phase | Feature | Status |
 |-------|---------|--------|
 | 1 | Splash Screen | ✅ Complete |
-| 2 | Onboarding + Design System (35+ components) | ✅ Complete |
+| 2 | Onboarding + Design System (36+ components) | ✅ Complete |
 | 3 | Auth Screens (Login, Signup, OTP, Forgot Password) | ✅ Complete |
 | 4 | Home Screen (discovery, banners, categories, floating cart, bottom nav) | ✅ Complete |
 | 5 | Restaurant Details + Cart + Checkout | ✅ Complete |
-| 6 | Profile, Orders, Favorites, Addresses — screens, routes, services, stores | ✅ Complete (pending schema) |
+| 6 | Profile, Orders, Favorites, Addresses — screens, routes, services, stores | ✅ Complete |
+| 7 | Search & Discovery — global search, suggestions, recent, trending, results | ✅ Complete |
+
+---
+
+## ✅ Phase 7 — Search & Discovery (Complete)
+
+Built a full premium Search & Discovery screen at `screens/SearchScreen.tsx` · route `app/search.tsx`.
+
+### Features Delivered
+
+| Feature | Detail |
+|---------|--------|
+| Global search input | Auto-focused TextInput in header · debounced 300 ms · clear button |
+| Instant suggestions | Local suggestions appear while typing (restaurants, food, categories) |
+| Recent searches | Stored in AsyncStorage (`@cravio/recent-searches`) · swipe to remove · clear all |
+| Trending searches | 8 trending chips (Biryani, Pizza, Burger, Sushi, Coffee, Desserts, Healthy, Noodles) |
+| Popular Restaurants | Horizontal scroll of compact restaurant cards with image/rating/delivery time |
+| Popular Dishes | Vertical list of `FoodCard` components (isPopular items) |
+| Search results | Async via `searchService` → Supabase first, falls back to local mock data |
+| Result tabs | All · Restaurants · Food · Categories — with result count badges |
+| Category results | Coloured chip grid from matching CATEGORIES |
+| Empty state | `EmptyState` with `noSearchResult` variant + contextual message |
+| Loading skeleton | `RestaurantCardSkeleton` + `FoodCardSkeleton` during search |
+| Error state | `EmptyState` noInternet variant + Retry button |
+| Dark / Light theme | Full `useColors()` support throughout all sub-components |
+| TypeScript | Zero errors — `tsc --noEmit` clean |
+
+### New Files
+
+| File | Purpose |
+|------|---------|
+| `screens/SearchScreen.tsx` | Full search UI — all sub-components co-located |
+| `app/search.tsx` | Thin Expo Router route |
+| `services/searchService.ts` | Supabase-first search with local fallback + instant suggestions |
+
+### Changed Files
+
+| File | Change |
+|------|--------|
+| `app/_layout.tsx` | Added `search` to PROTECTED set + registered `Stack.Screen name="search"` |
+| `navigation/routes.ts` | Added `ROUTES.SEARCH = '/search'` |
+| `screens/HomeScreen.tsx` | Bottom nav index 1 (Search) now navigates to `/search` |
+
+### Navigation
+
+```
+/home (bottom nav tab 1 → Search)
+  └─→ /search
+        ├─ Idle:   Recent + Trending + Popular Restaurants + Popular Dishes
+        ├─ Active: Instant suggestions overlay
+        └─ Results: Tabs (All / Restaurants / Food / Categories) + Empty state
+```
+
+### Supabase Integration
+
+`services/searchService.ts` queries `restaurants` and `foods` tables via Supabase PostgREST.
+Falls back to local `homeData.ts` mock arrays when DB returns empty (expected until data is seeded).
 
 ---
 
 ## 🖥️ Phase 6 — Screens & Backend Wiring (Complete ✅)
 
-All screens, routes, Supabase services, and Zustand stores are built and wired.
+All screens, routes, Supabase services, and Zustand stores built and verified.
 
 ### Screens Built
 
@@ -34,51 +91,7 @@ All screens, routes, Supabase services, and Zustand stores are built and wired.
 | Address List | `screens/address/AddressListScreen.tsx` | `/address` |
 | Address Form | `screens/address/AddressFormScreen.tsx` | `/address/new`, `/address/[id]` |
 
-### Services (all wired to Supabase — NOT stubs)
-
-| File | Responsibility |
-|------|---------------|
-| `services/supabase.ts` | Client with AsyncStorage session persistence |
-| `services/authService.ts` | signUp · signIn · signOut · forgotPassword · getSession |
-| `services/userService.ts` | getProfile · updateProfile |
-| `services/orderService.ts` | getOrders · getOrderById · createOrder · updateStatus |
-| `services/favoriteService.ts` | getFavorites · addFavorite · removeFavorite · toggleFavorite |
-| `services/addressService.ts` | getAddresses · addAddress · updateAddress · deleteAddress · setDefault |
-
-### Stores (all wired)
-
-| File | Responsibility |
-|------|---------------|
-| `store/useAuthStore.ts` | Full auth lifecycle · initializeAuth · Supabase session sync |
-| `store/useOrderStore.ts` | fetchOrders · createOrder · fetchOrderById |
-| `store/useFavoriteStore.ts` | fetch · add · remove · toggle · O(1) isFavorite |
-| `store/useAddressStore.ts` | fetch · add · update · delete · setDefault |
-| `store/useUserStore.ts` | profile state |
-
-### Auth Guard (`app/_layout.tsx`)
-
-- Subscribes to `supabase.auth.onAuthStateChange` on mount
-- Protects: `home`, `profile`, `orders`, `favorites`, `address`, `restaurant`, `cart`, `checkout`
-- Redirects unauthenticated → `/welcome`, authenticated → `/home` from auth routes
-
-### Supabase Schema (`services/schema.sql`)
-
-Complete schema with RLS policies ready to apply:
-
-| Table | Purpose |
-|-------|---------|
-| `users` | User profiles (mirrors `auth.users`) |
-| `addresses` | Saved delivery addresses |
-| `restaurants` | Restaurant catalogue |
-| `foods` | Menu items |
-| `orders` | Order records |
-| `order_items` | Line items per order |
-| `favorites` | Saved restaurants |
-| `cart` | Persistent cart |
-
----
-
-## ✅ Backend Verified (2026-07-23)
+### Backend Verified (2026-07-23)
 
 Full end-to-end authenticated verification passed. All 9 checks green.
 
@@ -94,8 +107,6 @@ Full end-to-end authenticated verification passed. All 9 checks green.
 | Orders + order_items — create, join select, items verified | ✅ |
 | RLS — anon sees 0 rows; user2 cannot read user1's data | ✅ |
 
-**Note:** `orderService.updateStatus()` is intentionally blocked for client users (no UPDATE RLS on orders). Order status is managed server-side only. This is correct by design.
-
 ---
 
 ## 🏗️ Environment
@@ -104,11 +115,11 @@ Full end-to-end authenticated verification passed. All 9 checks green.
 |------|--------|
 | `pnpm install` | ✅ Done (1,095 packages) |
 | TypeScript errors | ✅ Zero |
-| Workflow `Cravio Mobile` | ✅ Running — `PORT=18115 pnpm --filter @workspace/mobile run dev` |
+| Workflow `artifacts/mobile: expo` | ✅ Running — port 18115 |
 | `EXPO_PUBLIC_SUPABASE_URL` | ✅ Set in Replit Secrets |
 | `EXPO_PUBLIC_SUPABASE_ANON_KEY` | ✅ Set in Replit Secrets |
-| Supabase REST reachable | ✅ Connected (`tksdioppxwtqsogavmks.supabase.co`) |
-| Database tables exist | ❌ Schema not yet applied |
+| Supabase REST reachable | ✅ Connected |
+| Database tables (8) | ✅ Schema applied |
 
 ---
 
@@ -128,7 +139,7 @@ Full end-to-end authenticated verification passed. All 9 checks green.
 | `expo-linear-gradient` | ~15.0.8 | Gradients |
 | `expo-haptics` | ~15.0.8 | Haptic feedback |
 | `react-native-keyboard-controller` | 1.18.5 | Keyboard handling |
-| `@react-native-async-storage/async-storage` | 2.2.0 | Session persistence |
+| `@react-native-async-storage/async-storage` | 2.2.0 | Session + recent searches persistence |
 | `@expo-google-fonts/inter` | ^0.4.0 | Inter typeface |
 | `@expo-google-fonts/poppins` | ^0.4.1 | Poppins typeface |
 
@@ -143,6 +154,8 @@ Full end-to-end authenticated verification passed. All 9 checks green.
                                          └─→ /auth/login
                                                ├─→ /auth/forgot-password → /auth/otp
                                                └─→ (success) → /home
+                                                     ├─→ /search  ← Phase 7
+                                                     │     └─→ (back) → /home
                                                      ├─→ /restaurant/[id]
                                                      │     └─→ /cart → /checkout
                                                      ├─→ /profile
@@ -159,9 +172,8 @@ Full end-to-end authenticated verification passed. All 9 checks green.
 
 | Issue | Severity | Status |
 |-------|----------|--------|
-| Database schema not applied | **Blocker for auth/data** | Must run `schema.sql` in Supabase SQL Editor |
-| Search screen not built | Medium | Phase 7 scope |
-| Card / Wallet payment | Low | Shows "Coming Soon" — Phase 7 scope |
+| Search results use local mock data | Medium | Supabase tables empty until data seeded — `searchService` falls back automatically |
+| Card / Wallet payment | Low | Shows "Coming Soon" — Phase 8 scope |
 | `shadow*` props deprecated on web | Low | Non-blocking — native shadows work fine |
 | `props.pointerEvents` deprecation | Low | Non-blocking |
 | `@types/react` minor version mismatch | Low | Non-blocking warning from Expo CLI |
@@ -170,10 +182,8 @@ Full end-to-end authenticated verification passed. All 9 checks green.
 
 ## 🚀 Next Phase
 
-**Phase 7** — Search Screen + optional: real-time order tracking, payment gateway, push notifications.
-
-Entry point: build `screens/SearchScreen.tsx` + `app/search.tsx` and wire the Home screen search bar to navigate to `/search`.
+**Phase 8** — optional: Real-time order tracking, push notifications, payment gateway (Stripe), or data seeding for restaurants/foods in Supabase.
 
 ---
 
-*Workflow running. Zero TypeScript errors. Schema SQL ready at `services/schema.sql` — apply in Supabase to unlock all backend features.*
+*Workflow running. Zero TypeScript errors. All 7 phases complete.*

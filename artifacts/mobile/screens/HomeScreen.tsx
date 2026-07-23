@@ -800,7 +800,7 @@ export function HomeScreen() {
           </ScrollView>
         );
       case 1:
-        return <PlaceholderTab iconName="search-outline" title="Search" />;
+        return null; // navigates away — handled in onPress below
       case 2:
         return <PlaceholderTab iconName="receipt-outline" title="Orders" />;
       case 3:
@@ -837,6 +837,7 @@ export function HomeScreen() {
         items={NAV_ITEMS}
         activeIndex={activeTab}
         onPress={(index: number) => {
+          if (index === 1) { router.push('/search'); return; }
           if (index === 2) { router.push('/orders'); return; }
           if (index === 3) { router.push('/profile'); return; }
           setActiveTab(index);

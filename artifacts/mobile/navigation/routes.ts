@@ -19,6 +19,9 @@ export const ROUTES = {
   CART: '/cart' as const,
   CHECKOUT: '/checkout' as const,
 
+  // ── Phase 7: Search & Discovery ────────────────────────────────────────────
+  SEARCH: '/search' as const,
+
   // ── Phase 6: Profile & supporting screens ──────────────────────────────────
   PROFILE: '/profile' as const,
   ORDERS: '/orders' as const,
