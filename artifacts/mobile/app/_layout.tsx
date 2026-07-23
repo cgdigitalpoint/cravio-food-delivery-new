@@ -58,6 +58,20 @@ function RootLayoutNav() {
         options={{ animation: 'slide_from_right' }}
       />
 
+      {/* ── Phase 5: Restaurant · Cart · Checkout ── */}
+      <Stack.Screen
+        name="restaurant/[id]"
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="cart"
+        options={{ animation: 'slide_from_bottom' }}
+      />
+      <Stack.Screen
+        name="checkout"
+        options={{ animation: 'slide_from_right' }}
+      />
+
       {/* ── Design system (Phase 2) ── */}
       <Stack.Screen
         name="design-system"

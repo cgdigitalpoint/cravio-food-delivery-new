@@ -21,15 +21,10 @@ export const ROUTES = {
   // CART: '/(tabs)/cart' as const,
   // PROFILE: '/(tabs)/profile' as const,
 
-  // ── Phase 4: Restaurant ────────────────────────────────────────────────
-  // RESTAURANT_DETAIL: '/restaurants/[id]' as const,
-
-  // ── Phase 5: Checkout & Orders ─────────────────────────────────────────
-  // CHECKOUT: '/checkout' as const,
-  // CHECKOUT_ADDRESS: '/checkout/address' as const,
-  // CHECKOUT_PAYMENT: '/checkout/payment' as const,
-  // ORDER_DETAIL: '/orders/[id]' as const,
-  // ORDER_TRACKING: '/orders/tracking' as const,
+  // ── Phase 4 & 5: Restaurant + Cart + Checkout ─────────────────────────
+  RESTAURANT_DETAIL: '/restaurant' as const,  // append /[id]
+  CART: '/cart' as const,
+  CHECKOUT: '/checkout' as const,
 
   // ── Phase 6: Profile & Settings ────────────────────────────────────────
   // PROFILE_ADDRESSES: '/profile/addresses' as const,

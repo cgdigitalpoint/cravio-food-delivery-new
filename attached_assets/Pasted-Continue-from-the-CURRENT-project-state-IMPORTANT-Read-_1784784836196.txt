@@ -1,0 +1,103 @@
+Continue from the CURRENT project state.
+
+IMPORTANT:
+
+- Read PROJECT_STATUS.md first.
+- Do NOT regenerate the project.
+- Do NOT recreate any screens.
+- Do NOT modify completed phases.
+- Continue ONLY from the latest checkpoint.
+
+========================================
+TASK 1 — COMPLETE PHASE 5
+========================================
+
+Resume exactly where you stopped.
+
+Finish only the remaining work.
+
+Tasks:
+
+1. Fix the remaining Reanimated 4 SharedValue type issue.
+2. Resolve all remaining TypeScript errors.
+3. Verify Restaurant Details Screen.
+4. Verify Cart Screen.
+5. Verify Checkout Screen.
+6. Verify Floating Cart.
+7. Verify all navigation routes.
+8. Verify all imports and exports.
+9. Verify Expo Router navigation.
+10. Verify NativeWind styling.
+11. Update PROJECT_STATUS.md.
+
+When complete mark:
+
+✅ Phase 5 Complete
+
+========================================
+TASK 2 — FIX PREVIEW
+========================================
+
+The application already works in a new browser tab.
+
+The embedded Replit Preview panel is not working correctly.
+
+Do NOT modify application code unless required for preview compatibility.
+
+Check and fix:
+
+• Expo development server
+• Replit workflow
+• Metro bundler
+• Preview URL
+• Internal/External port mapping
+• Web server configuration
+• Expo Web configuration
+• Port exposure
+• Preview iframe compatibility
+
+Ensure:
+
+- Embedded Preview works.
+- New Tab Preview also works.
+- Auto Reload works.
+- No blank screen.
+- No loading loop.
+- No runtime errors.
+
+========================================
+TASK 3 — FINAL VERIFICATION
+========================================
+
+Run all checks.
+
+✔ Zero TypeScript errors
+✔ Zero build errors
+✔ Zero runtime errors
+✔ Preview working
+✔ New Tab working
+✔ Navigation working
+✔ Restaurant Details working
+✔ Cart working
+✔ Checkout working
+
+Update PROJECT_STATUS.md.
+
+========================================
+FINAL RESPONSE
+========================================
+
+If everything is successful reply ONLY:
+
+✅ Preview Fixed
+✅ Phase 5 Complete
+✅ Zero Errors
+✅ Ready for Phase 6
+
+If anything is still failing, reply ONLY:
+
+❌ Remaining Issue:
+<exact issue>
+
+Do not start Phase 6.
+Do not regenerate existing code.

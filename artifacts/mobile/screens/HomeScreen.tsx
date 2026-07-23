@@ -22,6 +22,7 @@ import Animated, {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { Bell, ChevronDown, MapPin, Mic, ShoppingCart } from 'lucide-react-native';
 
 import {
@@ -40,6 +41,7 @@ import {
 } from '@/components/ui';
 import { useColors } from '@/hooks/useColors';
 import { PP } from '@/theme/poppins';
+import { useCartStore } from '@/store/useCartStore';
 import {
   BANNERS,
   CATEGORIES,
@@ -356,10 +358,12 @@ function HorizontalRestaurantScroll({
   data,
   favorites,
   onFavoriteToggle,
+  onRestaurantPress,
 }: {
   data: Restaurant[];
   favorites: Set<string>;
   onFavoriteToggle: (id: string) => void;
+  onRestaurantPress: (id: string) => void;
 }) {
   return (
     <ScrollView
@@ -385,7 +389,7 @@ function HorizontalRestaurantScroll({
             isNew={r.isNew}
             isFavorite={favorites.has(r.id)}
             onFavoritePress={() => onFavoriteToggle(r.id)}
-            onPress={() => {}}
+            onPress={() => onRestaurantPress(r.id)}
           />
         </View>
       ))}
@@ -429,10 +433,12 @@ function VerticalRestaurantList({
   data,
   favorites,
   onFavoriteToggle,
+  onRestaurantPress,
 }: {
   data: Restaurant[];
   favorites: Set<string>;
   onFavoriteToggle: (id: string) => void;
+  onRestaurantPress: (id: string) => void;
 }) {
   return (
     <View style={{ gap: 12 }}>
@@ -451,7 +457,7 @@ function VerticalRestaurantList({
           isNew={r.isNew}
           isFavorite={favorites.has(r.id)}
           onFavoritePress={() => onFavoriteToggle(r.id)}
-          onPress={() => {}}
+          onPress={() => onRestaurantPress(r.id)}
         />
       ))}
     </View>
@@ -524,7 +530,17 @@ function PlaceholderTab({ iconName, title }: { iconName: string; title: string }
 }
 
 // ─── Floating Cart Button ─────────────────────────────────────────────────────
-function FloatingCartButton({ count, bottomOffset }: { count: number; bottomOffset: number }) {
+function FloatingCartButton({
+  count,
+  total,
+  bottomOffset,
+  onPress,
+}: {
+  count: number;
+  total: number;
+  bottomOffset: number;
+  onPress: () => void;
+}) {
   const scale = useSharedValue(0);
 
   useEffect(() => {
@@ -541,7 +557,7 @@ function FloatingCartButton({ count, bottomOffset }: { count: number; bottomOffs
 
   return (
     <Animated.View style={[cartStyles.wrap, { bottom: bottomOffset + 12 }, animStyle]}>
-      <TouchableOpacity activeOpacity={0.9} onPress={() => {}}>
+      <TouchableOpacity activeOpacity={0.9} onPress={onPress}>
         <LinearGradient
           colors={['#FF8530', '#FF6B00']}
           start={{ x: 0, y: 0 }}
@@ -559,7 +575,7 @@ function FloatingCartButton({ count, bottomOffset }: { count: number; bottomOffs
           <View style={cartStyles.right}>
             <ShoppingCart size={18} color="#FFFFFF" strokeWidth={2} />
             <Text style={[PP.bodySM, { color: 'rgba(255,255,255,0.88)', marginLeft: 5 }]}>
-              ${(count * 10.99).toFixed(2)}
+              ${total.toFixed(2)}
             </Text>
           </View>
         </LinearGradient>
@@ -603,6 +619,8 @@ const cartStyles = StyleSheet.create({
 export function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const { itemCount, totalAmount } = useCartStore();
 
   const paddingTop = Platform.OS === 'web' ? 67 : insets.top;
   const paddingBottom = Platform.OS === 'web' ? 34 : insets.bottom;
@@ -613,8 +631,6 @@ export function HomeScreen() {
   const [activeTab, setActiveTab] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [favorites, setFavorites] = useState<Set<string>>(new Set(['r1', 'r3']));
-
-  const CART_COUNT = 3; // dummy — non-empty cart to show floating button on home tab
 
   // Simulate network load
   useEffect(() => {
@@ -678,6 +694,7 @@ export function HomeScreen() {
           data={FEATURED_RESTAURANTS}
           favorites={favorites}
           onFavoriteToggle={toggleFavorite}
+          onRestaurantPress={(id) => router.push(`/restaurant/${id}`)}
         />
       </View>
 
@@ -716,6 +733,7 @@ export function HomeScreen() {
               data={filteredPopular}
               favorites={favorites}
               onFavoriteToggle={toggleFavorite}
+              onRestaurantPress={(id) => router.push(`/restaurant/${id}`)}
             />
           </View>
         )}
@@ -734,6 +752,7 @@ export function HomeScreen() {
           data={FAST_DELIVERY_RESTAURANTS}
           favorites={favorites}
           onFavoriteToggle={toggleFavorite}
+          onRestaurantPress={(id) => router.push(`/restaurant/${id}`)}
         />
       </View>
 
@@ -750,6 +769,7 @@ export function HomeScreen() {
           data={TOP_RATED_RESTAURANTS}
           favorites={favorites}
           onFavoriteToggle={toggleFavorite}
+          onRestaurantPress={(id) => router.push(`/restaurant/${id}`)}
         />
       </View>
 
@@ -804,7 +824,12 @@ export function HomeScreen() {
 
       {/* Floating cart — visible only on home tab when cart non-empty */}
       {activeTab === 0 && (
-        <FloatingCartButton count={CART_COUNT} bottomOffset={BOTTOM_NAV_H} />
+        <FloatingCartButton
+          count={itemCount}
+          total={totalAmount}
+          bottomOffset={BOTTOM_NAV_H}
+          onPress={() => router.push('/cart')}
+        />
       )}
 
       {/* Bottom navigation — sits at bottom naturally as flex child */}

@@ -1,0 +1,192 @@
+Continue from the existing Cravio project.
+
+IMPORTANT:
+Read PROJECT_STATUS.md first.
+
+Do NOT restart the project.
+Do NOT modify Phase 1–4.
+Do NOT change authentication.
+
+Build ONLY Phase 5.
+
+===========================
+PHASE 5
+Restaurant Details + Cart + Checkout
+===========================
+
+Create a premium Restaurant Details experience.
+
+Restaurant Details Screen
+
+Include:
+
+- Large restaurant cover image
+- Restaurant logo
+- Restaurant name
+- Rating
+- Total Reviews
+- Delivery Time
+- Distance
+- Delivery Fee
+- Open / Closed status
+- Veg / Non-Veg indicator
+- Favourite button
+- Share button
+
+----------------------------------
+
+Food Categories
+
+Examples:
+
+Popular
+
+Pizza
+
+Burger
+
+Starter
+
+Main Course
+
+Chinese
+
+Dessert
+
+Drinks
+
+Sticky category tabs.
+
+----------------------------------
+
+Food Cards
+
+Every food item should have:
+
+Image
+
+Name
+
+Description
+
+Price
+
+Rating
+
+Veg / Non-Veg
+
+Customizable tag
+
+Best Seller badge
+
+Discount badge
+
+Add Button
+
+Quantity Selector
+
+----------------------------------
+
+Add To Cart
+
+Animated Add button.
+
+Increase quantity.
+
+Decrease quantity.
+
+Update total instantly.
+
+Persistent floating cart.
+
+----------------------------------
+
+Cart Screen
+
+Modern premium UI.
+
+Show:
+
+Food Items
+
+Restaurant Name
+
+Quantity Controls
+
+Special Instructions
+
+Coupon Code
+
+Apply Coupon
+
+Subtotal
+
+Delivery Charges
+
+Platform Fee
+
+Taxes
+
+Grand Total
+
+----------------------------------
+
+Checkout Screen
+
+Delivery Address
+
+Add New Address
+
+Payment Method UI
+
+Cash on Delivery
+
+Online Payment (placeholder)
+
+Estimated Delivery Time
+
+Order Notes
+
+Place Order Button
+
+Premium Success Animation
+
+----------------------------------
+
+Animations
+
+Smooth transitions
+
+Button animations
+
+Cart animations
+
+Premium micro interactions
+
+----------------------------------
+
+Architecture
+
+Reusable components only.
+
+TypeScript
+
+NativeWind
+
+Expo Router
+
+No backend yet.
+
+No Supabase integration yet.
+
+No payment gateway yet.
+
+Use dummy data only.
+
+Update PROJECT_STATUS.md
+
+Mark:
+
+Phase 5 Complete
+
+Stop after Phase 5.
