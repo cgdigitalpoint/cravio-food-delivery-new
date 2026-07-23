@@ -836,7 +836,11 @@ export function HomeScreen() {
       <BottomNavigation
         items={NAV_ITEMS}
         activeIndex={activeTab}
-        onPress={setActiveTab}
+        onPress={(index: number) => {
+          if (index === 2) { router.push('/orders'); return; }
+          if (index === 3) { router.push('/profile'); return; }
+          setActiveTab(index);
+        }}
       />
     </View>
   );

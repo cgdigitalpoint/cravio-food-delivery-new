@@ -1,3 +1,4 @@
+// ─── Root Layout ──────────────────────────────────────────────────────────────
 import React, { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -18,77 +19,100 @@ import {
   Poppins_800ExtraBold,
   useFonts,
 } from '@expo-google-fonts/poppins';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { supabase } from '@/services/supabase';
+import { useAuthStore } from '@/store/useAuthStore';
 
 // Prevent the native splash screen from auto-hiding before assets load.
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
+// Protected route segments — redirect to /welcome if unauthenticated
+const PROTECTED = new Set(['home', 'profile', 'orders', 'favorites', 'address', 'restaurant', 'cart', 'checkout']);
+// Auth-only segments — redirect to /home if already authenticated
+const AUTH_ONLY = new Set(['auth']);
+
+function AuthGuard() {
+  const router = useRouter();
+  const segments = useSegments();
+  const { isAuthenticated, setAuthenticatedUser, setUnauthenticated, loadProfile } = useAuthStore();
+
+  // Subscribe to Supabase auth state on mount
+  useEffect(() => {
+    const subscription = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setAuthenticatedUser(session.user.id);
+        loadProfile(session.user.id);
+      } else {
+        setUnauthenticated();
+      }
+    });
+    return () => subscription.data.subscription.unsubscribe();
+  }, []);
+
+  // Route guard — runs whenever auth state or segments change
+  useEffect(() => {
+    const seg0 = segments[0] as string | undefined;
+    if (!seg0) return; // still on splash — let it self-route
+
+    if (isAuthenticated && AUTH_ONLY.has(seg0)) {
+      router.replace('/home');
+    } else if (!isAuthenticated && PROTECTED.has(seg0)) {
+      router.replace('/welcome');
+    }
+  }, [isAuthenticated, segments]);
+
+  return null;
+}
+
 function RootLayoutNav() {
   return (
-    <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
-      {/* ── Phase 1 / Phase 3 screens ── */}
-      <Stack.Screen name="index" />
-      <Stack.Screen name="onboarding" />
-      <Stack.Screen name="welcome" />
+    <>
+      <AuthGuard />
+      <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
+        {/* ── Pre-auth flow ── */}
+        <Stack.Screen name="index" />
+        <Stack.Screen name="onboarding" />
+        <Stack.Screen name="welcome" />
 
-      {/* ── Auth screens ── */}
-      <Stack.Screen
-        name="auth/login"
-        options={{ animation: 'slide_from_right' }}
-      />
-      <Stack.Screen
-        name="auth/signup"
-        options={{ animation: 'slide_from_right' }}
-      />
-      <Stack.Screen
-        name="auth/otp"
-        options={{ animation: 'slide_from_right' }}
-      />
-      <Stack.Screen
-        name="auth/forgot-password"
-        options={{ animation: 'slide_from_right' }}
-      />
+        {/* ── Auth screens ── */}
+        <Stack.Screen name="auth/login" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="auth/signup" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="auth/otp" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="auth/forgot-password" options={{ animation: 'slide_from_right' }} />
 
-      {/* ── Phase 4: Home screen ── */}
-      <Stack.Screen
-        name="home"
-        options={{ animation: 'slide_from_right' }}
-      />
+        {/* ── Phase 4: Home ── */}
+        <Stack.Screen name="home" options={{ animation: 'slide_from_right' }} />
 
-      {/* ── Phase 5: Restaurant · Cart · Checkout ── */}
-      <Stack.Screen
-        name="restaurant/[id]"
-        options={{ animation: 'slide_from_right' }}
-      />
-      <Stack.Screen
-        name="cart"
-        options={{ animation: 'slide_from_bottom' }}
-      />
-      <Stack.Screen
-        name="checkout"
-        options={{ animation: 'slide_from_right' }}
-      />
+        {/* ── Phase 5: Restaurant · Cart · Checkout ── */}
+        <Stack.Screen name="restaurant/[id]" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="cart" options={{ animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="checkout" options={{ animation: 'slide_from_right' }} />
 
-      {/* ── Design system (Phase 2) ── */}
-      <Stack.Screen
-        name="design-system"
-        options={{ animation: 'slide_from_right' }}
-      />
-    </Stack>
+        {/* ── Phase 6: Profile & supporting screens ── */}
+        <Stack.Screen name="profile" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="orders" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="orders/[id]" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="favorites" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="address/index" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="address/new" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="address/[id]" options={{ animation: 'slide_from_right' }} />
+
+        {/* ── Design system (Phase 2) ── */}
+        <Stack.Screen name="design-system" options={{ animation: 'slide_from_right' }} />
+      </Stack>
+    </>
   );
 }
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
-    // Phase 2 – Inter (Design System components)
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
-    // Phase 3 – Poppins (Premium UI screens)
     Poppins_400Regular,
     Poppins_500Medium,
     Poppins_600SemiBold,

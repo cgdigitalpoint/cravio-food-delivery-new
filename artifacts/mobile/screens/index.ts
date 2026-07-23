@@ -8,6 +8,14 @@ export { OnboardingScreen } from './OnboardingScreen';
 export { WelcomeScreen } from './WelcomeScreen';
 export { DesignSystemScreen } from './DesignSystemScreen';
 
+// Phase 6 screens
+export { ProfileScreen } from './ProfileScreen';
+export { OrdersScreen } from './OrdersScreen';
+export { OrderDetailsScreen } from './OrderDetailsScreen';
+export { FavoritesScreen } from './FavoritesScreen';
+export { AddressListScreen } from './address/AddressListScreen';
+export { AddressFormScreen } from './address/AddressFormScreen';
+
 // Auth screens
 export { LoginScreen } from './auth/LoginScreen';
 export { SignupScreen } from './auth/SignupScreen';
