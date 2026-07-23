@@ -7,7 +7,6 @@ router = "expo-domain"
 
 [[services]]
 name = "expo"
-ensurePreviewReachable = "/status"
 paths = [ "/" ]
 localPort = 18115
 
