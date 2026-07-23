@@ -1,69 +1,176 @@
 # Cravio — Project Status
 
-## Phase Overview
+> Last updated: 2026-07-23
+> App: Food Delivery Mobile App (Expo / React Native / TypeScript)
+> Artifact: `artifacts/mobile` · Workflow: `Cravio Mobile` (RUNNING)
+
+---
+
+## ✅ Completed Phases
 
 | Phase | Feature | Status |
 |-------|---------|--------|
 | 1 | Splash Screen | ✅ Complete |
-| 2 | Onboarding + Design System | ✅ Complete |
-| 3 | Auth Screens (Sign In, Sign Up, OTP, Forgot Password) | ✅ Complete |
-| 4 | Home Screen (restaurant discovery, categories, banners, floating cart, bottom nav) | ✅ Complete |
+| 2 | Onboarding + Design System (35+ components) | ✅ Complete |
+| 3 | Auth Screens (Login, Signup, OTP, Forgot Password) | ✅ Complete |
+| 4 | Home Screen (discovery, banners, categories, floating cart, bottom nav) | ✅ Complete |
 | 5 | Restaurant Details + Cart + Checkout | ✅ Complete |
+| 6 | Profile, Orders, Favorites, Addresses — screens, routes, services, stores | ✅ Complete (pending schema) |
 
 ---
 
-## Phase 5 — Complete
+## 🖥️ Phase 6 — Screens & Backend Wiring (Complete ✅)
 
-### New Screens
+All screens, routes, Supabase services, and Zustand stores are built and wired.
+
+### Screens Built
 
 | Screen | File | Route |
 |--------|------|-------|
-| Restaurant Details | `screens/RestaurantDetailsScreen.tsx` | `/restaurant/[id]` |
-| Cart | `screens/CartScreen.tsx` | `/cart` |
-| Checkout | `screens/CheckoutScreen.tsx` | `/checkout` |
+| Profile | `screens/ProfileScreen.tsx` | `/profile` |
+| Orders List | `screens/OrdersScreen.tsx` | `/orders` |
+| Order Details | `screens/OrderDetailsScreen.tsx` | `/orders/[id]` |
+| Favorites | `screens/FavoritesScreen.tsx` | `/favorites` |
+| Address List | `screens/address/AddressListScreen.tsx` | `/address` |
+| Address Form | `screens/address/AddressFormScreen.tsx` | `/address/new`, `/address/[id]` |
 
-### New Data
+### Services (all wired to Supabase — NOT stubs)
 
-| File | Contents |
-|------|----------|
-| `data/restaurantData.ts` | `RestaurantMenuItem` type, full menus for r1–r4, generic fallback for r5–r10, `PROMO_CODES` |
+| File | Responsibility |
+|------|---------------|
+| `services/supabase.ts` | Client with AsyncStorage session persistence |
+| `services/authService.ts` | signUp · signIn · signOut · forgotPassword · getSession |
+| `services/userService.ts` | getProfile · updateProfile |
+| `services/orderService.ts` | getOrders · getOrderById · createOrder · updateStatus |
+| `services/favoriteService.ts` | getFavorites · addFavorite · removeFavorite · toggleFavorite |
+| `services/addressService.ts` | getAddresses · addAddress · updateAddress · deleteAddress · setDefault |
 
-### New Route Files
+### Stores (all wired)
 
-| File | Route |
-|------|-------|
-| `app/restaurant/[id].tsx` | `/restaurant/[id]` |
-| `app/cart.tsx` | `/cart` |
-| `app/checkout.tsx` | `/checkout` |
+| File | Responsibility |
+|------|---------------|
+| `store/useAuthStore.ts` | Full auth lifecycle · initializeAuth · Supabase session sync |
+| `store/useOrderStore.ts` | fetchOrders · createOrder · fetchOrderById |
+| `store/useFavoriteStore.ts` | fetch · add · remove · toggle · O(1) isFavorite |
+| `store/useAddressStore.ts` | fetch · add · update · delete · setDefault |
+| `store/useUserStore.ts` | profile state |
 
-### Updated Files
+### Auth Guard (`app/_layout.tsx`)
 
-| File | Change |
-|------|--------|
-| `app/_layout.tsx` | Registered `restaurant/[id]`, `cart`, `checkout` in Stack |
-| `screens/index.ts` | Exported `RestaurantDetailsScreen`, `CartScreen`, `CheckoutScreen` |
-| `navigation/routes.ts` | Added `RESTAURANT_DETAIL`, `CART`, `CHECKOUT` constants |
-| `screens/HomeScreen.tsx` | Wired `useRouter` + `useCartStore`; restaurant cards navigate to `/restaurant/[id]`; floating cart navigates to `/cart`; cart count/total from live store |
+- Subscribes to `supabase.auth.onAuthStateChange` on mount
+- Protects: `home`, `profile`, `orders`, `favorites`, `address`, `restaurant`, `cart`, `checkout`
+- Redirects unauthenticated → `/welcome`, authenticated → `/home` from auth routes
 
-### Feature Checklist
+### Supabase Schema (`services/schema.sql`)
 
-- ✅ Restaurant Details: parallax cover, info card, sticky category tabs, item add/qty controls, floating cart bar
-- ✅ Cart: item list with qty controls, special instructions per item, coupon validation (`CRAVIO20`, `FIRST50`, `FREEDEL`), bill breakdown (subtotal + delivery + platform fee + 5% tax), proceed to checkout CTA
-- ✅ Checkout: saved address selection, add-new-address button, COD/Card/Wallet payment selector (card + wallet show "Coming Soon"), order notes, order summary, animated Place Order button
-- ✅ Success animation: spring checkmark + confetti dots, ETA card, "Track My Order" CTA clears cart and returns to home
-- ✅ Floating cart on Home: live `itemCount` + `totalAmount` from Zustand store, taps → `/cart`
-- ✅ Zero TypeScript errors
-- ✅ All navigation routes registered in Expo Router Stack
+Complete schema with RLS policies ready to apply:
 
-### Known Limitations (by design — dummy data, no backend)
-
-- Card and Wallet payment methods show "Coming Soon" (no payment gateway)
-- Order tracking screen not built (Phase 6 scope)
-- Addresses are hardcoded dummy data
-- No persistence between app restarts (Zustand in-memory only)
+| Table | Purpose |
+|-------|---------|
+| `users` | User profiles (mirrors `auth.users`) |
+| `addresses` | Saved delivery addresses |
+| `restaurants` | Restaurant catalogue |
+| `foods` | Menu items |
+| `orders` | Order records |
+| `order_items` | Line items per order |
+| `favorites` | Saved restaurants |
+| `cart` | Persistent cart |
 
 ---
 
-## Next Phase (not started)
+## ⚠️ Required Manual Step — Apply Database Schema
 
-**Phase 6** — Order Tracking + Profile + Search
+**The Supabase tables do not exist yet.** All 8 tables return 404 from the REST API.
+
+You must run `services/schema.sql` in the Supabase SQL Editor **before** auth/orders/favorites/addresses will work at runtime.
+
+### How to apply
+
+1. Go to [https://supabase.com/dashboard/project/tksdioppxwtqsogavmks](https://supabase.com/dashboard/project/tksdioppxwtqsogavmks)
+2. Navigate to **SQL Editor → New Query**
+3. Paste the entire contents of `artifacts/mobile/services/schema.sql`
+4. Click **Run**
+
+The file is complete and idempotent (`CREATE TABLE IF NOT EXISTS`, `CREATE POLICY IF NOT EXISTS`-equivalent). Safe to run on a fresh project.
+
+---
+
+## 🏗️ Environment
+
+| Item | Status |
+|------|--------|
+| `pnpm install` | ✅ Done (1,095 packages) |
+| TypeScript errors | ✅ Zero |
+| Workflow `Cravio Mobile` | ✅ Running — `PORT=18115 pnpm --filter @workspace/mobile run dev` |
+| `EXPO_PUBLIC_SUPABASE_URL` | ✅ Set in Replit Secrets |
+| `EXPO_PUBLIC_SUPABASE_ANON_KEY` | ✅ Set in Replit Secrets |
+| Supabase REST reachable | ✅ Connected (`tksdioppxwtqsogavmks.supabase.co`) |
+| Database tables exist | ❌ Schema not yet applied |
+
+---
+
+## 📦 Installed Packages
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `expo` | ~54.0.27 | Core framework |
+| `expo-router` | ~6.0.17 | File-based routing |
+| `react-native` | 0.81.5 | Native runtime |
+| `@supabase/supabase-js` | ^2.110.8 | Backend client |
+| `zustand` | ^5.0.14 | State management |
+| `@tanstack/react-query` | catalog | Data fetching |
+| `react-native-reanimated` | ~4.1.1 | Animations |
+| `nativewind` | ^4.2.6 | Tailwind utility classes |
+| `lucide-react-native` | ^1.25.0 | Icons |
+| `expo-linear-gradient` | ~15.0.8 | Gradients |
+| `expo-haptics` | ~15.0.8 | Haptic feedback |
+| `react-native-keyboard-controller` | 1.18.5 | Keyboard handling |
+| `@react-native-async-storage/async-storage` | 2.2.0 | Session persistence |
+| `@expo-google-fonts/inter` | ^0.4.0 | Inter typeface |
+| `@expo-google-fonts/poppins` | ^0.4.1 | Poppins typeface |
+
+---
+
+## 📁 Full Route Map
+
+```
+/ (Splash ~2.8s)
+  └─→ /onboarding ──Skip/last-Next──→ /welcome
+                                         ├─→ /auth/signup → /auth/otp
+                                         └─→ /auth/login
+                                               ├─→ /auth/forgot-password → /auth/otp
+                                               └─→ (success) → /home
+                                                     ├─→ /restaurant/[id]
+                                                     │     └─→ /cart → /checkout
+                                                     ├─→ /profile
+                                                     │     ├─→ /orders → /orders/[id]
+                                                     │     ├─→ /favorites
+                                                     │     └─→ /address → /address/new
+                                                     │                  → /address/[id]
+                                                     └─→ (tab nav: home / search / orders / profile)
+```
+
+---
+
+## ⚠️ Known Limitations (by design)
+
+| Issue | Severity | Status |
+|-------|----------|--------|
+| Database schema not applied | **Blocker for auth/data** | Must run `schema.sql` in Supabase SQL Editor |
+| Search screen not built | Medium | Phase 7 scope |
+| Card / Wallet payment | Low | Shows "Coming Soon" — Phase 7 scope |
+| `shadow*` props deprecated on web | Low | Non-blocking — native shadows work fine |
+| `props.pointerEvents` deprecation | Low | Non-blocking |
+| `@types/react` minor version mismatch | Low | Non-blocking warning from Expo CLI |
+
+---
+
+## 🚀 Next Phase
+
+**Phase 7** — Search Screen + optional: real-time order tracking, payment gateway, push notifications.
+
+Entry point: build `screens/SearchScreen.tsx` + `app/search.tsx` and wire the Home screen search bar to navigate to `/search`.
+
+---
+
+*Workflow running. Zero TypeScript errors. Schema SQL ready at `services/schema.sql` — apply in Supabase to unlock all backend features.*
