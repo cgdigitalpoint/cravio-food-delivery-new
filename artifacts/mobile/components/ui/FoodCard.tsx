@@ -20,6 +20,8 @@ export interface FoodCardProps {
   isNew?: boolean;
   onAddPress?: () => void;
   onPress?: () => void;
+  isFavorite?: boolean;
+  onFavoritePress?: () => void;
 }
 
 export function FoodCard({
@@ -34,6 +36,8 @@ export function FoodCard({
   isNew,
   onAddPress,
   onPress,
+  isFavorite,
+  onFavoritePress,
 }: FoodCardProps) {
   const colors = useColors();
 
@@ -150,6 +154,20 @@ export function FoodCard({
             <Ionicons name="fast-food" size={28} color="rgba(255,255,255,0.7)" />
           </LinearGradient>
         )}
+        {/* Favorite button overlay */}
+        {onFavoritePress != null && (
+          <TouchableOpacity
+            onPress={onFavoritePress}
+            style={[styles.favBtn, { backgroundColor: 'rgba(0,0,0,0.35)' }]}
+            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+          >
+            <Ionicons
+              name={isFavorite ? 'heart' : 'heart-outline'}
+              size={14}
+              color={isFavorite ? '#EF4444' : '#FFFFFF'}
+            />
+          </TouchableOpacity>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -205,6 +223,16 @@ const styles = StyleSheet.create({
     height: 100,
     overflow: 'hidden',
     flexShrink: 0,
+  },
+  favBtn: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   image: {
     width: '100%',

@@ -35,14 +35,17 @@ Added Phase 9 engagement features without changing completed phase routes, the e
 
 | Feature | Detail |
 |---|---|
-| Favorites | Supabase-backed restaurant favorites remain synchronized across Home, Restaurant Details, and Favorites; food favorites are persisted locally using the existing AsyncStorage setup and shown in a Restaurants/Dishes Favorites screen |
+| Favorites | Supabase-backed restaurant favorites synchronized across Home, Search, Restaurant Details, and Favorites screen; food favorites persisted locally via AsyncStorage and shown in a Restaurants/Dishes Favorites screen |
+| Search Engagement | Restaurant and food favorite toggles wired into Search results (all tabs) and the idle Popular Dishes section — heart buttons reflect live store state |
 | Reviews | Restaurant rating summary, average rating, total review count, distribution bars, avatars, dates, verified-purchase badges, helpful voting, sorting, food review highlights, and photo placeholders |
 | Personalization | Recommended food carousel ranks popular, highly rated, and favorited dishes; similar restaurant carousel uses cuisine, category, rating, and distance |
 | Recently Viewed | Restaurant details auto-save a capped history in persistent storage; Profile links to a history screen with open and clear actions |
 | Sharing | Native Share API actions for restaurants and food items |
+| FoodCard | Added optional `isFavorite` / `onFavoritePress` props — renders a heart overlay on the image; backwards-compatible, existing usage unchanged |
+| Profile | Version footer updated to reflect Phase 9 completion |
 | UI quality | Reusable engagement components, empty states, favorite controls, responsive horizontal carousels, and preserved loading/error behavior |
 
-**Phase 9 verification:** Full TypeScript check and the Expo iOS/Android production build pass. Expo Doctor continues to report only the existing non-blocking `@types/react` and `@types/react-dom` minor-version warning.
+**Phase 9 verification:** `pnpm run typecheck` passes with zero TypeScript errors. Expo iOS production bundle builds successfully. Expo Doctor reports only the existing non-blocking `@types/react` and `@types/react-dom` minor-version warning.
 
 ---
 

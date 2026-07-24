@@ -60,6 +60,9 @@ import {
   searchAll,
   type SearchSuggestion,
 } from '@/services/searchService';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useFavoriteStore } from '@/store/useFavoriteStore';
+import { useEngagementStore } from '@/store/useEngagementStore';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const STORAGE_KEY = '@cravio/recent-searches';
@@ -477,6 +480,7 @@ function IdleContent({
 }) {
   const router = useRouter();
   const [loadingPopular, setLoadingPopular] = useState(true);
+  const { isFoodFavorite, toggleFoodFavorite } = useEngagementStore();
 
   useEffect(() => {
     const t = setTimeout(() => setLoadingPopular(false), 800);
@@ -550,6 +554,8 @@ function IdleContent({
                   isNew={f.isNew}
                   onPress={() => {}}
                   onAddPress={() => {}}
+                  isFavorite={isFoodFavorite(f.id)}
+                  onFavoritePress={() => toggleFoodFavorite(f.id)}
                 />
               </View>
             ))}
@@ -710,6 +716,9 @@ function ResultsContent({
   onRestaurantPress: (id: string) => void;
 }) {
   const colors = useColors();
+  const { supabaseUserId } = useAuthStore();
+  const { isFavorite: isRestaurantFavorite, toggleFavorite } = useFavoriteStore();
+  const { isFoodFavorite, toggleFoodFavorite } = useEngagementStore();
   const total = restaurants.length + foods.length + categories.length;
   const hasResults = total > 0;
 
@@ -770,6 +779,10 @@ function ResultsContent({
                   imageUri={r.imageUri}
                   isNew={r.isNew}
                   offerText={r.offerText}
+                  isFavorite={isRestaurantFavorite(r.id)}
+                  onFavoritePress={() => {
+                    if (supabaseUserId) toggleFavorite(supabaseUserId, r.id);
+                  }}
                   onPress={() => onRestaurantPress(r.id)}
                 />
               </View>
@@ -799,6 +812,8 @@ function ResultsContent({
                   isNew={f.isNew}
                   onPress={() => {}}
                   onAddPress={() => {}}
+                  isFavorite={isFoodFavorite(f.id)}
+                  onFavoritePress={() => toggleFoodFavorite(f.id)}
                 />
               </View>
             ))}

@@ -174,7 +174,7 @@ export function ProfileScreen({ onOrders, onFavorites, onAddresses, onRecentlyVi
         </View>
 
         <Text style={[PP.caption, styles.version, { color: colors.mutedForeground }]}>
-          Cravio v1.0 · Phase 6
+          Cravio v1.0 · Phase 9
         </Text>
       </ScrollView>
 
