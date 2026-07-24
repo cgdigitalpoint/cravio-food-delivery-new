@@ -31,6 +31,11 @@ export const ROUTES = {
   ADDRESSES: '/address' as const,
   ADDRESS_NEW: '/address/new' as const,
   ADDRESS_EDIT: '/address' as const, // append /[id]
+
+  // ── Phase 10B: Order flow ───────────────────────────────────────────────────
+  ORDER_SUCCESS: '/order-success' as const,
+  ORDER_FAILURE: '/order-failure' as const,
+  INVOICE: '/invoice' as const, // append /[id]
 } as const;
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];

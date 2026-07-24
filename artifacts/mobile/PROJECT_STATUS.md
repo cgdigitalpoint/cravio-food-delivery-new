@@ -18,6 +18,58 @@
 | 6 | Profile, Orders, Favorites, Addresses — screens, routes, services, stores | ✅ Complete |
 | 7 | Search & Discovery — global search, suggestions, recent, trending, results | ✅ Complete |
 | 10A | Checkout Orchestration — address management, delivery options, coupon, payment, price summary, validation | ✅ Complete |
+| 10B | Order Placement, Order Tracking, Order History, Invoice, Reorder, Notifications Foundation | ✅ Complete |
+
+---
+
+## ✅ Phase 10B — Order Placement, Tracking & History (Complete ✅)
+
+Full post-checkout order flow. Zero TypeScript errors. Expo iOS bundle builds clean.
+
+| Feature | Detail |
+|---------|--------|
+| Order Creation | `CheckoutScreen.handlePlaceOrder` calls `useOrderStore.createOrder` → Supabase `orders` + `order_items` tables; clears cart on success |
+| Order Number | First 8 chars of UUID, uppercase (e.g. `#A3F8C1D0`) |
+| Order Success Screen | `screens/OrderSuccessScreen.tsx` — animated spring circle, order card (number, restaurant, ETA, payment, total), "View Order" + "Continue Shopping" CTAs |
+| Order Failure Screen | `screens/OrderFailureScreen.tsx` — shake animation, error message, Try Again / Change Payment / Back to Checkout |
+| In-app Notification | `store/useNotificationStore.ts` — `order_placed` notification added on success; model supports 6 status types (no push yet) |
+| My Orders — Search | `screens/OrdersScreen.tsx` — search bar filters by restaurant name or order number prefix |
+| Order Details — Enhanced | `screens/OrderDetailsScreen.tsx` — status tracker with descriptions + ETA chip; map placeholder; items; payment; address placeholder; full price breakdown; Reorder + Invoice buttons |
+| Order Tracking Timeline | 5-step tracker (Placed → Accepted → Preparing → Out for Delivery → Delivered); cancelled state; active step highlighted with description + ETA |
+| Map Placeholder | "Live Order Tracking — coming soon" panel in order details |
+| Reorder | Delivered/cancelled orders show "Reorder" button — clears cart, re-adds items, navigates to checkout |
+| Invoice Screen | `screens/InvoiceScreen.tsx` — order #, date, restaurant, item rows, full price breakdown (subtotal/discount/delivery/platform fee/GST/grand total), payment status, download placeholder |
+| Notifications Foundation | `store/useNotificationStore.ts` — 6 notification types, `addNotification` / `markRead` / `markAllRead` / `clearNotifications` |
+
+### New Files
+
+| File | Role |
+|------|------|
+| `screens/OrderSuccessScreen.tsx` | Animated post-order success screen |
+| `screens/OrderFailureScreen.tsx` | Order failure UI with retry actions |
+| `screens/InvoiceScreen.tsx` | Full invoice summary with price breakdown |
+| `store/useNotificationStore.ts` | In-app notification model (no push) |
+| `app/order-success.tsx` | Route: `/order-success` |
+| `app/order-failure.tsx` | Route: `/order-failure` |
+| `app/invoice/[id].tsx` | Route: `/invoice/[id]` |
+
+### Modified Files
+
+| File | Change |
+|------|--------|
+| `screens/CheckoutScreen.tsx` | Wired `handlePlaceOrder` to `createOrder` + notification + `clearCart`; loading state on button |
+| `screens/OrderDetailsScreen.tsx` | Full rewrite — enhanced tracker, map placeholder, full bill, payment, reorder, invoice link |
+| `screens/OrdersScreen.tsx` | Added search bar filtering by restaurant / order number |
+| `screens/index.ts` | Exported 3 new screens |
+| `app/_layout.tsx` | Registered `order-success`, `order-failure`, `invoice/[id]`; added to PROTECTED set |
+| `navigation/routes.ts` | Added `ORDER_SUCCESS`, `ORDER_FAILURE`, `INVOICE` |
+
+### Quality
+
+| Check | Result |
+|-------|--------|
+| `pnpm run typecheck` | ✅ Zero errors |
+| `expo export --platform ios` | ✅ Bundle builds (7.82 MB HBC) |
 
 ---
 

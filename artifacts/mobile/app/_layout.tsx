@@ -30,7 +30,7 @@ SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
 
 // Protected route segments — redirect to /welcome if unauthenticated
-const PROTECTED = new Set(['home', 'search', 'profile', 'orders', 'favorites', 'recently-viewed', 'address', 'restaurant', 'cart', 'checkout']);
+const PROTECTED = new Set(['home', 'search', 'profile', 'orders', 'favorites', 'recently-viewed', 'address', 'restaurant', 'cart', 'checkout', 'order-success', 'order-failure', 'invoice']);
 // Auth-only segments — redirect to /home if already authenticated
 const AUTH_ONLY = new Set(['auth']);
 
@@ -103,6 +103,11 @@ function RootLayoutNav() {
         <Stack.Screen name="address/index" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="address/new" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="address/[id]" options={{ animation: 'slide_from_right' }} />
+
+        {/* ── Phase 10B: Order Success / Failure / Invoice ── */}
+        <Stack.Screen name="order-success" options={{ animation: 'fade', gestureEnabled: false }} />
+        <Stack.Screen name="order-failure" options={{ animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="invoice/[id]" options={{ animation: 'slide_from_right' }} />
 
         {/* ── Design system (Phase 2) ── */}
         <Stack.Screen name="design-system" options={{ animation: 'slide_from_right' }} />

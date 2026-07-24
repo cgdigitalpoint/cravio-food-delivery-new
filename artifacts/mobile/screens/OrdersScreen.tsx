@@ -1,18 +1,20 @@
 // ─── Orders Screen ────────────────────────────────────────────────────────────
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowLeft, Package } from 'lucide-react-native';
+import { ArrowLeft, Search, X } from 'lucide-react-native';
 import { useColors } from '@/hooks/useColors';
 import { PP } from '@/theme/poppins';
+import { borderRadius, spacing } from '@/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useOrderStore } from '@/store/useOrderStore';
 import { EmptyState } from '@/components/ui';
@@ -104,6 +106,7 @@ export function OrdersScreen({ onBack, onOrderPress }: OrdersScreenProps) {
   const { orders, isLoading, fetchOrders } = useOrderStore();
   const [activeTab, setActiveTab] = useState<TabKey>('active');
   const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const paddingTop = Platform.OS === 'web' ? 60 : insets.top;
   const paddingBottom = Platform.OS === 'web' ? 34 : insets.bottom;
@@ -119,11 +122,20 @@ export function OrdersScreen({ onBack, onOrderPress }: OrdersScreenProps) {
     setRefreshing(false);
   };
 
-  const filteredOrders = orders.filter((o) => {
-    if (activeTab === 'active') return ACTIVE_STATUSES.includes(o.status);
-    if (activeTab === 'completed') return o.status === 'delivered';
-    return o.status === 'cancelled';
-  });
+  const filteredOrders = useMemo(() => {
+    const byTab = orders.filter((o) => {
+      if (activeTab === 'active') return ACTIVE_STATUSES.includes(o.status);
+      if (activeTab === 'completed') return o.status === 'delivered';
+      return o.status === 'cancelled';
+    });
+    if (!searchQuery.trim()) return byTab;
+    const q = searchQuery.trim().toLowerCase();
+    return byTab.filter(
+      (o) =>
+        o.restaurant_name.toLowerCase().includes(q) ||
+        o.id.slice(0, 8).toLowerCase().includes(q),
+    );
+  }, [orders, activeTab, searchQuery]);
 
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
@@ -136,6 +148,27 @@ export function OrdersScreen({ onBack, onOrderPress }: OrdersScreenProps) {
         </TouchableOpacity>
         <Text style={[PP.h3, { color: colors.foreground }]}>My Orders</Text>
         <View style={{ width: 40 }} />
+      </View>
+
+      {/* Search bar */}
+      <View style={[styles.searchBar, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
+        <View style={[styles.searchInput, { backgroundColor: colors.surfaceVariant, borderColor: colors.border }]}>
+          <Search size={16} color={colors.mutedForeground} />
+          <TextInput
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="Search orders or restaurants…"
+            placeholderTextColor={colors.mutedForeground}
+            style={[PP.bodySM, { flex: 1, color: colors.foreground, marginLeft: 8, padding: 0 }]}
+            returnKeyType="search"
+            accessibilityLabel="Search orders"
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <X size={15} color={colors.mutedForeground} />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       {/* Tabs */}
@@ -172,9 +205,11 @@ export function OrdersScreen({ onBack, onOrderPress }: OrdersScreenProps) {
         ) : filteredOrders.length === 0 ? (
           <EmptyState
             variant="noOrders"
-            title="No orders yet"
+            title={searchQuery ? 'No matching orders' : 'No orders yet'}
             subtitle={
-              activeTab === 'active'
+              searchQuery
+                ? `No orders matching "${searchQuery}"`
+                : activeTab === 'active'
                 ? 'Your active orders will appear here'
                 : activeTab === 'completed'
                 ? 'Completed orders will appear here'
@@ -222,6 +257,19 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderBottomWidth: 2,
     borderBottomColor: 'transparent',
+  },
+  searchBar: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  searchInput: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    paddingHorizontal: spacing.md12,
+    paddingVertical: 9,
   },
   scroll: { flex: 1 },
   list: { padding: 16, gap: 12 },

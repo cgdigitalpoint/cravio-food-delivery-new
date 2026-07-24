@@ -5,7 +5,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  Alert,
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -35,6 +35,8 @@ import { borderRadius, spacing } from '@/theme';
 import { useCartStore } from '@/store/useCartStore';
 import { useAddressStore } from '@/store/useAddressStore';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useOrderStore } from '@/store/useOrderStore';
+import { useNotificationStore } from '@/store/useNotificationStore';
 import { EmptyState, Skeleton } from '@/components/ui';
 import {
   CheckoutItemRow,
@@ -246,7 +248,11 @@ export function CheckoutScreen() {
     removeItem,
     applyPromoCode,
     removePromoCode,
+    clearCart,
   } = useCartStore();
+
+  const { createOrder } = useOrderStore();
+  const { addNotification } = useNotificationStore();
 
   const { addresses, isLoading: addressLoading, fetchAddresses } = useAddressStore();
   const { supabaseUserId } = useAuthStore();
@@ -260,6 +266,7 @@ export function CheckoutScreen() {
     contactless: false,
     note: '',
   });
+  const [isPlacing, setIsPlacing] = useState(false);
 
   // ── Fetch addresses on mount and when userId changes ──────────────────────
   useEffect(() => {
@@ -298,9 +305,9 @@ export function CheckoutScreen() {
     [],
   );
 
-  const handlePlaceOrder = () => {
-    if (validationError) return;
-    const selectedAddr = addresses.find((a) => a.id === selectedAddressId);
+  const handlePlaceOrder = async () => {
+    if (validationError || isPlacing || !supabaseUserId) return;
+
     const paymentLabel =
       selectedPayment === 'cod'
         ? 'Cash on Delivery'
@@ -308,11 +315,55 @@ export function CheckoutScreen() {
         ? 'UPI'
         : 'Online';
 
-    Alert.alert(
-      '✓ Ready to Place Order',
-      `Delivering to: ${selectedAddr?.title ?? 'Selected Address'}\nPayment: ${paymentLabel}\nTotal: $${grandTotal.toFixed(2)}\n\nOrder placement will be completed in Phase 10B.`,
-      [{ text: 'Got it', style: 'default' }],
-    );
+    setIsPlacing(true);
+    try {
+      const order = await createOrder({
+        userId: supabaseUserId,
+        restaurantId: restaurantId ?? '',
+        restaurantName: restaurantName ?? 'Restaurant',
+        total: grandTotal,
+        paymentMethod: paymentLabel,
+        items: items.map((ci) => ({
+          foodId: ci.menuItem.id,
+          foodName: ci.menuItem.name,
+          foodImage:
+            (ci.menuItem as any).imageUrl ??
+            (ci.menuItem as any).imageUri ??
+            '',
+          quantity: ci.quantity,
+          price: ci.menuItem.price,
+        })),
+      });
+
+      addNotification({
+        type: 'order_placed',
+        orderId: order.id,
+        orderNumber: order.id.slice(0, 8).toUpperCase(),
+        restaurantName: restaurantName ?? 'Restaurant',
+        message: `Your order from ${restaurantName ?? 'Restaurant'} has been placed!`,
+      });
+
+      clearCart();
+
+      router.replace({
+        pathname: '/order-success',
+        params: {
+          orderId: order.id,
+          restaurantName: restaurantName ?? 'Restaurant',
+          total: grandTotal.toFixed(2),
+          paymentMethod: selectedPayment ?? 'cod',
+        },
+      } as any);
+    } catch (err) {
+      const errorMsg =
+        err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+      router.push({
+        pathname: '/order-failure',
+        params: { error: errorMsg },
+      } as any);
+    } finally {
+      setIsPlacing(false);
+    }
   };
 
   // ── Empty cart state ──────────────────────────────────────────────────────
@@ -557,11 +608,11 @@ export function CheckoutScreen() {
 
         <TouchableOpacity
           onPress={handlePlaceOrder}
-          disabled={!!validationError}
+          disabled={!!(validationError || isPlacing)}
           activeOpacity={0.9}
-          style={[styles.orderBtnWrap, { opacity: validationError ? 0.55 : 1 }]}
+          style={[styles.orderBtnWrap, { opacity: validationError || isPlacing ? 0.65 : 1 }]}
           accessibilityLabel="Place order"
-          accessibilityState={{ disabled: !!validationError }}
+          accessibilityState={{ disabled: !!(validationError || isPlacing) }}
         >
           <LinearGradient
             colors={['#FF8C38', '#FF6B00']}
@@ -569,20 +620,29 @@ export function CheckoutScreen() {
             end={{ x: 1, y: 0 }}
             style={styles.orderBtn}
           >
-            <View>
-              <Text style={[PP.button, { color: '#fff' }]}>Place Order</Text>
-              <Text style={[PP.caption, { color: 'rgba(255,255,255,0.8)', textAlign: 'center' }]}>
-                ${grandTotal.toFixed(2)} ·{' '}
-                {selectedPayment === 'cod'
-                  ? 'Cash on Delivery'
-                  : selectedPayment === 'upi'
-                  ? 'UPI'
-                  : selectedPayment
-                  ? 'Online'
-                  : 'Select payment'}
-              </Text>
-            </View>
-            <ChevronRight size={22} color="#fff" strokeWidth={2.5} />
+            {isPlacing ? (
+              <>
+                <ActivityIndicator size="small" color="#fff" />
+                <Text style={[PP.button, { color: '#fff', marginLeft: 10 }]}>Placing Order…</Text>
+              </>
+            ) : (
+              <>
+                <View>
+                  <Text style={[PP.button, { color: '#fff' }]}>Place Order</Text>
+                  <Text style={[PP.caption, { color: 'rgba(255,255,255,0.8)', textAlign: 'center' }]}>
+                    ${grandTotal.toFixed(2)} ·{' '}
+                    {selectedPayment === 'cod'
+                      ? 'Cash on Delivery'
+                      : selectedPayment === 'upi'
+                      ? 'UPI'
+                      : selectedPayment
+                      ? 'Online'
+                      : 'Select payment'}
+                  </Text>
+                </View>
+                <ChevronRight size={22} color="#fff" strokeWidth={2.5} />
+              </>
+            )}
           </LinearGradient>
         </TouchableOpacity>
       </View>
