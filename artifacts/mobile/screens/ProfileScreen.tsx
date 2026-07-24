@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   ChevronRight,
   CreditCard,
+  Clock3,
   Heart,
   LogOut,
   MapPin,
@@ -30,6 +31,7 @@ interface ProfileScreenProps {
   onOrders?: () => void;
   onFavorites?: () => void;
   onAddresses?: () => void;
+  onRecentlyViewed?: () => void;
   onLogout?: () => void;
 }
 
@@ -63,7 +65,7 @@ function MenuRow({ icon, label, subtitle, onPress, isDanger = false }: MenuRowPr
   );
 }
 
-export function ProfileScreen({ onOrders, onFavorites, onAddresses, onLogout }: ProfileScreenProps) {
+export function ProfileScreen({ onOrders, onFavorites, onAddresses, onRecentlyViewed, onLogout }: ProfileScreenProps) {
   const insets = useSafeAreaInsets();
   const colors = useColors();
   const { user, supabaseUserId, isLoading, logout } = useAuthStore();
@@ -131,8 +133,14 @@ export function ProfileScreen({ onOrders, onFavorites, onAddresses, onLogout }: 
           <MenuRow
             icon={<Heart size={18} color="#EC4899" />}
             label="Favorites"
-            subtitle="Your saved restaurants"
+            subtitle="Your saved restaurants and dishes"
             onPress={onFavorites}
+          />
+          <MenuRow
+            icon={<Clock3 size={18} color="#F97316" />}
+            label="Recently Viewed"
+            subtitle="Restaurants you visited recently"
+            onPress={onRecentlyViewed}
           />
           <MenuRow
             icon={<MapPin size={18} color="#6366F1" />}

@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
 import { useColors } from '@/hooks/useColors';
@@ -17,6 +18,9 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useFavoriteStore } from '@/store/useFavoriteStore';
 import { EmptyState, FavoriteButton } from '@/components/ui';
 import { RESTAURANTS } from '@/data/homeData';
+import { getMenuItems, type RestaurantMenuItem } from '@/data/restaurantData';
+import { useEngagementStore } from '@/store/useEngagementStore';
+import { RestaurantMenuItemCard } from '@/components/restaurant/RestaurantMenuItemCard';
 
 interface FavoritesScreenProps {
   onBack?: () => void;
@@ -28,6 +32,8 @@ export function FavoritesScreen({ onBack, onRestaurantPress }: FavoritesScreenPr
   const colors = useColors();
   const { supabaseUserId } = useAuthStore();
   const { favorites, isLoading, fetchFavorites, removeFavorite } = useFavoriteStore();
+  const { favoriteFoodIds, hydrate, toggleFoodFavorite } = useEngagementStore();
+  const [activeTab, setActiveTab] = useState<'restaurants' | 'dishes'>('restaurants');
   const [refreshing, setRefreshing] = useState(false);
 
   const paddingTop = Platform.OS === 'web' ? 60 : insets.top;
@@ -35,6 +41,7 @@ export function FavoritesScreen({ onBack, onRestaurantPress }: FavoritesScreenPr
 
   useEffect(() => {
     if (supabaseUserId) fetchFavorites(supabaseUserId);
+    hydrate();
   }, [supabaseUserId]);
 
   const handleRefresh = async () => {
@@ -54,6 +61,9 @@ export function FavoritesScreen({ onBack, onRestaurantPress }: FavoritesScreenPr
     fav,
     restaurant: RESTAURANTS.find((r) => r.id === fav.restaurant_id),
   }));
+  const favoriteFoods: RestaurantMenuItem[] = RESTAURANTS.flatMap((restaurant) =>
+    getMenuItems(restaurant.id).filter((item) => favoriteFoodIds.has(item.id)),
+  );
 
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
@@ -76,17 +86,35 @@ export function FavoritesScreen({ onBack, onRestaurantPress }: FavoritesScreenPr
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#FF6B00" />
         }
       >
-        {isLoading && !refreshing ? (
+        <View style={[styles.tabs, { backgroundColor: colors.surfaceVariant }]}>
+          {(['restaurants', 'dishes'] as const).map((tab) => (
+            <TouchableOpacity
+              key={tab}
+              onPress={() => setActiveTab(tab)}
+              style={[styles.tab, activeTab === tab && { backgroundColor: colors.card }]}
+            >
+              <Text style={[PP.label, { color: activeTab === tab ? colors.foreground : colors.mutedForeground }]}>
+                {tab === 'restaurants' ? 'Restaurants' : 'Dishes'}
+              </Text>
+              <View style={[styles.countBadge, { backgroundColor: activeTab === tab ? colors.primary : colors.muted }]}>
+                <Text style={[PP.caption, { color: activeTab === tab ? '#FFFFFF' : colors.mutedForeground }]}>
+                  {tab === 'restaurants' ? favoriteRestaurants.length : favoriteFoods.length}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+        {activeTab === 'restaurants' && isLoading && !refreshing ? (
           <View style={styles.centered}>
             <Text style={[PP.body, { color: colors.mutedForeground }]}>Loading favorites…</Text>
           </View>
-        ) : favoriteRestaurants.length === 0 ? (
+        ) : activeTab === 'restaurants' && favoriteRestaurants.length === 0 ? (
           <EmptyState
             variant="custom"
             title="No favorites yet"
             subtitle="Heart a restaurant on the home screen to save it here"
           />
-        ) : (
+        ) : activeTab === 'restaurants' ? (
           favoriteRestaurants.map(({ fav, restaurant }) => (
             <TouchableOpacity
               key={fav.id}
@@ -95,6 +123,9 @@ export function FavoritesScreen({ onBack, onRestaurantPress }: FavoritesScreenPr
               activeOpacity={0.8}
             >
               <View style={styles.cardBody}>
+                {restaurant?.imageUri ? (
+                  <Image source={{ uri: restaurant.imageUri }} style={styles.restaurantImage} contentFit="cover" />
+                ) : null}
                 <View style={styles.cardInfo}>
                   <Text style={[PP.label, { color: colors.foreground }]}>
                     {restaurant?.name ?? fav.restaurant_id}
@@ -116,6 +147,25 @@ export function FavoritesScreen({ onBack, onRestaurantPress }: FavoritesScreenPr
                 />
               </View>
             </TouchableOpacity>
+          ))
+        ) : favoriteFoods.length === 0 ? (
+          <EmptyState
+            variant="custom"
+            title="No favorite dishes yet"
+            subtitle="Tap the heart beside a dish to save it here"
+          />
+        ) : (
+          favoriteFoods.map((item) => (
+            <RestaurantMenuItemCard
+              key={item.id}
+              item={item}
+              quantity={0}
+              onAdd={() => {}}
+              onIncrease={() => {}}
+              onDecrease={() => {}}
+              isFavorite
+              onFavorite={() => toggleFoodFavorite(item.id)}
+            />
           ))
         )}
       </ScrollView>
@@ -140,4 +190,8 @@ const styles = StyleSheet.create({
   cardBody: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   cardInfo: { flex: 1, marginRight: 12 },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 60 },
+  tabs: { flexDirection: 'row', borderRadius: 14, padding: 4, marginBottom: 16 },
+  tab: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, paddingVertical: 10, borderRadius: 11 },
+  countBadge: { minWidth: 22, alignItems: 'center', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 10 },
+  restaurantImage: { width: 62, height: 62, borderRadius: 12, marginRight: 12 },
 });

@@ -13,6 +13,9 @@ interface RestaurantMenuSectionProps {
   onAdd: (item: RestaurantMenuItem) => void;
   onIncrease: (item: RestaurantMenuItem) => void;
   onDecrease: (item: RestaurantMenuItem) => void;
+  favoriteIds?: Set<string>;
+  onFavorite?: (item: RestaurantMenuItem) => void;
+  onShare?: (item: RestaurantMenuItem) => void;
   onLayout?: (y: number) => void;
 }
 
@@ -23,6 +26,9 @@ export function RestaurantMenuSection({
   onAdd,
   onIncrease,
   onDecrease,
+  favoriteIds,
+  onFavorite,
+  onShare,
   onLayout,
 }: RestaurantMenuSectionProps) {
   const colors = useColors();
@@ -49,6 +55,9 @@ export function RestaurantMenuSection({
           onAdd={() => onAdd(item)}
           onIncrease={() => onIncrease(item)}
           onDecrease={() => onDecrease(item)}
+          isFavorite={favoriteIds?.has(item.id)}
+          onFavorite={onFavorite ? () => onFavorite(item) : undefined}
+          onShare={onShare ? () => onShare(item) : undefined}
         />
       ))}
     </View>
@@ -67,4 +76,5 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   emoji: { fontSize: 17 },
+  shareButton: { padding: 5 },
 });

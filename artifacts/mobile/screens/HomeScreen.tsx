@@ -42,6 +42,9 @@ import {
 import { useColors } from '@/hooks/useColors';
 import { PP } from '@/theme/poppins';
 import { useCartStore } from '@/store/useCartStore';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useFavoriteStore } from '@/store/useFavoriteStore';
+import { Alert } from 'react-native';
 import {
   BANNERS,
   CATEGORIES,
@@ -621,6 +624,12 @@ export function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { itemCount, totalAmount } = useCartStore();
+  const { supabaseUserId } = useAuthStore();
+  const {
+    favoriteIds: storedFavoriteIds,
+    fetchFavorites,
+    toggleFavorite: toggleStoredFavorite,
+  } = useFavoriteStore();
 
   const paddingTop = Platform.OS === 'web' ? 67 : insets.top;
   const paddingBottom = Platform.OS === 'web' ? 34 : insets.bottom;
@@ -630,7 +639,7 @@ export function HomeScreen() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeTab, setActiveTab] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [favorites, setFavorites] = useState<Set<string>>(new Set(['r1', 'r3']));
+  const favorites = storedFavoriteIds;
 
   // Simulate network load
   useEffect(() => {
@@ -640,12 +649,20 @@ export function HomeScreen() {
     return () => clearTimeout(t);
   }, []);
 
-  const toggleFavorite = (id: string) => {
-    setFavorites((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
+  useEffect(() => {
+    if (supabaseUserId) fetchFavorites(supabaseUserId);
+  }, [supabaseUserId]);
+
+  const toggleFavorite = async (id: string) => {
+    if (!supabaseUserId) {
+      Alert.alert('Sign in to save favorites', 'Your saved restaurants sync across devices when you sign in.');
+      return;
+    }
+    try {
+      await toggleStoredFavorite(supabaseUserId, id);
+    } catch {
+      Alert.alert('Could not update favorite', 'Please try again.');
+    }
   };
 
   // Category filter for "Popular Near You" vertical section

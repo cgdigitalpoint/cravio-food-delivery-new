@@ -1,0 +1,113 @@
+Phase 9 – Engagement, Reviews & Personalization
+
+Current Status:
+
+✅ Phase 1 Complete
+✅ Phase 2 Complete
+✅ Phase 3 Complete
+✅ Phase 4 Complete
+✅ Phase 5 Complete
+✅ Phase 6 Complete
+✅ Phase 7 Complete
+✅ Phase 8 Complete
+
+GitHub is up to date.
+Do NOT modify or regenerate any completed phase.
+Do NOT start Phase 10.
+
+Implement ONLY Phase 9.
+
+=========================
+FEATURES
+=========================
+
+1. Favorites (Wishlist)
+- Add/remove favorite restaurants
+- Add/remove favorite food items
+- Favorites screen
+- Favorite badge
+- Persistent storage with Supabase
+
+2. Restaurant Reviews
+- Rating summary
+- Average rating
+- Total reviews
+- Review list
+- User avatar
+- Review date
+- Verified purchase badge
+
+3. Food Reviews
+- Individual food ratings
+- Review section
+- Helpful count
+- Review sorting
+- Photo placeholder support
+
+4. Recommended Items
+- AI-style recommended foods
+- Based on category
+- Based on popularity
+- Based on favorites
+- Horizontal carousel
+
+5. Similar Restaurants
+- Nearby restaurants
+- Same cuisine
+- Same category
+- Horizontal cards
+
+6. Recently Viewed
+- Auto save viewed restaurants
+- History screen
+- Clear history option
+
+7. Share
+- Share restaurant
+- Share food item
+- Native share API
+
+8. UI Improvements
+- Better animations
+- Skeleton loading
+- Empty states
+- Error states
+- Responsive layout
+- NativeWind styling
+- Reusable components only
+
+=========================
+QUALITY RULES
+=========================
+
+- Do not break any previous phase.
+- Keep existing navigation.
+- Keep existing stores.
+- Keep existing database structure.
+- Reuse components wherever possible.
+- TypeScript must remain error-free.
+- No duplicated code.
+
+=========================
+SAFETY
+=========================
+
+Because AI usage is limited:
+
+After every major feature:
+- Save progress internally.
+
+If AI usage becomes low:
+- Automatically create a Git commit before stopping.
+
+At the end:
+1. Run full TypeScript check.
+2. Run Expo build.
+3. Fix every error.
+4. Update PROJECT_STATUS.md.
+5. Commit all Phase 9 changes.
+6. Push to GitHub.
+7. Report completed features.
+8. Do NOT start Phase 10.
+
+Only implement Phase 9.

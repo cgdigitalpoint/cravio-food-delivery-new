@@ -27,6 +27,7 @@ export const ROUTES = {
   ORDERS: '/orders' as const,
   ORDER_DETAILS: '/orders' as const, // append /[id]
   FAVORITES: '/favorites' as const,
+  RECENTLY_VIEWED: '/recently-viewed' as const,
   ADDRESSES: '/address' as const,
   ADDRESS_NEW: '/address/new' as const,
   ADDRESS_EDIT: '/address' as const, // append /[id]

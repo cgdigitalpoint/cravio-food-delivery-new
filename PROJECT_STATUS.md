@@ -30,6 +30,20 @@ Upgraded `screens/RestaurantDetailsScreen.tsx` and added reusable restaurant men
 
 **Phase 8 verification:** `pnpm run typecheck` passes with zero TypeScript errors. The Expo iOS and Android production bundles, manifests, and assets build successfully. Expo Doctor reports only the existing non-blocking React type minor-version warning.
 
+### Phase 9 — Engagement, Reviews & Personalization (Complete ✅)
+Added Phase 9 engagement features without changing completed phase routes, the existing cart store, or the Supabase schema.
+
+| Feature | Detail |
+|---|---|
+| Favorites | Supabase-backed restaurant favorites remain synchronized across Home, Restaurant Details, and Favorites; food favorites are persisted locally using the existing AsyncStorage setup and shown in a Restaurants/Dishes Favorites screen |
+| Reviews | Restaurant rating summary, average rating, total review count, distribution bars, avatars, dates, verified-purchase badges, helpful voting, sorting, food review highlights, and photo placeholders |
+| Personalization | Recommended food carousel ranks popular, highly rated, and favorited dishes; similar restaurant carousel uses cuisine, category, rating, and distance |
+| Recently Viewed | Restaurant details auto-save a capped history in persistent storage; Profile links to a history screen with open and clear actions |
+| Sharing | Native Share API actions for restaurants and food items |
+| UI quality | Reusable engagement components, empty states, favorite controls, responsive horizontal carousels, and preserved loading/error behavior |
+
+**Phase 9 verification:** Full TypeScript check and the Expo iOS/Android production build pass. Expo Doctor continues to report only the existing non-blocking `@types/react` and `@types/react-dom` minor-version warning.
+
 ---
 
 ## 🖥️ Phase 3 Screens — Verified
@@ -308,10 +322,10 @@ Built the full Home Screen at `screens/HomeScreen.tsx` · route `app/home.tsx`.
 
 ## 🚀 Next Phase to Start
 
-**Phase 9 — To be defined**
+**Phase 10 — To be defined**
 
 Do not start until the next product scope is agreed.
 
 ---
 
-*Workflow running. Zero TypeScript errors. Phases 1–8 complete. Waiting for Phase 9 scope.*
+*Workflow running. Zero TypeScript errors. Phases 1–9 complete. Waiting for Phase 10 scope.*

@@ -3,6 +3,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Share,
   ScrollView,
   StyleSheet,
   Text,
@@ -35,9 +36,13 @@ import {
 
 import {
   EmptyState,
-  QuantitySelector,
-  Skeleton,
 } from '@/components/ui';
+import {
+  RatingSummary,
+  RecommendedFoodCarousel,
+  ReviewSection,
+  SimilarRestaurantCarousel,
+} from '@/components/engagement';
 import { RestaurantLogo } from '@/components/restaurant/RestaurantLogo';
 import { RestaurantMenuSection } from '@/components/restaurant/RestaurantMenuSection';
 import { RestaurantSkeleton } from '@/components/restaurant/RestaurantSkeleton';
@@ -50,6 +55,16 @@ import {
 } from '@/data/restaurantData';
 import { useColors } from '@/hooks/useColors';
 import { useCartStore } from '@/store/useCartStore';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useFavoriteStore } from '@/store/useFavoriteStore';
+import { useEngagementStore } from '@/store/useEngagementStore';
+import {
+  getAverageRating,
+  getFoodReviewHighlights,
+  getRestaurantReviews,
+  getRecommendedItems,
+  getSimilarRestaurants,
+} from '@/data/engagementData';
 import type { MenuItem } from '@/types';
 import { PP } from '@/theme/poppins';
 
@@ -127,11 +142,13 @@ function RestaurantHeader({
   isFavorite,
   onBack,
   onFavorite,
+  onShare,
 }: {
   restaurant: (typeof RESTAURANTS)[number];
   isFavorite: boolean;
   onBack: () => void;
   onFavorite: () => void;
+  onShare: () => void;
 }) {
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -150,6 +167,7 @@ function RestaurantHeader({
         <TouchableOpacity
           accessibilityRole="button"
           accessibilityLabel={`Share ${restaurant.name}`}
+          onPress={onShare}
           style={styles.headerButton}
         >
           <Share2 size={18} color="#FFFFFF" />
@@ -328,8 +346,20 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
   const [isLoading, setIsLoading] = useState(true);
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('popular');
-  const [isFavorite, setIsFavorite] = useState(restaurant?.isFavorite ?? false);
   const [showStickyTabs, setShowStickyTabs] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const { supabaseUserId } = useAuthStore();
+  const {
+    favoriteIds: restaurantFavoriteIds,
+    fetchFavorites,
+    toggleFavorite: toggleFavoriteInStore,
+  } = useFavoriteStore();
+  const {
+    favoriteFoodIds,
+    hydrate,
+    toggleFoodFavorite,
+    addRecentlyViewed,
+  } = useEngagementStore();
 
   const {
     items: cartItems,
@@ -347,6 +377,12 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
     const timer = setTimeout(() => setIsLoading(false), 320);
     return () => clearTimeout(timer);
   }, [restaurantId]);
+
+  useEffect(() => {
+    hydrate();
+    addRecentlyViewed(restaurantId);
+    if (supabaseUserId) fetchFavorites(supabaseUserId);
+  }, [restaurantId, supabaseUserId]);
 
   const allSections = useMemo(
     () => (restaurant ? getMenuByCategory(restaurant.id) : []),
@@ -439,6 +475,52 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
     },
     [getCartEntry, removeItem, updateQuantity],
   );
+
+  const isFavorite = restaurantFavoriteIds.has(restaurantId);
+  const reviews = useMemo(() => getRestaurantReviews(restaurantId), [restaurantId]);
+  const foodReviews = useMemo(() => getFoodReviewHighlights(restaurantId), [restaurantId]);
+  const recommendedItems = useMemo(
+    () => getRecommendedItems(restaurantId, favoriteFoodIds),
+    [restaurantId, favoriteFoodIds],
+  );
+  const similarRestaurants = useMemo(
+    () => (restaurant ? getSimilarRestaurants(restaurant) : []),
+    [restaurant],
+  );
+
+  const shareRestaurant = useCallback(async () => {
+    if (!restaurant || isSharing) return;
+    setIsSharing(true);
+    try {
+      await Share.share({
+        title: restaurant.name,
+        message: `Try ${restaurant.name} on Cravio — ${restaurant.cuisine}.`,
+        url: `https://cravio.app/restaurant/${restaurant.id}`,
+      });
+    } finally {
+      setIsSharing(false);
+    }
+  }, [isSharing, restaurant]);
+
+  const shareFood = useCallback(async (item: RestaurantMenuItem) => {
+    await Share.share({
+      title: item.name,
+      message: `Try ${item.name} from ${restaurant?.name ?? 'this restaurant'} on Cravio — $${item.price.toFixed(2)}.`,
+      url: `https://cravio.app/food/${item.id}`,
+    });
+  }, [restaurant]);
+
+  const toggleRestaurantFavorite = useCallback(async () => {
+    if (!supabaseUserId) {
+      Alert.alert('Sign in to save favorites', 'Your saved restaurants sync across devices when you sign in.');
+      return;
+    }
+    try {
+      await toggleFavoriteInStore(supabaseUserId, restaurantId);
+    } catch {
+      Alert.alert('Could not update favorite', 'Please try again.');
+    }
+  }, [restaurantId, supabaseUserId, toggleFavoriteInStore]);
 
   const handleScroll = useCallback(
     (offset: number) => {
@@ -591,6 +673,9 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
               onAdd={handleAdd}
               onIncrease={handleIncrease}
               onDecrease={handleDecrease}
+              favoriteIds={favoriteFoodIds}
+              onFavorite={(item) => toggleFoodFavorite(item.id)}
+              onShare={shareFood}
               onLayout={(y) => {
                 sectionOffsets.current[section.category.id] = y;
               }}
@@ -607,13 +692,39 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
             />
           </View>
         )}
+
+        <RecommendedFoodCarousel
+          items={recommendedItems}
+          favoriteIds={favoriteFoodIds}
+          onFavorite={(item) => toggleFoodFavorite(item.id)}
+          onFoodPress={(item) => shareFood(item)}
+        />
+
+        <RatingSummary
+          average={getAverageRating(reviews, restaurant.rating)}
+          total={1200 + reviews.length}
+          reviews={reviews}
+        />
+        <ReviewSection title="Restaurant reviews" reviews={reviews} />
+
+        <ReviewSection
+          title="Food reviews"
+          reviews={foodReviews}
+          emptyTitle="No food reviews yet"
+        />
+
+        <SimilarRestaurantCarousel
+          restaurants={similarRestaurants}
+          onRestaurantPress={(candidate) => router.push(`/restaurant/${candidate.id}`)}
+        />
       </Animated.ScrollView>
 
       <RestaurantHeader
         restaurant={restaurant}
         isFavorite={isFavorite}
         onBack={() => router.back()}
-        onFavorite={() => setIsFavorite((value) => !value)}
+        onFavorite={toggleRestaurantFavorite}
+        onShare={shareRestaurant}
       />
 
       {showStickyTabs ? (

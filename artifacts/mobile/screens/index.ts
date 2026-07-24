@@ -13,6 +13,7 @@ export { ProfileScreen } from './ProfileScreen';
 export { OrdersScreen } from './OrdersScreen';
 export { OrderDetailsScreen } from './OrderDetailsScreen';
 export { FavoritesScreen } from './FavoritesScreen';
+export { RecentlyViewedScreen } from './RecentlyViewedScreen';
 export { AddressListScreen } from './address/AddressListScreen';
 export { AddressFormScreen } from './address/AddressFormScreen';
 

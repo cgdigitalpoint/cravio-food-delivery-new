@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Image } from 'expo-image';
-import { Minus, Plus, Star } from 'lucide-react-native';
+import { Plus, Share2, Star } from 'lucide-react-native';
 
-import { QuantitySelector } from '@/components/ui';
+import { FavoriteButton, QuantitySelector } from '@/components/ui';
 import { useColors } from '@/hooks/useColors';
 import { PP } from '@/theme/poppins';
 import type { RestaurantMenuItem } from '@/data/restaurantData';
@@ -14,6 +14,9 @@ interface RestaurantMenuItemCardProps {
   onAdd: () => void;
   onIncrease: () => void;
   onDecrease: () => void;
+  isFavorite?: boolean;
+  onFavorite?: () => void;
+  onShare?: () => void;
 }
 
 function VegIndicator({ isVeg }: { isVeg: boolean }) {
@@ -31,6 +34,9 @@ export function RestaurantMenuItemCard({
   onAdd,
   onIncrease,
   onDecrease,
+  isFavorite = false,
+  onFavorite,
+  onShare,
 }: RestaurantMenuItemCardProps) {
   const colors = useColors();
   const discountedPrice = item.discount
@@ -54,6 +60,24 @@ export function RestaurantMenuItemCard({
           >
             {item.name}
           </Text>
+          {onFavorite ? (
+            <FavoriteButton
+              isFavorite={isFavorite}
+              onToggle={onFavorite}
+              size="sm"
+              backgroundColor="transparent"
+            />
+          ) : null}
+          {onShare ? (
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={`Share ${item.name}`}
+              onPress={onShare}
+              style={styles.shareButton}
+            >
+              <Share2 size={16} color={colors.mutedForeground} />
+            </TouchableOpacity>
+          ) : null}
         </View>
 
         {item.isBestSeller ? (
@@ -157,6 +181,7 @@ const styles = StyleSheet.create({
   priceRow: { marginTop: 8 },
   imageColumn: { width: 104, alignItems: 'center' },
   image: { width: 104, height: 104, borderRadius: 12 },
+  shareButton: { padding: 5 },
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',

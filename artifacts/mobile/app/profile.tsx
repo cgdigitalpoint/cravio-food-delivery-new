@@ -9,6 +9,7 @@ export default function ProfileRoute() {
     <ProfileScreen
       onOrders={() => router.push('/orders')}
       onFavorites={() => router.push('/favorites')}
+      onRecentlyViewed={() => router.push('/recently-viewed')}
       onAddresses={() => router.push('/address')}
       onLogout={() => router.replace('/welcome')}
     />
