@@ -401,8 +401,8 @@ export function CheckoutScreen() {
           <SectionLabel>YOUR ORDER</SectionLabel>
           {items.map((ci) => (
             <CheckoutItemRow
-              key={ci.cartItemId}
-              cartItemId={ci.cartItemId}
+              key={ci.id}
+              cartItemId={ci.id}
               name={ci.menuItem.name}
               imageUrl={
                 (ci.menuItem as any).imageUrl ??
@@ -412,11 +412,11 @@ export function CheckoutScreen() {
               price={ci.menuItem.price}
               quantity={ci.quantity}
               isVeg={(ci.menuItem as any).isVeg}
-              cookingNote={cookingNotes[ci.cartItemId] ?? ''}
+              cookingNote={cookingNotes[ci.id] ?? ''}
               onCookingNoteChange={handleCookingNote}
-              onIncrease={() => updateQuantity(ci.cartItemId, ci.quantity + 1)}
-              onDecrease={() => updateQuantity(ci.cartItemId, ci.quantity - 1)}
-              onRemove={() => removeItem(ci.cartItemId)}
+              onIncrease={() => updateQuantity(ci.id, ci.quantity + 1)}
+              onDecrease={() => updateQuantity(ci.id, ci.quantity - 1)}
+              onRemove={() => removeItem(ci.id)}
             />
           ))}
         </Animated.View>

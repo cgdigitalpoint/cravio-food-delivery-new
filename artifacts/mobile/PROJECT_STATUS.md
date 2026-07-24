@@ -1,6 +1,6 @@
 # Cravio — Project Status
 
-> Last updated: 2026-07-23
+> Last updated: 2026-07-24
 > App: Food Delivery Mobile App (Expo / React Native / TypeScript)
 > Artifact: `artifacts/mobile` · Workflow: `artifacts/mobile: expo` (RUNNING)
 
@@ -17,6 +17,57 @@
 | 5 | Restaurant Details + Cart + Checkout | ✅ Complete |
 | 6 | Profile, Orders, Favorites, Addresses — screens, routes, services, stores | ✅ Complete |
 | 7 | Search & Discovery — global search, suggestions, recent, trending, results | ✅ Complete |
+| 10A | Checkout Orchestration — address management, delivery options, coupon, payment, price summary, validation | ✅ Complete |
+
+---
+
+## ✅ Phase 10A — Checkout Orchestration (Complete ✅)
+
+Full pre-order checkout flow built and verified. Zero TypeScript errors. Expo iOS bundle builds clean.
+
+| Feature | Detail |
+|---------|--------|
+| Checkout orchestration | `screens/CheckoutScreen.tsx` — full scroll flow: restaurant banner → items → address → delivery → coupon → payment → price summary → sticky CTA |
+| Address management | List, Add, Edit, Delete, Set Default — `AddressListScreen`, `AddressFormScreen`, `useAddressStore`, `addressService` (Supabase-backed) |
+| Address validation | Form requires: label, house, street, city, state, pincode — save button disabled until all filled |
+| Default address | Toggle in form + "Set Default" action in list; auto-selected on checkout load |
+| GPS placeholder | `latitude: null / longitude: null` stored; GPS picker deferred to Phase 10B |
+| Delivery options | ASAP (ETA chip) / Schedule (UI-only placeholder); contactless toggle; delivery instructions text field |
+| Coupon system | `CouponInput` validates against `PROMO_CODES` dict (FIRST50 · CRAVIO20 · FREEDEL · BOGO100 · WKND20); animated apply/remove; savings shown |
+| Payment selection | COD ✅ · UPI ✅ · Card (Soon) · Wallet (Soon) — `PaymentSelector` with radio UI |
+| Price summary | Subtotal · Discount · Coupon Discount · Delivery Fee · Platform Fee ($0.99) · GST (5%) · Grand Total — `PriceSummary` with savings chip |
+| Checkout validation | Blocks "Place Order" if cart empty / no address / no payment; `ValidationBanner` shown in footer |
+| Skeleton loading | Address section shows skeletons while fetching |
+| Empty states | Empty cart → full empty screen with CTA; no addresses → inline empty state |
+| Dark / Light theme | Full `useColors()` throughout all components |
+| Cooking notes | Per-item collapsible text input in `CheckoutItemRow` |
+| TypeScript fix | Resolved `ci.cartItemId` → `ci.id` mismatch (CartItem type uses `id`) |
+
+### Files
+
+| File | Role |
+|------|------|
+| `screens/CheckoutScreen.tsx` | Main orchestrator — 728 lines |
+| `components/checkout/CheckoutItemRow.tsx` | Cart item with qty controls + cooking notes |
+| `components/checkout/CouponInput.tsx` | Apply/validate/remove promo code |
+| `components/checkout/DeliveryOptions.tsx` | ASAP/Schedule · contactless · instructions |
+| `components/checkout/PaymentSelector.tsx` | COD · UPI · Card (Soon) · Wallet (Soon) |
+| `components/checkout/PriceSummary.tsx` | Full price breakdown with savings |
+| `screens/address/AddressListScreen.tsx` | Address list with CRUD actions |
+| `screens/address/AddressFormScreen.tsx` | Add/edit form with validation |
+| `app/address/index.tsx` | Route: `/address` |
+| `app/address/new.tsx` | Route: `/address/new` |
+| `app/address/[id].tsx` | Route: `/address/[id]` (edit) |
+| `store/useAddressStore.ts` | Zustand CRUD store |
+| `services/addressService.ts` | Supabase CRUD service |
+| `data/restaurantData.ts` | `PROMO_CODES` dict |
+
+### Quality
+
+| Check | Result |
+|-------|--------|
+| `pnpm run typecheck` | ✅ Zero errors |
+| `expo export --platform ios` | ✅ Bundle builds (7.76 MB HBC) |
 
 ---
 
