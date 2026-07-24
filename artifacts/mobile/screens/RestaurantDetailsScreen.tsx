@@ -1,11 +1,7 @@
-// ─── Restaurant Details Screen — Phase 5 ─────────────────────────────────────
-// Cover image · restaurant info · sticky category tabs · food items · floating cart.
-
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
-  Dimensions,
-  Image,
+  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
@@ -19,286 +15,95 @@ import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
-  withTiming,
 } from 'react-native-reanimated';
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
   ArrowLeft,
-  ChevronDown,
-  Clock,
+  Clock3,
   Heart,
-  Info,
   MapPin,
+  Search,
   Share2,
   ShoppingCart,
   Star,
   Truck,
-  Users,
-  Zap,
+  X,
 } from 'lucide-react-native';
 
-import { useColors } from '@/hooks/useColors';
-import { PP } from '@/theme/poppins';
-import { useCartStore } from '@/store/useCartStore';
+import {
+  EmptyState,
+  QuantitySelector,
+  Skeleton,
+} from '@/components/ui';
+import { RestaurantLogo } from '@/components/restaurant/RestaurantLogo';
+import { RestaurantMenuSection } from '@/components/restaurant/RestaurantMenuSection';
+import { RestaurantSkeleton } from '@/components/restaurant/RestaurantSkeleton';
 import { RESTAURANTS } from '@/data/homeData';
 import {
   getMenuByCategory,
   getRestaurantCategories,
+  type MenuCategory,
   type RestaurantMenuItem,
 } from '@/data/restaurantData';
+import { useColors } from '@/hooks/useColors';
+import { useCartStore } from '@/store/useCartStore';
 import type { MenuItem } from '@/types';
+import { PP } from '@/theme/poppins';
 
-const { width: SCREEN_W } = Dimensions.get('window');
-const COVER_H = 260;
-const STICKY_H = 52; // height of the sticky tab bar
+const COVER_HEIGHT = 252;
+const TOP_BAR_HEIGHT = 56;
+const STICKY_TABS_HEIGHT = 52;
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function VegDot({ isVeg }: { isVeg: boolean }) {
+function VegIndicator({ isVeg }: { isVeg: boolean }) {
+  const color = isVeg ? '#16A34A' : '#DC2626';
   return (
-    <View
-      style={[
-        vegStyles.box,
-        { borderColor: isVeg ? '#16A34A' : '#DC2626' },
-      ]}
-    >
-      <View
-        style={[
-          vegStyles.dot,
-          { backgroundColor: isVeg ? '#16A34A' : '#DC2626' },
-        ]}
-      />
+    <View style={[styles.vegBox, { borderColor: color }]}>
+      <View style={[styles.vegDot, { backgroundColor: color }]} />
     </View>
   );
 }
-
-const vegStyles = StyleSheet.create({
-  box: {
-    width: 14,
-    height: 14,
-    borderWidth: 1.5,
-    borderRadius: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dot: { width: 7, height: 7, borderRadius: 4 },
-});
-
-// ─── Food Item Card ────────────────────────────────────────────────────────────
-
-function FoodItemCard({
-  item,
-  quantity,
-  onAdd,
-  onIncrease,
-  onDecrease,
-}: {
-  item: RestaurantMenuItem;
-  quantity: number;
-  onAdd: () => void;
-  onIncrease: () => void;
-  onDecrease: () => void;
-}) {
-  const colors = useColors();
-  const scale = useSharedValue(1);
-
-  const handleAdd = () => {
-    scale.value = withSpring(0.92, { damping: 10, stiffness: 300 }, () => {
-      scale.value = withSpring(1, { damping: 10, stiffness: 300 });
-    });
-    onAdd();
-  };
-
-  const animBtn = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-
-  const discountedPrice = item.discount
-    ? item.price * (1 - item.discount / 100)
-    : null;
-
-  return (
-    <View style={[ficStyles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-      {/* Badges row */}
-      {(item.isBestSeller || item.discount) && (
-        <View style={ficStyles.badgeRow}>
-          {item.isBestSeller && (
-            <View style={[ficStyles.badge, { backgroundColor: '#FFF7ED' }]}>
-              <Text style={[PP.caption, { color: '#FF6B00', fontFamily: 'Poppins_600SemiBold', fontSize: 10 }]}>
-                🏆 Best Seller
-              </Text>
-            </View>
-          )}
-          {item.discount ? (
-            <View style={[ficStyles.badge, { backgroundColor: '#F0FDF4' }]}>
-              <Text style={[PP.caption, { color: '#16A34A', fontFamily: 'Poppins_600SemiBold', fontSize: 10 }]}>
-                {item.discount}% OFF
-              </Text>
-            </View>
-          ) : null}
-        </View>
-      )}
-
-      <View style={ficStyles.row}>
-        {/* Text side */}
-        <View style={ficStyles.info}>
-          <View style={ficStyles.nameRow}>
-            <VegDot isVeg={item.isVeg} />
-            <Text style={[PP.label, { color: colors.foreground, flex: 1, marginLeft: 6 }]} numberOfLines={2}>
-              {item.name}
-            </Text>
-          </View>
-
-          {item.isCustomizable && (
-            <Text style={[PP.caption, { color: colors.mutedForeground, marginTop: 2, fontSize: 10 }]}>
-              Customizable
-            </Text>
-          )}
-
-          <Text style={[PP.bodySM, { color: colors.mutedForeground, marginTop: 4 }]} numberOfLines={2}>
-            {item.description}
-          </Text>
-
-          <View style={ficStyles.metaRow}>
-            <Star size={11} color="#F59E0B" fill="#F59E0B" />
-            <Text style={[PP.caption, { color: colors.mutedForeground, marginLeft: 3 }]}>
-              {item.rating.toFixed(1)}
-            </Text>
-            {item.calories ? (
-              <>
-                <Text style={[PP.caption, { color: colors.border, marginHorizontal: 6 }]}>·</Text>
-                <Text style={[PP.caption, { color: colors.mutedForeground }]}>{item.calories} cal</Text>
-              </>
-            ) : null}
-          </View>
-
-          <View style={ficStyles.priceRow}>
-            {discountedPrice ? (
-              <>
-                <Text style={[PP.subtitle, { color: colors.primary, fontFamily: 'Poppins_700Bold' }]}>
-                  ${discountedPrice.toFixed(2)}
-                </Text>
-                <Text style={[PP.caption, { color: colors.mutedForeground, textDecorationLine: 'line-through', marginLeft: 6 }]}>
-                  ${item.price.toFixed(2)}
-                </Text>
-              </>
-            ) : (
-              <Text style={[PP.subtitle, { color: colors.foreground, fontFamily: 'Poppins_700Bold' }]}>
-                ${item.price.toFixed(2)}
-              </Text>
-            )}
-          </View>
-        </View>
-
-        {/* Image + add button */}
-        <View style={ficStyles.imgWrap}>
-          <Image
-            source={{ uri: item.imageUrl }}
-            style={ficStyles.img}
-            resizeMode="cover"
-          />
-          {quantity === 0 ? (
-            <Animated.View style={[ficStyles.addBtn, animBtn]}>
-              <TouchableOpacity
-                onPress={handleAdd}
-                activeOpacity={0.8}
-                style={[ficStyles.addBtnInner, { backgroundColor: colors.primary }]}
-              >
-                <Text style={[PP.buttonSM, { color: '#fff' }]}>ADD</Text>
-              </TouchableOpacity>
-            </Animated.View>
-          ) : (
-            <View style={[ficStyles.qtyRow, { backgroundColor: colors.primary }]}>
-              <TouchableOpacity onPress={onDecrease} style={ficStyles.qtyBtn}>
-                <Text style={[PP.button, { color: '#fff', lineHeight: 20 }]}>−</Text>
-              </TouchableOpacity>
-              <Text style={[PP.label, { color: '#fff', minWidth: 18, textAlign: 'center' }]}>
-                {quantity}
-              </Text>
-              <TouchableOpacity onPress={onIncrease} style={ficStyles.qtyBtn}>
-                <Text style={[PP.button, { color: '#fff', lineHeight: 20 }]}>+</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
-      </View>
-    </View>
-  );
-}
-
-const ficStyles = StyleSheet.create({
-  card: {
-    marginHorizontal: 16,
-    marginBottom: 12,
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 14,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  badgeRow: { flexDirection: 'row', gap: 6, marginBottom: 8 },
-  badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
-  row: { flexDirection: 'row', gap: 12 },
-  info: { flex: 1 },
-  nameRow: { flexDirection: 'row', alignItems: 'flex-start' },
-  metaRow: { flexDirection: 'row', alignItems: 'center', marginTop: 6 },
-  priceRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8 },
-  imgWrap: { width: 100, alignItems: 'center' },
-  img: { width: 100, height: 100, borderRadius: 12 },
-  addBtn: { marginTop: 8 },
-  addBtnInner: {
-    paddingHorizontal: 20,
-    paddingVertical: 7,
-    borderRadius: 10,
-  },
-  qtyRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 10,
-    marginTop: 8,
-    overflow: 'hidden',
-  },
-  qtyBtn: { paddingHorizontal: 10, paddingVertical: 6 },
-});
-
-// ─── Category Tab Strip ────────────────────────────────────────────────────────
 
 function CategoryTabs({
   categories,
   activeId,
   onSelect,
-  background,
+  backgroundColor,
 }: {
-  categories: { id: string; name: string; emoji: string }[];
+  categories: MenuCategory[];
   activeId: string;
   onSelect: (id: string) => void;
-  background: string;
+  backgroundColor: string;
 }) {
   const colors = useColors();
+
   return (
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      style={{ backgroundColor: background }}
-      contentContainerStyle={tabStyles.list}
+      style={{ backgroundColor }}
+      contentContainerStyle={styles.categoryList}
     >
-      {categories.map((cat) => {
-        const active = cat.id === activeId;
+      {categories.map((category) => {
+        const active = category.id === activeId;
         return (
           <TouchableOpacity
-            key={cat.id}
-            onPress={() => onSelect(cat.id)}
-            activeOpacity={0.7}
+            key={category.id}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: active }}
+            onPress={() => onSelect(category.id)}
+            activeOpacity={0.75}
             style={[
-              tabStyles.tab,
-              active && { borderBottomColor: colors.primary, borderBottomWidth: 2.5 },
+              styles.categoryTab,
+              active && {
+                borderBottomColor: colors.primary,
+                borderBottomWidth: 2.5,
+              },
             ]}
           >
-            <Text style={tabStyles.emoji}>{cat.emoji}</Text>
+            <Text style={styles.categoryEmoji}>{category.emoji}</Text>
             <Text
               style={[
                 PP.bodySM,
@@ -308,7 +113,7 @@ function CategoryTabs({
                 },
               ]}
             >
-              {cat.name}
+              {category.name}
             </Text>
           </TouchableOpacity>
         );
@@ -317,9 +122,620 @@ function CategoryTabs({
   );
 }
 
-const tabStyles = StyleSheet.create({
-  list: { paddingHorizontal: 16, gap: 4 },
-  tab: {
+function RestaurantHeader({
+  restaurant,
+  isFavorite,
+  onBack,
+  onFavorite,
+}: {
+  restaurant: (typeof RESTAURANTS)[number];
+  isFavorite: boolean;
+  onBack: () => void;
+  onFavorite: () => void;
+}) {
+  const colors = useColors();
+  const insets = useSafeAreaInsets();
+
+  return (
+    <View style={[styles.headerLayer, { paddingTop: insets.top + 10 }]}>
+      <TouchableOpacity
+        accessibilityRole="button"
+        accessibilityLabel="Go back"
+        onPress={onBack}
+        style={styles.headerButton}
+      >
+        <ArrowLeft size={21} color="#FFFFFF" strokeWidth={2.5} />
+      </TouchableOpacity>
+      <View style={styles.headerActions}>
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={`Share ${restaurant.name}`}
+          style={styles.headerButton}
+        >
+          <Share2 size={18} color="#FFFFFF" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          onPress={onFavorite}
+          style={[styles.headerButton, styles.headerButtonGap]}
+        >
+          <Heart
+            size={19}
+            color={isFavorite ? '#FF8C38' : '#FFFFFF'}
+            fill={isFavorite ? '#FF8C38' : 'transparent'}
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+function RestaurantSummary({
+  restaurant,
+}: {
+  restaurant: (typeof RESTAURANTS)[number];
+}) {
+  const colors = useColors();
+  const reviewCount = 1200 + Number(restaurant.id.replace('r', '')) * 143;
+
+  return (
+    <View style={[styles.summary, { backgroundColor: colors.background }]}>
+      <View className="flex-row items-start">
+        <RestaurantLogo name={restaurant.name} imageUri={restaurant.imageUri} />
+        <View className="flex-1" style={styles.summaryTitle}>
+          <View className="flex-row items-center">
+            <VegIndicator isVeg={restaurant.isVeg ?? false} />
+            <Text
+              numberOfLines={2}
+              style={[PP.h3, { color: colors.foreground, flex: 1, marginLeft: 8 }]}
+            >
+              {restaurant.name}
+            </Text>
+          </View>
+          <Text
+            numberOfLines={2}
+            style={[PP.bodySM, { color: colors.mutedForeground, marginTop: 4 }]}
+          >
+            {restaurant.cuisine}
+          </Text>
+        </View>
+        <View
+          style={[
+            styles.statusBadge,
+            { backgroundColor: restaurant.isOpen ? '#F0FDF4' : '#FEF2F2' },
+          ]}
+        >
+          <View
+            style={[
+              styles.statusDot,
+              { backgroundColor: restaurant.isOpen ? '#16A34A' : '#DC2626' },
+            ]}
+          />
+          <Text
+            style={[
+              PP.caption,
+              {
+                color: restaurant.isOpen ? '#16A34A' : '#DC2626',
+                fontFamily: 'Poppins_600SemiBold',
+              },
+            ]}
+          >
+            {restaurant.isOpen ? 'Open' : 'Closed'}
+          </Text>
+        </View>
+      </View>
+
+      <View className="flex-row items-center" style={styles.ratingRow}>
+        <Star size={16} color="#F59E0B" fill="#F59E0B" />
+        <Text style={[PP.label, { color: colors.foreground, marginLeft: 5 }]}>
+          {restaurant.rating.toFixed(1)}
+        </Text>
+        <Text style={[PP.bodySM, { color: colors.mutedForeground, marginLeft: 4 }]}>
+          ({reviewCount.toLocaleString()} reviews)
+        </Text>
+      </View>
+
+      <View className="flex-row flex-wrap" style={styles.infoPills}>
+        <View style={[styles.infoPill, { backgroundColor: colors.surfaceVariant }]}>
+          <Clock3 size={13} color={colors.primary} />
+          <Text style={[PP.caption, { color: colors.foreground, marginLeft: 5 }]}>
+            {restaurant.deliveryTime} min
+          </Text>
+        </View>
+        <View style={[styles.infoPill, { backgroundColor: colors.surfaceVariant }]}>
+          <MapPin size={13} color={colors.primary} />
+          <Text style={[PP.caption, { color: colors.foreground, marginLeft: 5 }]}>
+            {restaurant.distance}
+          </Text>
+        </View>
+        <View style={[styles.infoPill, { backgroundColor: colors.surfaceVariant }]}>
+          <Truck size={13} color={colors.primary} />
+          <Text style={[PP.caption, { color: colors.foreground, marginLeft: 5 }]}>
+            {restaurant.deliveryFee === 0 ? 'Free delivery' : `$${restaurant.deliveryFee} delivery`}
+          </Text>
+        </View>
+      </View>
+
+      {restaurant.offerText ? (
+        <View style={styles.offerBanner}>
+          <Text style={styles.offerIcon}>%</Text>
+          <Text style={[PP.caption, { color: colors.primary, fontFamily: 'Poppins_600SemiBold' }]}>
+            {restaurant.offerText} on this order
+          </Text>
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+function FloatingCartButton({
+  count,
+  total,
+  onPress,
+  bottom,
+}: {
+  count: number;
+  total: number;
+  onPress: () => void;
+  bottom: number;
+}) {
+  const colors = useColors();
+
+  if (count === 0) return null;
+
+  return (
+    <View style={[styles.cartButtonWrap, { bottom: bottom + 16 }]}>
+      <TouchableOpacity
+        accessibilityRole="button"
+        accessibilityLabel={`View cart with ${count} items`}
+        onPress={onPress}
+        activeOpacity={0.9}
+        style={styles.cartButton}
+      >
+        <LinearGradient
+          colors={['#FF8C38', colors.primary]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.cartGradient}
+        >
+          <View style={styles.cartCount}>
+            <Text style={[PP.buttonSM, { color: colors.primary }]}>{count}</Text>
+          </View>
+          <View className="flex-1" style={styles.cartLabel}>
+            <ShoppingCart size={17} color="#FFFFFF" />
+            <Text style={[PP.button, { color: '#FFFFFF', marginLeft: 7 }]}>View Cart</Text>
+          </View>
+          <Text style={[PP.button, { color: '#FFFFFF' }]}>${total.toFixed(2)}</Text>
+        </LinearGradient>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string }) {
+  const colors = useColors();
+  const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const scrollRef = useRef<ScrollView>(null);
+  const sectionOffsets = useRef<Record<string, number>>({});
+  const scrollY = useSharedValue(0);
+
+  const restaurant = useMemo(
+    () => RESTAURANTS.find((candidate) => candidate.id === restaurantId),
+    [restaurantId],
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [query, setQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('popular');
+  const [isFavorite, setIsFavorite] = useState(restaurant?.isFavorite ?? false);
+  const [showStickyTabs, setShowStickyTabs] = useState(false);
+
+  const {
+    items: cartItems,
+    itemCount,
+    totalAmount,
+    restaurantId: cartRestaurantId,
+    restaurantName: cartRestaurantName,
+    addItem,
+    removeItem,
+    updateQuantity,
+    clearCart,
+  } = useCartStore();
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 320);
+    return () => clearTimeout(timer);
+  }, [restaurantId]);
+
+  const allSections = useMemo(
+    () => (restaurant ? getMenuByCategory(restaurant.id) : []),
+    [restaurant],
+  );
+  const menuQuery = query.trim().toLowerCase();
+  const filteredSections = useMemo(
+    () =>
+      allSections
+        .map((section) => ({
+          ...section,
+          items: section.items.filter((item) => {
+            if (!menuQuery) return true;
+            return [item.name, item.description, ...item.tags]
+              .join(' ')
+              .toLowerCase()
+              .includes(menuQuery);
+          }),
+        }))
+        .filter((section) => section.items.length > 0),
+    [allSections, menuQuery],
+  );
+  const categories = useMemo(
+    () =>
+      (menuQuery
+        ? filteredSections.map((section) => section.category)
+        : getRestaurantCategories(restaurantId)),
+    [filteredSections, menuQuery, restaurantId],
+  );
+  const quantities = useMemo(() => {
+    const result: Record<string, number> = {};
+    cartItems.forEach((item) => {
+      result[item.menuItem.id] = (result[item.menuItem.id] ?? 0) + item.quantity;
+    });
+    return result;
+  }, [cartItems]);
+
+  const handleAdd = useCallback(
+    (item: RestaurantMenuItem) => {
+      if (cartRestaurantId && cartRestaurantId !== restaurantId) {
+        Alert.alert(
+          'Start a new cart?',
+          `Your cart has items from ${cartRestaurantName ?? 'another restaurant'}.`,
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Start new',
+              style: 'destructive',
+              onPress: () => {
+                clearCart();
+                addItem(item as unknown as MenuItem);
+              },
+            },
+          ],
+        );
+        return;
+      }
+      addItem(item as unknown as MenuItem);
+    },
+    [addItem, cartRestaurantId, cartRestaurantName, clearCart, restaurantId],
+  );
+
+  const getCartEntry = useCallback(
+    (item: RestaurantMenuItem) => {
+      const entries = cartItems.filter((cartItem) => cartItem.menuItem.id === item.id);
+      if (entries.length === 0) return undefined;
+      return {
+        id: entries[0].id,
+        quantity: entries.reduce((sum, entry) => sum + entry.quantity, 0),
+      };
+    },
+    [cartItems],
+  );
+
+  const handleIncrease = useCallback(
+    (item: RestaurantMenuItem) => {
+      const entry = getCartEntry(item);
+      if (entry) updateQuantity(entry.id, entry.quantity + 1);
+      else handleAdd(item);
+    },
+    [getCartEntry, handleAdd, updateQuantity],
+  );
+
+  const handleDecrease = useCallback(
+    (item: RestaurantMenuItem) => {
+      const entry = getCartEntry(item);
+      if (!entry) return;
+      if (entry.quantity <= 1) removeItem(entry.id);
+      else updateQuantity(entry.id, entry.quantity - 1);
+    },
+    [getCartEntry, removeItem, updateQuantity],
+  );
+
+  const handleScroll = useCallback(
+    (offset: number) => {
+      setShowStickyTabs(offset > COVER_HEIGHT - TOP_BAR_HEIGHT);
+      const visibleSections = Object.entries(sectionOffsets.current).sort(
+        ([, first], [, second]) => first - second,
+      );
+      for (let index = visibleSections.length - 1; index >= 0; index -= 1) {
+        if (offset + insets.top + STICKY_TABS_HEIGHT + 12 >= visibleSections[index][1]) {
+          setActiveCategory(visibleSections[index][0]);
+          break;
+        }
+      }
+    },
+    [insets.top],
+  );
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  const coverStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateY: interpolate(
+          scrollY.value,
+          [-COVER_HEIGHT, 0, COVER_HEIGHT],
+          [-COVER_HEIGHT / 2, 0, COVER_HEIGHT * 0.28],
+        ),
+      },
+    ],
+  }));
+
+  const stickyTitleStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(
+      scrollY.value,
+      [COVER_HEIGHT - TOP_BAR_HEIGHT - 30, COVER_HEIGHT - TOP_BAR_HEIGHT],
+      [0, 1],
+    ),
+  }));
+
+  const scrollToCategory = (categoryId: string) => {
+    setActiveCategory(categoryId);
+    const offset = sectionOffsets.current[categoryId];
+    if (offset !== undefined) {
+      scrollRef.current?.scrollTo({
+        y: Math.max(0, offset - insets.top - STICKY_TABS_HEIGHT - 8),
+        animated: true,
+      });
+    }
+  };
+
+  if (isLoading) return <RestaurantSkeleton />;
+
+  if (!restaurant) {
+    return (
+      <View style={[styles.stateScreen, { backgroundColor: colors.background }]}>
+        <EmptyState
+          variant="custom"
+          title="Restaurant unavailable"
+          subtitle="We couldn't load this restaurant. Please go back and try another one."
+          ctaText="Go back"
+          onCtaPress={() => router.back()}
+        />
+      </View>
+    );
+  }
+
+  const coverUri = restaurant.imageUri ?? `https://picsum.photos/seed/${restaurant.id}/800/500`;
+
+  return (
+    <KeyboardAvoidingView
+      style={[styles.screen, { backgroundColor: colors.background }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <Animated.ScrollView
+        ref={scrollRef as any}
+        onScroll={(event) => {
+          scrollHandler(event);
+          handleScroll(event.nativeEvent.contentOffset.y);
+        }}
+        scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: 120 + insets.bottom }}
+      >
+        <View style={styles.coverWrap}>
+          <Image source={{ uri: coverUri }} style={[styles.cover, coverStyle]} contentFit="cover" />
+          <LinearGradient
+            colors={['rgba(0,0,0,0.58)', 'transparent', 'rgba(0,0,0,0.28)']}
+            style={StyleSheet.absoluteFill}
+          />
+        </View>
+
+        <RestaurantSummary restaurant={restaurant} />
+
+        <View style={[styles.searchWrap, { backgroundColor: colors.background }]}>
+          <View
+            className="flex-row items-center"
+            style={[
+              styles.searchInput,
+              { backgroundColor: colors.surfaceVariant, borderColor: colors.border },
+            ]}
+          >
+            <Search size={18} color={colors.mutedForeground} />
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Search this menu"
+              placeholderTextColor={colors.mutedForeground}
+              accessibilityLabel="Search this menu"
+              style={[styles.searchText, { color: colors.foreground }]}
+              returnKeyType="search"
+            />
+            {query ? (
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Clear menu search"
+                onPress={() => setQuery('')}
+              >
+                <X size={17} color={colors.mutedForeground} />
+              </TouchableOpacity>
+            ) : null}
+          </View>
+        </View>
+
+        <View
+          style={[
+            styles.tabsWrap,
+            { backgroundColor: colors.background, borderColor: colors.border },
+          ]}
+        >
+          <CategoryTabs
+            categories={categories}
+            activeId={activeCategory}
+            onSelect={scrollToCategory}
+            backgroundColor={colors.background}
+          />
+        </View>
+
+        {filteredSections.length > 0 ? (
+          filteredSections.map((section) => (
+            <RestaurantMenuSection
+              key={section.category.id}
+              category={section.category}
+              items={section.items}
+              quantities={quantities}
+              onAdd={handleAdd}
+              onIncrease={handleIncrease}
+              onDecrease={handleDecrease}
+              onLayout={(y) => {
+                sectionOffsets.current[section.category.id] = y;
+              }}
+            />
+          ))
+        ) : (
+          <View style={styles.emptyMenu}>
+            <EmptyState
+              variant="noSearchResult"
+              title="No dishes found"
+              subtitle={query ? `No menu items match “${query}”.` : 'This menu is currently empty.'}
+              ctaText={query ? 'Clear search' : undefined}
+              onCtaPress={query ? () => setQuery('') : undefined}
+            />
+          </View>
+        )}
+      </Animated.ScrollView>
+
+      <RestaurantHeader
+        restaurant={restaurant}
+        isFavorite={isFavorite}
+        onBack={() => router.back()}
+        onFavorite={() => setIsFavorite((value) => !value)}
+      />
+
+      {showStickyTabs ? (
+        <View
+          style={[
+            styles.stickyTabs,
+            {
+              top: insets.top + TOP_BAR_HEIGHT,
+              backgroundColor: colors.background,
+              borderColor: colors.border,
+            },
+          ]}
+        >
+          <Animated.Text
+            numberOfLines={1}
+            style={[PP.subtitle, { color: colors.foreground, marginHorizontal: 16 }, stickyTitleStyle]}
+          >
+            {restaurant.name}
+          </Animated.Text>
+          <CategoryTabs
+            categories={categories}
+            activeId={activeCategory}
+            onSelect={scrollToCategory}
+            backgroundColor={colors.background}
+          />
+        </View>
+      ) : null}
+
+      <FloatingCartButton
+        count={itemCount}
+        total={totalAmount}
+        onPress={() => router.push('/cart')}
+        bottom={insets.bottom}
+      />
+    </KeyboardAvoidingView>
+  );
+}
+
+const styles = StyleSheet.create({
+  screen: { flex: 1 },
+  stateScreen: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28 },
+  coverWrap: { height: COVER_HEIGHT, overflow: 'hidden' },
+  cover: { width: '100%', height: COVER_HEIGHT + 60, top: -30 },
+  headerLayer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 30,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingBottom: 10,
+  },
+  headerActions: { flexDirection: 'row' },
+  headerButton: {
+    width: 38,
+    height: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12,
+    backgroundColor: 'rgba(0,0,0,0.36)',
+  },
+  headerButtonGap: { marginLeft: 8 },
+  summary: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 16 },
+  summaryTitle: { marginLeft: 15, marginRight: 8 },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 9,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  statusDot: { width: 7, height: 7, borderRadius: 4 },
+  ratingRow: { marginTop: 14 },
+  infoPills: { gap: 8, marginTop: 14 },
+  infoPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 20,
+  },
+  offerBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+    marginTop: 13,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderRadius: 10,
+    backgroundColor: '#FFF7ED',
+  },
+  offerIcon: {
+    width: 17,
+    height: 17,
+    borderRadius: 9,
+    color: '#FFFFFF',
+    backgroundColor: '#FF6B00',
+    textAlign: 'center',
+    fontSize: 11,
+    fontWeight: '700',
+    lineHeight: 17,
+  },
+  searchWrap: { paddingHorizontal: 16, paddingBottom: 14 },
+  searchInput: {
+    minHeight: 46,
+    borderWidth: 1,
+    borderRadius: 14,
+    paddingHorizontal: 13,
+  },
+  searchText: {
+    flex: 1,
+    marginHorizontal: 9,
+    paddingVertical: 0,
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 13,
+  },
+  tabsWrap: { borderTopWidth: 1, borderBottomWidth: 1 },
+  categoryList: { paddingHorizontal: 12, gap: 2 },
+  categoryTab: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
@@ -328,500 +744,49 @@ const tabStyles = StyleSheet.create({
     borderBottomWidth: 2.5,
     borderBottomColor: 'transparent',
   },
-  emoji: { fontSize: 14 },
-});
-
-// ─── Floating Cart Bar ────────────────────────────────────────────────────────
-
-function FloatingCartBar({
-  itemCount,
-  total,
-  onPress,
-  bottomOffset,
-}: {
-  itemCount: number;
-  total: number;
-  onPress: () => void;
-  bottomOffset: number;
-}) {
-  const scale = useSharedValue(0);
-  const opacity = useSharedValue(0);
-
-  React.useEffect(() => {
-    if (itemCount > 0) {
-      scale.value = withSpring(1, { damping: 14, stiffness: 180 });
-      opacity.value = withTiming(1, { duration: 200 });
-    } else {
-      scale.value = withSpring(0, { damping: 14, stiffness: 180 });
-      opacity.value = withTiming(0, { duration: 150 });
-    }
-  }, [itemCount]);
-
-  const animStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-    opacity: opacity.value,
-  }));
-
-  return (
-    <Animated.View style={[fcbStyles.wrap, animStyle, { bottom: bottomOffset + 16 }]}>
-      <TouchableOpacity onPress={onPress} activeOpacity={0.9} style={fcbStyles.btn}>
-        <LinearGradient
-          colors={['#FF8C38', '#FF6B00']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={fcbStyles.gradient}
-        >
-          <View style={fcbStyles.countBubble}>
-            <Text style={[PP.buttonSM, { color: '#FF6B00', fontSize: 12 }]}>{itemCount}</Text>
-          </View>
-          <Text style={[PP.button, { color: '#fff' }]}>View Cart</Text>
-          <Text style={[PP.button, { color: '#fff', opacity: 0.85 }]}>${total.toFixed(2)}</Text>
-        </LinearGradient>
-      </TouchableOpacity>
-    </Animated.View>
-  );
-}
-
-const fcbStyles = StyleSheet.create({
-  wrap: { position: 'absolute', left: 20, right: 20, zIndex: 100 },
-  btn: { borderRadius: 16, overflow: 'hidden', shadowColor: '#FF6B00', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.45, shadowRadius: 12, elevation: 8 },
-  gradient: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 16 },
-  countBubble: { backgroundColor: '#fff', borderRadius: 10, minWidth: 28, height: 28, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
-});
-
-// ─── Main Screen ──────────────────────────────────────────────────────────────
-
-export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string }) {
-  const colors = useColors();
-  const insets = useSafeAreaInsets();
-  const router = useRouter();
-
-  // Data
-  const restaurant = RESTAURANTS.find((r) => r.id === restaurantId);
-  const categories = getRestaurantCategories(restaurantId);
-  const sections = getMenuByCategory(restaurantId);
-
-  // State
-  const [activeCategory, setActiveCategory] = useState(categories[0]?.id ?? 'popular');
-  const [isFavorite, setIsFavorite] = useState(restaurant?.isFavorite ?? false);
-  const [tabBarY, setTabBarY] = useState(COVER_H + 200); // rough default
-  const [showStickyTabs, setShowStickyTabs] = useState(false);
-  const sectionOffsets = useRef<Record<string, number>>({});
-  const scrollRef = useRef<ScrollView>(null);
-  const scrollY = useSharedValue(0);
-
-  // Cart
-  const { items: cartItems, itemCount, totalAmount, restaurantId: cartRestaurantId, addItem, removeItem, updateQuantity, clearCart, restaurantName } = useCartStore();
-
-  // Per-menu-item quantity derived from cart
-  const itemQuantities: Record<string, number> = {};
-  const cartItemById: Record<string, { cartId: string; qty: number }> = {};
-  for (const ci of cartItems) {
-    const mid = ci.menuItem.id;
-    itemQuantities[mid] = (itemQuantities[mid] ?? 0) + ci.quantity;
-    cartItemById[mid] = { cartId: ci.id, qty: ci.quantity };
-  }
-
-  // Add / increase / decrease handlers
-  const handleAdd = useCallback((item: RestaurantMenuItem) => {
-    if (cartRestaurantId && cartRestaurantId !== restaurantId) {
-      Alert.alert(
-        'Start new cart?',
-        `Your cart has items from ${restaurantName ?? 'another restaurant'}. Start a new cart?`,
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Start New',
-            style: 'destructive',
-            onPress: () => {
-              clearCart();
-              addItem(item as unknown as MenuItem, 1);
-            },
-          },
-        ],
-      );
-      return;
-    }
-    addItem(item as unknown as MenuItem, 1);
-  }, [cartRestaurantId, restaurantId, restaurantName, clearCart, addItem]);
-
-  const handleIncrease = useCallback((item: RestaurantMenuItem) => {
-    const entry = cartItemById[item.id];
-    if (entry) updateQuantity(entry.cartId, entry.qty + 1);
-    else addItem(item as unknown as MenuItem, 1);
-  }, [cartItems]);
-
-  const handleDecrease = useCallback((item: RestaurantMenuItem) => {
-    const entry = cartItemById[item.id];
-    if (!entry) return;
-    if (entry.qty <= 1) removeItem(entry.cartId);
-    else updateQuantity(entry.cartId, entry.qty - 1);
-  }, [cartItems]);
-
-  // Scroll tracking
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
-    },
-  });
-
-  const handleScrollMomentum = (y: number) => {
-    setShowStickyTabs(y >= tabBarY - insets.top - STICKY_H);
-    // Update active category
-    const sorted = Object.entries(sectionOffsets.current).sort(([, a], [, b]) => a - b);
-    for (let i = sorted.length - 1; i >= 0; i--) {
-      if (y + insets.top + STICKY_H + 10 >= sorted[i][1]) {
-        setActiveCategory(sorted[i][0]);
-        break;
-      }
-    }
-  };
-
-  // Scroll to section when tab tapped
-  const scrollToCategory = (catId: string) => {
-    setActiveCategory(catId);
-    const offset = sectionOffsets.current[catId];
-    if (offset !== undefined && scrollRef.current) {
-      scrollRef.current.scrollTo({
-        y: Math.max(0, offset - insets.top - STICKY_H - 8),
-        animated: true,
-      });
-    }
-  };
-
-  // Cover parallax
-  const coverStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        translateY: interpolate(scrollY.value, [-COVER_H, 0, COVER_H], [-COVER_H / 2, 0, COVER_H * 0.3]),
-      },
-    ],
-  }));
-
-  // Top bar fade-in on scroll
-  const topBarStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(scrollY.value, [COVER_H - 80, COVER_H - 20], [0, 1]),
-  }));
-
-  if (!restaurant) return null;
-
-  const reviewCount = 1200 + parseInt(restaurantId.slice(1)) * 143;
-
-  return (
-    <View style={[styles.screen, { backgroundColor: colors.background }]}>
-      {/* ── Animated scroll area ── */}
-      <Animated.ScrollView
-        ref={scrollRef as any}
-        onScroll={scrollHandler}
-        scrollEventThrottle={16}
-        onMomentumScrollEnd={(e) => handleScrollMomentum(e.nativeEvent.contentOffset.y)}
-        onScrollEndDrag={(e) => handleScrollMomentum(e.nativeEvent.contentOffset.y)}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120 }}
-      >
-        {/* ── Cover image ── */}
-        <View style={styles.coverWrap}>
-          <Animated.Image
-            source={{ uri: restaurant.imageUri ?? `https://picsum.photos/seed/${restaurantId}/800/500` }}
-            style={[styles.cover, coverStyle]}
-            resizeMode="cover"
-          />
-          <LinearGradient
-            colors={['rgba(0,0,0,0.55)', 'transparent', 'rgba(0,0,0,0.3)']}
-            style={StyleSheet.absoluteFill}
-          />
-        </View>
-
-        {/* ── Restaurant info card ── */}
-        <View style={[styles.infoCard, { backgroundColor: colors.background }]}>
-          {/* Restaurant name + open status */}
-          <View style={styles.nameRow}>
-            <View style={{ flex: 1 }}>
-              <View style={styles.nameTagRow}>
-                <VegDot isVeg={restaurant.isVeg ?? false} />
-                <Text
-                  style={[PP.h3, { color: colors.foreground, marginLeft: 8, flex: 1 }]}
-                  numberOfLines={2}
-                >
-                  {restaurant.name}
-                </Text>
-              </View>
-              <Text style={[PP.bodySM, { color: colors.mutedForeground, marginTop: 2 }]}>
-                {restaurant.cuisine}
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.statusBadge,
-                { backgroundColor: restaurant.isOpen ? '#F0FDF4' : '#FEF2F2' },
-              ]}
-            >
-              <View
-                style={[
-                  styles.statusDot,
-                  { backgroundColor: restaurant.isOpen ? '#16A34A' : '#DC2626' },
-                ]}
-              />
-              <Text
-                style={[
-                  PP.caption,
-                  {
-                    color: restaurant.isOpen ? '#16A34A' : '#DC2626',
-                    fontFamily: 'Poppins_600SemiBold',
-                  },
-                ]}
-              >
-                {restaurant.isOpen ? 'Open' : 'Closed'}
-              </Text>
-            </View>
-          </View>
-
-          {/* Rating + reviews */}
-          <View style={styles.ratingRow}>
-            <Star size={16} color="#F59E0B" fill="#F59E0B" />
-            <Text style={[PP.label, { color: colors.foreground, marginLeft: 4 }]}>
-              {restaurant.rating.toFixed(1)}
-            </Text>
-            <Text style={[PP.bodySM, { color: colors.mutedForeground, marginLeft: 4 }]}>
-              ({reviewCount.toLocaleString()} reviews)
-            </Text>
-          </View>
-
-          {/* Info pills */}
-          <View style={styles.pillRow}>
-            <View style={[styles.pill, { backgroundColor: colors.surfaceVariant }]}>
-              <Clock size={13} color={colors.primary} />
-              <Text style={[PP.caption, { color: colors.foreground, marginLeft: 5 }]}>
-                {restaurant.deliveryTime} min
-              </Text>
-            </View>
-            <View style={[styles.pill, { backgroundColor: colors.surfaceVariant }]}>
-              <MapPin size={13} color={colors.primary} />
-              <Text style={[PP.caption, { color: colors.foreground, marginLeft: 5 }]}>
-                {restaurant.distance}
-              </Text>
-            </View>
-            <View style={[styles.pill, { backgroundColor: colors.surfaceVariant }]}>
-              <Truck size={13} color={colors.primary} />
-              <Text style={[PP.caption, { color: colors.foreground, marginLeft: 5 }]}>
-                {restaurant.deliveryFee === 0 ? 'Free delivery' : `$${restaurant.deliveryFee} delivery`}
-              </Text>
-            </View>
-          </View>
-
-          {/* Offer banner */}
-          {restaurant.offerText && (
-            <View style={[styles.offerBanner, { backgroundColor: '#FFF7ED' }]}>
-              <Zap size={13} color="#FF6B00" fill="#FF6B00" />
-              <Text style={[PP.caption, { color: '#FF6B00', fontFamily: 'Poppins_600SemiBold', marginLeft: 5 }]}>
-                {restaurant.offerText} on this order
-              </Text>
-            </View>
-          )}
-        </View>
-
-        {/* ── Inline category tabs ── */}
-        <View
-          style={[styles.tabBarWrap, { backgroundColor: colors.background, borderColor: colors.border }]}
-          onLayout={(e) => setTabBarY(e.nativeEvent.layout.y)}
-        >
-          <CategoryTabs
-            categories={categories}
-            activeId={activeCategory}
-            onSelect={scrollToCategory}
-            background={colors.background}
-          />
-        </View>
-
-        {/* ── Menu sections ── */}
-        {sections.map(({ category, items }) => (
-          <View
-            key={category.id}
-            onLayout={(e) => {
-              sectionOffsets.current[category.id] = e.nativeEvent.layout.y;
-            }}
-          >
-            <View style={[styles.sectionHead, { borderColor: colors.border }]}>
-              <Text style={[PP.title, { color: colors.foreground }]}>
-                {category.emoji} {category.name}
-              </Text>
-              <Text style={[PP.caption, { color: colors.mutedForeground }]}>
-                {items.length} items
-              </Text>
-            </View>
-            {items.map((item) => (
-              <FoodItemCard
-                key={item.id}
-                item={item}
-                quantity={itemQuantities[item.id] ?? 0}
-                onAdd={() => handleAdd(item)}
-                onIncrease={() => handleIncrease(item)}
-                onDecrease={() => handleDecrease(item)}
-              />
-            ))}
-          </View>
-        ))}
-      </Animated.ScrollView>
-
-      {/* ── Fixed top bar (appears on scroll) ── */}
-      <View
-        style={[
-          styles.topBar,
-          { paddingTop: insets.top + 8, backgroundColor: colors.background },
-        ]}
-        pointerEvents="box-none"
-      >
-        {/* Back button (always visible) */}
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={[styles.topIconBtn, { backgroundColor: 'rgba(0,0,0,0.35)' }]}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <ArrowLeft size={20} color="#fff" strokeWidth={2.5} />
-        </TouchableOpacity>
-
-        {/* Animated title — only shown when scrolled */}
-        <Animated.Text
-          style={[PP.subtitle, { color: colors.foreground, flex: 1, textAlign: 'center' }, topBarStyle]}
-          numberOfLines={1}
-        >
-          {restaurant.name}
-        </Animated.Text>
-
-        {/* Right actions */}
-        <View style={styles.topRight}>
-          <TouchableOpacity
-            style={[styles.topIconBtn, { backgroundColor: 'rgba(0,0,0,0.35)' }]}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Share2 size={18} color="#fff" strokeWidth={2} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setIsFavorite((v) => !v)}
-            style={[styles.topIconBtn, { backgroundColor: 'rgba(0,0,0,0.35)', marginLeft: 8 }]}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Heart
-              size={18}
-              color={isFavorite ? '#FF6B00' : '#fff'}
-              fill={isFavorite ? '#FF6B00' : 'transparent'}
-              strokeWidth={2}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* ── Sticky category tab overlay (shown after scroll) ── */}
-      {showStickyTabs && (
-        <View
-          style={[
-            styles.stickyTabsOverlay,
-            { top: insets.top + 52, backgroundColor: colors.background, borderColor: colors.border },
-          ]}
-        >
-          <CategoryTabs
-            categories={categories}
-            activeId={activeCategory}
-            onSelect={scrollToCategory}
-            background={colors.background}
-          />
-        </View>
-      )}
-
-      {/* ── Floating cart bar ── */}
-      {itemCount > 0 && (
-        <FloatingCartBar
-          itemCount={itemCount}
-          total={totalAmount}
-          onPress={() => router.push('/cart')}
-          bottomOffset={insets.bottom}
-        />
-      )}
-    </View>
-  );
-}
-
-// ─── Styles ──────────────────────────────────────────────────────────────────
-const styles = StyleSheet.create({
-  screen: { flex: 1 },
-  coverWrap: { height: COVER_H, overflow: 'hidden' },
-  cover: { width: SCREEN_W, height: COVER_H + 60, top: -30 },
-
-  topBar: {
+  categoryEmoji: { fontSize: 14 },
+  stickyTabs: {
     position: 'absolute',
-    top: 0,
     left: 0,
     right: 0,
+    zIndex: 20,
+    borderBottomWidth: 1,
+    paddingTop: 9,
+  },
+  emptyMenu: { minHeight: 300, alignItems: 'center', justifyContent: 'center' },
+  cartButtonWrap: { position: 'absolute', left: 20, right: 20, zIndex: 50 },
+  cartButton: {
+    overflow: 'hidden',
+    borderRadius: 16,
+    shadowColor: '#FF6B00',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  cartGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingBottom: 10,
-    zIndex: 50,
+    paddingVertical: 14,
   },
-  topIconBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
+  cartCount: {
+    minWidth: 28,
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+    borderRadius: 14,
+    backgroundColor: '#FFFFFF',
+  },
+  cartLabel: { alignItems: 'center', marginLeft: 12 },
+  vegBox: {
+    width: 14,
+    height: 14,
+    borderWidth: 1.5,
+    borderRadius: 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  topRight: { flexDirection: 'row', alignItems: 'center' },
-
-  infoCard: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 16,
-  },
-  nameRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginBottom: 8 },
-  nameTagRow: { flexDirection: 'row', alignItems: 'center' },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-    gap: 5,
-    alignSelf: 'flex-start',
-    marginTop: 2,
-  },
-  statusDot: { width: 7, height: 7, borderRadius: 4 },
-  ratingRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  pillRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginBottom: 12 },
-  pill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  offerBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 10,
-  },
-
-  tabBarWrap: {
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-  },
-  stickyTabsOverlay: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    zIndex: 40,
-    borderBottomWidth: 1,
-  },
-
-  sectionHead: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginHorizontal: 16,
-    marginTop: 24,
-    marginBottom: 14,
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-  },
+  vegDot: { width: 7, height: 7, borderRadius: 4 },
 });

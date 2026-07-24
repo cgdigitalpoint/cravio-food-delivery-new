@@ -1,6 +1,6 @@
 # Cravio — Project Status
 
-> Last updated: 2026-07-22
+> Last updated: 2026-07-24
 > App: Food Delivery Mobile App (Expo / React Native / TypeScript)
 > Artifact: `artifacts/mobile` · Workflow: `artifacts/mobile: expo` (RUNNING)
 
@@ -16,6 +16,19 @@ Built 35+ reusable UI components powered by the Inter typeface and Cravio brand 
 
 ### Phase 3 — Premium UI Foundation (Complete ✅)
 All pre-auth screens built with Poppins typography, Reanimated animations, glassmorphism, linear gradients, and Lucide icons. Full navigation flow verified and screenshot-confirmed on all 7 screens.
+
+### Phase 8 — Restaurant Details & Menu (Complete ✅)
+Upgraded `screens/RestaurantDetailsScreen.tsx` and added reusable restaurant menu components without changing completed phase routes or cart APIs.
+
+| Feature | Detail |
+|---|---|
+| Restaurant header | Cover image, logo/initial fallback, name, cuisine, rating, reviews, veg/non-veg indicator, delivery time, distance, delivery fee, offer, and open/closed status |
+| Menu discovery | Search within the active restaurant menu, category tabs, grouped menu sections, and sticky category/header controls |
+| Ordering | Reusable food cards, shared `QuantitySelector`, add/increase/decrease actions, restaurant cart lock confirmation, and floating cart CTA |
+| States | Animated skeleton loading, invalid-restaurant error state, no-results empty state, and empty-menu state |
+| Motion & layout | Parallax cover, animated sticky header, smooth category scrolling, safe-area handling, NativeWind utility classes, and responsive flex layouts |
+
+**Phase 8 verification:** `pnpm run typecheck` passes with zero TypeScript errors. The Expo iOS and Android production bundles, manifests, and assets build successfully. Expo Doctor reports only the existing non-blocking React type minor-version warning.
 
 ---
 
@@ -295,10 +308,10 @@ Built the full Home Screen at `screens/HomeScreen.tsx` · route `app/home.tsx`.
 
 ## 🚀 Next Phase to Start
 
-**Phase 4 — Home Screen & Restaurant Discovery**
+**Phase 9 — To be defined**
 
-Entry point: activate `app/(tabs)/` group in `app/_layout.tsx`, replace the orphaned scaffold with a proper tab navigator using the existing `BottomNavigation` component (Phase 2), then build the Home screen reusing RestaurantCard, CategoryCard, OfferCard, SearchBar, Badge, and SectionHeader from Phase 2.
+Do not start until the next product scope is agreed.
 
 ---
 
-*All 3 workflows are running. Project is clean and stable. Waiting for next instruction.*
+*Workflow running. Zero TypeScript errors. Phases 1–8 complete. Waiting for Phase 9 scope.*
