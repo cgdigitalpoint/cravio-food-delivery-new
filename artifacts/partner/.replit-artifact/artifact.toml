@@ -1,0 +1,23 @@
+kind = "mobile"
+previewPath = "/partner/"
+title = "Cravio Partner"
+version = "1.0.0"
+id = "artifacts/partner"
+router = "expo-domain"
+
+[[services]]
+name = "expo"
+ensurePreviewReachable = "/status"
+paths = [ "/partner/" ]
+localPort = 18796
+
+[services.development]
+run = "pnpm --filter @workspace/partner run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/partner", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/partner", "run", "serve" ]
+
+[services.env]
+PORT = "18796"
+BASE_PATH = "/partner/"

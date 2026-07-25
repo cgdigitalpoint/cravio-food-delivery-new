@@ -1,8 +1,9 @@
 # Cravio — Project Status
 
-> Last updated: 2026-07-24
-> App: Food Delivery Mobile App (Expo / React Native / TypeScript)
-> Artifact: `artifacts/mobile` · Workflow: `artifacts/mobile: expo` (RUNNING)
+> Last updated: 2026-07-25
+> App: Food Delivery Mobile App + Restaurant Partner App (Expo / React Native / TypeScript)
+> Customer artifact: `artifacts/mobile` · Workflow: `artifacts/mobile: expo` (RUNNING)
+> Partner artifact: `artifacts/partner` · Workflow: `artifacts/partner: expo` (RUNNING)
 
 ---
 
@@ -286,6 +287,29 @@ Built the full Home Screen at `screens/HomeScreen.tsx` · route `app/home.tsx`.
 | Dummy Data | `data/homeData.ts` — 10 restaurants · 6 food items · 9 categories · 4 banners |
 
 **Navigation:** Post-auth screens redirect to `/home` (placeholder — final wiring in Phase 6).
+
+---
+
+## 🤝 Partner App — `artifacts/partner`
+
+### Phase 11A — Restaurant Partner App (Complete ✅)
+
+A fully independent Expo artifact for restaurant owners to onboard, manage their restaurant listing, and track approval status. No code shared with the customer app.
+
+| Area | Detail |
+|---|---|
+| Auth | Sign up / Sign in / Forgot password screens; Supabase email-password auth; Zustand `usePartnerAuthStore` |
+| Dashboard | Greeting card, approval status banner, open/close toggle, 6 quick-action tiles |
+| Restaurant Profile | Full restaurant form: name, cuisine, address, contact, delivery radius, min order, prep time |
+| Approval Status | Timeline stepper: Submitted → Under Review → Bank/GST Verification → Approved; rejection reason display |
+| Documents | 5 document types (FSSAI, GST, PAN, Menu, Bank); per-doc status badge; expo-image-picker integration (upload to Supabase Storage deferred to 11B) |
+| Bank Details | Bank name, account number (with confirmation), IFSC validation, account type |
+| GST Details | GST number with 15-char regex, business name, address |
+| Business Hours | 7-day toggle + inline time picker (30-min increments); "Apply Monday to All" shortcut |
+| Design | Same brand tokens as customer app (`#FF6B00`, Poppins/Inter, NativeWind v4, dark splash `#0F0F0F`) |
+| DB schema | `services/schema.sql` — 6 tables with RLS: `restaurant_partners`, `partner_restaurants`, `restaurant_documents`, `bank_details`, `gst_details`, `business_hours` |
+
+**Phase 11A verification:** `pnpm run typecheck` passes with zero TypeScript errors. Expo Metro bundler starts cleanly.
 
 ---
 
