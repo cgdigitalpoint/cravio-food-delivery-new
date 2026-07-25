@@ -28,6 +28,10 @@ export interface MenuItem {
   description: string;
   price: number;
   imageUrl: string;
+  /** Alternative image field used by some data sources (alias for imageUrl). */
+  imageUri?: string;
+  /** True for vegetarian items. */
+  isVeg?: boolean;
   category: string;
   tags: string[];
   isAvailable: boolean;

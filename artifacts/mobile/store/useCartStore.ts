@@ -18,14 +18,18 @@ interface CartState {
   totalAmount: number;
   itemCount: number;
 
+  // Signal for checkout scroll-to-section (cleared by CheckoutScreen after use)
+  checkoutScrollTo: 'payment' | null;
+
   // Actions
-  addItem: (menuItem: MenuItem, quantity?: number, notes?: string) => void;
+  addItem: (menuItem: MenuItem, quantity?: number, notes?: string, restaurantName?: string) => void;
   removeItem: (cartItemId: string) => void;
   updateQuantity: (cartItemId: string, quantity: number) => void;
   setTip: (tip: number) => void;
   applyPromoCode: (code: string, discount: number) => void;
   removePromoCode: () => void;
   clearCart: () => void;
+  setCheckoutScrollTo: (target: 'payment' | null) => void;
 }
 
 function calcTotals(items: CartItem[], tip: number, discount: number) {
@@ -48,8 +52,9 @@ export const useCartStore = create<CartState>((set, get) => ({
   promoDiscount: 0,
   totalAmount: 0,
   itemCount: 0,
+  checkoutScrollTo: null,
 
-  addItem: (menuItem, quantity = 1, notes) => {
+  addItem: (menuItem, quantity = 1, notes, restaurantName) => {
     const id = `${menuItem.id}_${Date.now()}${Math.random().toString(36).slice(2, 6)}`;
     const cartItem: CartItem = {
       id,
@@ -64,6 +69,9 @@ export const useCartStore = create<CartState>((set, get) => ({
       return {
         items,
         restaurantId: menuItem.restaurantId,
+        // Use the provided name; fall back to whatever is already in state (same
+        // restaurant add) so successive addItem calls don't clear the name.
+        restaurantName: restaurantName ?? state.restaurantName,
         ...calcTotals(items, state.tip, state.promoDiscount),
       };
     });
@@ -139,5 +147,9 @@ export const useCartStore = create<CartState>((set, get) => ({
       promoDiscount: 0,
       totalAmount: 0,
       itemCount: 0,
+      // checkoutScrollTo is intentionally NOT cleared here — it is a UI signal
+      // owned by CheckoutScreen, which clears it after consuming it.
     }),
+
+  setCheckoutScrollTo: (target) => set({ checkoutScrollTo: target }),
 }));

@@ -3,7 +3,7 @@
 // payment · price summary · validation.
 // Phase ends at "Place Order" validation step — no order is created here.
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -249,6 +249,8 @@ export function CheckoutScreen() {
     applyPromoCode,
     removePromoCode,
     clearCart,
+    checkoutScrollTo,
+    setCheckoutScrollTo,
   } = useCartStore();
 
   const { createOrder } = useOrderStore();
@@ -268,6 +270,10 @@ export function CheckoutScreen() {
   });
   const [isPlacing, setIsPlacing] = useState(false);
 
+  // ── Scroll-to-section refs (used when returning from Order Failure screen) ─
+  const scrollViewRef = useRef<ScrollView>(null);
+  const paymentSectionY = useRef<number>(0);
+
   // ── Fetch addresses on mount and when userId changes ──────────────────────
   useEffect(() => {
     if (supabaseUserId) fetchAddresses(supabaseUserId);
@@ -280,6 +286,17 @@ export function CheckoutScreen() {
       setSelectedAddressId(def.id);
     }
   }, [addresses]);
+
+  // ── Scroll to payment when returning via "Change Payment" from Order Failure
+  useEffect(() => {
+    if (checkoutScrollTo === 'payment') {
+      const t = setTimeout(() => {
+        scrollViewRef.current?.scrollTo({ y: paymentSectionY.current, animated: true });
+        setCheckoutScrollTo(null);
+      }, 200);
+      return () => clearTimeout(t);
+    }
+  }, [checkoutScrollTo]);
 
   // ── Price calculation ─────────────────────────────────────────────────────
   const actualDeliveryFee = deliveryFee > 0 ? deliveryFee : DEFAULT_DELIVERY_FEE;
@@ -327,8 +344,8 @@ export function CheckoutScreen() {
           foodId: ci.menuItem.id,
           foodName: ci.menuItem.name,
           foodImage:
-            (ci.menuItem as any).imageUrl ??
-            (ci.menuItem as any).imageUri ??
+            ci.menuItem.imageUrl ??
+            ci.menuItem.imageUri ??
             '',
           quantity: ci.quantity,
           price: ci.menuItem.price,
@@ -427,6 +444,7 @@ export function CheckoutScreen() {
       </View>
 
       <ScrollView
+        ref={scrollViewRef}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
@@ -456,13 +474,13 @@ export function CheckoutScreen() {
               cartItemId={ci.id}
               name={ci.menuItem.name}
               imageUrl={
-                (ci.menuItem as any).imageUrl ??
-                (ci.menuItem as any).imageUri ??
+                ci.menuItem.imageUrl ??
+                ci.menuItem.imageUri ??
                 ''
               }
               price={ci.menuItem.price}
               quantity={ci.quantity}
-              isVeg={(ci.menuItem as any).isVeg}
+              isVeg={ci.menuItem.isVeg}
               cookingNote={cookingNotes[ci.id] ?? ''}
               onCookingNoteChange={handleCookingNote}
               onIncrease={() => updateQuantity(ci.id, ci.quantity + 1)}
@@ -567,6 +585,7 @@ export function CheckoutScreen() {
         <Animated.View
           entering={FadeInDown.delay(200).duration(280).springify()}
           style={styles.section}
+          onLayout={(e) => { paymentSectionY.current = e.nativeEvent.layout.y; }}
         >
           <SectionLabel>PAYMENT METHOD</SectionLabel>
           <PaymentSelector

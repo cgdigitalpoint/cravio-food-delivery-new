@@ -68,7 +68,11 @@ export const orderService = {
     }));
 
     const { error: itemsError } = await supabase.from('order_items').insert(items);
-    if (itemsError) throw new Error(itemsError.message);
+    if (itemsError) {
+      // Rollback: remove the orphan order so no partial records are left in the DB.
+      await supabase.from('orders').delete().eq('id', (order as DbOrder).id);
+      throw new Error(itemsError.message);
+    }
 
     return order as DbOrder;
   },

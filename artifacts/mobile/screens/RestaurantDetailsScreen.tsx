@@ -433,16 +433,16 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
               style: 'destructive',
               onPress: () => {
                 clearCart();
-                addItem(item as unknown as MenuItem);
+                addItem(item as unknown as MenuItem, 1, undefined, restaurant?.name);
               },
             },
           ],
         );
         return;
       }
-      addItem(item as unknown as MenuItem);
+      addItem(item as unknown as MenuItem, 1, undefined, restaurant?.name);
     },
-    [addItem, cartRestaurantId, cartRestaurantName, clearCart, restaurantId],
+    [addItem, cartRestaurantId, cartRestaurantName, clearCart, restaurant, restaurantId],
   );
 
   const getCartEntry = useCallback(

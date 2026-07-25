@@ -217,7 +217,7 @@ export function OrderDetailsScreen({ orderId, onBack }: OrderDetailsScreenProps)
                 isAvailable: true,
                 isPopular: false,
               };
-              addItem(menuItem, item.quantity);
+              addItem(menuItem, item.quantity, undefined, order.restaurant_name);
             });
             router.push('/checkout');
           },
