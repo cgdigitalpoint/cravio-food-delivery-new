@@ -2,12 +2,10 @@
 import React from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { OrderFailureScreen } from '@/screens';
-import { useCartStore } from '@/store/useCartStore';
 
 export default function OrderFailureRoute() {
   const router = useRouter();
   const { error } = useLocalSearchParams<{ error: string }>();
-  const setCheckoutScrollTo = useCartStore((s) => s.setCheckoutScrollTo);
 
   return (
     <OrderFailureScreen
@@ -17,12 +15,6 @@ export default function OrderFailureRoute() {
       onRetry={() => router.back()}
       // Back to Checkout: return normally without any scroll target.
       onBackToCheckout={() => router.back()}
-      // Change Payment: signal checkout to scroll to & highlight the payment section,
-      // then navigate back so the user lands right on it.
-      onChangePayment={() => {
-        setCheckoutScrollTo('payment');
-        router.back();
-      }}
     />
   );
 }

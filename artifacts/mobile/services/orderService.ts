@@ -39,42 +39,40 @@ export const orderService = {
     userId: string;
     restaurantId: string;
     restaurantName: string;
+    addressId: string;
     total: number;
     paymentMethod: string;
     items: Array<{ foodId: string; foodName: string; foodImage: string; quantity: number; price: number }>;
   }): Promise<DbOrder> {
-    const { data: order, error } = await supabase
-      .from('orders')
-      .insert({
-        user_id: params.userId,
-        restaurant_id: params.restaurantId,
-        restaurant_name: params.restaurantName,
-        status: 'pending' as OrderStatus,
-        total: params.total,
-        payment_method: params.paymentMethod,
-        created_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
-    if (error) throw new Error(error.message);
+    if (!params.userId) throw new Error('Your session has expired. Please sign in again.');
+    if (!params.addressId) throw new Error('Please select a delivery address before placing your order.');
+    if (!params.restaurantId) throw new Error('The restaurant could not be identified. Please return to the menu and try again.');
+    if (params.items.length === 0) throw new Error('Your cart is empty. Add an item before placing your order.');
 
-    const items: Omit<DbOrderItem, 'id'>[] = params.items.map((item) => ({
-      order_id: (order as DbOrder).id,
-      food_id: item.foodId,
-      food_name: item.foodName,
-      food_image: item.foodImage,
-      quantity: item.quantity,
-      price: item.price,
-    }));
+    // Order creation is intentionally one database transaction. The SQL function
+    // also validates the authenticated user and address, so the client cannot
+    // create an order with a different user's data or leave orphan rows behind.
+    const { data, error } = await supabase.rpc('create_order_with_items', {
+      p_restaurant_id: params.restaurantId,
+      p_restaurant_name: params.restaurantName,
+      p_address_id: params.addressId,
+      p_total: params.total,
+      // COD is the only supported payment method in this phase.
+      p_payment_method: 'Cash on Delivery',
+      p_items: params.items.map((item) => ({
+        foodId: item.foodId,
+        foodName: item.foodName,
+        foodImage: item.foodImage,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+    });
 
-    const { error: itemsError } = await supabase.from('order_items').insert(items);
-    if (itemsError) {
-      // Rollback: remove the orphan order so no partial records are left in the DB.
-      await supabase.from('orders').delete().eq('id', (order as DbOrder).id);
-      throw new Error(itemsError.message);
+    if (error) {
+      throw new Error(formatOrderError(error.message));
     }
-
-    return order as DbOrder;
+    if (!data) throw new Error('The order was not returned by Supabase. Please try again.');
+    return data as DbOrder;
   },
 
   /** Update an order's status. */
@@ -86,3 +84,20 @@ export const orderService = {
     if (error) throw new Error(error.message);
   },
 };
+
+function formatOrderError(message: string): string {
+  const normalized = message.toLowerCase();
+  if (normalized.includes('not authenticated') || normalized.includes('jwt')) {
+    return 'Your session has expired. Please sign in again.';
+  }
+  if (normalized.includes('address')) {
+    return 'That delivery address is no longer available. Please select another address.';
+  }
+  if (normalized.includes('function') && normalized.includes('does not exist')) {
+    return 'Order service is not configured yet. Run the SQL migration in services/schema.sql, then try again.';
+  }
+  if (normalized.includes('network') || normalized.includes('fetch')) {
+    return 'Network connection failed. Check your internet connection and try again.';
+  }
+  return `We could not place your order: ${message}`;
+}

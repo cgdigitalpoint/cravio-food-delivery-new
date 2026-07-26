@@ -69,6 +69,7 @@ export interface DbOrder {
   user_id: string;
   restaurant_id: string;
   restaurant_name: string;
+  address_id: string | null;
   status: OrderStatus;
   total: number;
   payment_method: string;

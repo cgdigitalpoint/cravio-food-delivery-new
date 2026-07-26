@@ -1,14 +1,14 @@
 // ─── Payment Selector ─────────────────────────────────────────────────────────
-// COD · UPI · Credit/Debit Card (placeholder) · Wallet (placeholder).
+// Cash on Delivery is the only supported payment method in this phase.
 
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Banknote, CreditCard, Smartphone, Wallet } from 'lucide-react-native';
+import { Banknote } from 'lucide-react-native';
 import { useColors } from '@/hooks/useColors';
 import { PP } from '@/theme/poppins';
 import { borderRadius, spacing } from '@/theme';
 
-export type PaymentMethod = 'cod' | 'upi' | 'card' | 'wallet';
+export type PaymentMethod = 'cod';
 
 export interface PaymentSelectorProps {
   selected: PaymentMethod | null;
@@ -85,44 +85,17 @@ function Option({
 export function PaymentSelector({ selected, onSelect }: PaymentSelectorProps) {
   const colors = useColors();
 
-  const iconColor = (method: PaymentMethod) =>
-    selected === method ? '#FF6B00' : colors.mutedForeground;
+  const iconColor = selected === 'cod' ? '#FF6B00' : colors.mutedForeground;
 
   return (
     <View style={styles.container}>
       <Option
         id="cod"
-        icon={<Banknote size={18} color={iconColor('cod')} />}
+        icon={<Banknote size={18} color={iconColor} />}
         label="Cash on Delivery"
         subtitle="Pay when your order arrives"
         selected={selected === 'cod'}
         onSelect={() => onSelect('cod')}
-      />
-      <Option
-        id="upi"
-        icon={<Smartphone size={18} color={iconColor('upi')} />}
-        label="UPI"
-        subtitle="GPay, PhonePe, Paytm & more"
-        selected={selected === 'upi'}
-        onSelect={() => onSelect('upi')}
-      />
-      <Option
-        id="card"
-        icon={<CreditCard size={18} color={colors.mutedForeground} />}
-        label="Credit / Debit Card"
-        subtitle="Visa, Mastercard, Amex"
-        selected={selected === 'card'}
-        onSelect={() => onSelect('card')}
-        disabled
-      />
-      <Option
-        id="wallet"
-        icon={<Wallet size={18} color={colors.mutedForeground} />}
-        label="Cravio Wallet"
-        subtitle="Instant payments & rewards"
-        selected={selected === 'wallet'}
-        onSelect={() => onSelect('wallet')}
-        disabled
       />
     </View>
   );

@@ -1,6 +1,6 @@
 # Cravio
 
-A food delivery mobile app (Expo / React Native / TypeScript) — Phases 1–6 complete, Phase 7 pending.
+A food delivery mobile app (Expo / React Native / TypeScript) with customer checkout and Supabase-backed orders.
 
 ## Run & Operate
 
@@ -50,9 +50,9 @@ A food delivery mobile app (Expo / React Native / TypeScript) — Phases 1–6 c
 - Phase 5: Restaurant Details + Cart + Checkout
 - Phase 6: Profile, Orders, Favorites, Addresses — screens + Supabase services + Zustand stores
 
-**Phase 7 next:** Search screen (`screens/SearchScreen.tsx` + `app/search.tsx`)
+**Phase 11B:** Customer startup and order flow hardening is implemented in code. Apply the Phase 11B SQL section in `artifacts/mobile/services/schema.sql` before testing order placement against Supabase.
 
-⚠️ **Blocker:** `artifacts/mobile/services/schema.sql` must be applied in the Supabase SQL Editor before auth/data features work.
+⚠️ **Supabase checklist:** Run the complete `artifacts/mobile/services/schema.sql` in the Supabase SQL Editor. This adds the address reference, aligns catalog ID columns to text, creates the atomic `create_order_with_items` RPC, and grants it to authenticated users. Then sign in, create/select an address, and place a COD test order.
 
 ## User preferences
 

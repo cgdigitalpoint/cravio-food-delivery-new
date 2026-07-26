@@ -261,7 +261,8 @@ export function CheckoutScreen() {
 
   // ── Local state ───────────────────────────────────────────────────────────
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
-  const [selectedPayment, setSelectedPayment] = useState<PaymentMethod | null>(null);
+  // COD is the only supported payment method in this phase.
+  const [selectedPayment, setSelectedPayment] = useState<PaymentMethod | null>('cod');
   const [cookingNotes, setCookingNotes] = useState<Record<string, string>>({});
   const [deliveryOpts, setDeliveryOpts] = useState<DeliveryOptionsValue>({
     type: 'asap',
@@ -287,7 +288,7 @@ export function CheckoutScreen() {
     }
   }, [addresses]);
 
-  // ── Scroll to payment when returning via "Change Payment" from Order Failure
+  // ── Return to the payment section after a failed placement attempt
   useEffect(() => {
     if (checkoutScrollTo === 'payment') {
       const t = setTimeout(() => {
@@ -311,9 +312,10 @@ export function CheckoutScreen() {
   const validationError = useMemo(() => {
     if (itemCount === 0) return 'Your cart is empty. Add items before checkout.';
     if (!selectedAddressId) return 'Please select a delivery address.';
-    if (!selectedPayment) return 'Please select a payment method.';
+    if (!selectedPayment) return 'Cash on Delivery is required to place an order.';
+    if (!supabaseUserId) return 'Your session has expired. Please sign in again.';
     return null;
-  }, [itemCount, selectedAddressId, selectedPayment]);
+  }, [itemCount, selectedAddressId, selectedPayment, supabaseUserId]);
 
   const handleCookingNote = useCallback(
     (cartItemId: string, note: string) => {
@@ -325,21 +327,15 @@ export function CheckoutScreen() {
   const handlePlaceOrder = async () => {
     if (validationError || isPlacing || !supabaseUserId) return;
 
-    const paymentLabel =
-      selectedPayment === 'cod'
-        ? 'Cash on Delivery'
-        : selectedPayment === 'upi'
-        ? 'UPI'
-        : 'Online';
-
     setIsPlacing(true);
     try {
       const order = await createOrder({
         userId: supabaseUserId,
         restaurantId: restaurantId ?? '',
         restaurantName: restaurantName ?? 'Restaurant',
+        addressId: selectedAddressId as string,
         total: grandTotal,
-        paymentMethod: paymentLabel,
+        paymentMethod: 'Cash on Delivery',
         items: items.map((ci) => ({
           foodId: ci.menuItem.id,
           foodName: ci.menuItem.name,
@@ -368,7 +364,7 @@ export function CheckoutScreen() {
           orderId: order.id,
           restaurantName: restaurantName ?? 'Restaurant',
           total: grandTotal.toFixed(2),
-          paymentMethod: selectedPayment ?? 'cod',
+          paymentMethod: 'cod',
         },
       } as any);
     } catch (err) {
@@ -650,13 +646,7 @@ export function CheckoutScreen() {
                   <Text style={[PP.button, { color: '#fff' }]}>Place Order</Text>
                   <Text style={[PP.caption, { color: 'rgba(255,255,255,0.8)', textAlign: 'center' }]}>
                     ${grandTotal.toFixed(2)} ·{' '}
-                    {selectedPayment === 'cod'
-                      ? 'Cash on Delivery'
-                      : selectedPayment === 'upi'
-                      ? 'UPI'
-                      : selectedPayment
-                      ? 'Online'
-                      : 'Select payment'}
+                    {selectedPayment === 'cod' ? 'Cash on Delivery' : 'Select payment'}
                   </Text>
                 </View>
                 <ChevronRight size={22} color="#fff" strokeWidth={2.5} />

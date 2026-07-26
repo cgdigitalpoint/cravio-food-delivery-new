@@ -473,8 +473,8 @@ export function OrderDetailsScreen({ orderId, onBack }: OrderDetailsScreenProps)
               </View>
               <Text style={[PP.label, { color: colors.foreground }]}>{order.payment_method}</Text>
               <View style={[styles.paidBadge, { backgroundColor: '#F0FDF4' }]}>
-                <Text style={[PP.caption, { color: '#16A34A', fontFamily: 'Poppins_600SemiBold' }]}>
-                  Paid
+                  <Text style={[PP.caption, { color: '#16A34A', fontFamily: 'Poppins_600SemiBold' }]}>
+                    Pay on delivery
                 </Text>
               </View>
             </View>

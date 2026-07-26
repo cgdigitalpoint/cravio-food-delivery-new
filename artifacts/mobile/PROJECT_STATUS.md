@@ -276,12 +276,34 @@ Full end-to-end authenticated verification passed. All 9 checks green.
 | Issue | Severity | Status |
 |-------|----------|--------|
 | Search results use local mock data | Medium | Supabase tables empty until data seeded — `searchService` falls back automatically |
-| Card / Wallet payment | Low | Shows "Coming Soon" — Phase 8 scope |
+| Payment gateway | N/A | Deliberately not implemented; checkout uses Cash on Delivery only in Phase 11B |
 | `shadow*` props deprecated on web | Low | Non-blocking — native shadows work fine |
 | `props.pointerEvents` deprecation | Low | Non-blocking |
 | `@types/react` minor version mismatch | Low | Non-blocking warning from Expo CLI |
 
 ---
+
+## ✅ Phase 11B — Startup, Order Reliability & Customer Performance
+
+| Area | Result |
+|------|--------|
+| Startup | Shortened the branded splash intro and kept font-error fallback behavior |
+| Order creation | Uses the atomic `create_order_with_items` Supabase RPC with address ownership validation |
+| Catalog IDs | Orders, order items, favorites, and cart accept the app's string catalog IDs |
+| COD | COD is the only selectable method and is stored server-side as `Cash on Delivery` |
+| Errors | Session, address, network, empty-cart, and missing-RPC errors are surfaced with actionable messages |
+| Verification | `pnpm run typecheck` passes; managed Expo workflow is running on port 18115 |
+
+### Required Supabase Dashboard action
+
+Run `artifacts/mobile/services/schema.sql` in the Supabase SQL Editor. The Phase 11B section is safe to rerun for the existing schema and:
+
+1. Converts app-owned catalog ID columns from UUID to text.
+2. Adds `orders.address_id` with a foreign key to the user's address.
+3. Creates indexes for user order history and order item lookup.
+4. Creates and grants the transactional `create_order_with_items` RPC.
+
+After applying SQL, test: sign in → add/select an address → add a menu item → checkout with COD → confirm one `orders` row and its `order_items` rows.
 
 ## 🚀 Next Phase
 
@@ -289,4 +311,4 @@ Full end-to-end authenticated verification passed. All 9 checks green.
 
 ---
 
-*Workflow running. Zero TypeScript errors. All 7 phases complete.*
+*Workflow running. Zero TypeScript errors. Phase 11B code changes complete; Supabase SQL application remains a dashboard action.*

@@ -175,7 +175,7 @@ export function OrderSuccessScreen({
             />
             <View style={[styles.totalDivider, { backgroundColor: colors.border }]} />
             <View style={styles.totalRow}>
-              <Text style={[PP.label, { color: colors.mutedForeground }]}>Total Paid</Text>
+              <Text style={[PP.label, { color: colors.mutedForeground }]}>Order Total</Text>
               <Text style={[PP.title, { color: '#FF6B00' }]}>${grandTotal.toFixed(2)}</Text>
             </View>
           </View>

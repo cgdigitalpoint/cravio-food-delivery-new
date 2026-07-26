@@ -1,5 +1,5 @@
 // ─── Splash Screen ────────────────────────────────────────────────────────────
-// Premium animated brand intro. Auto-calls onComplete after ~2.8s.
+// Premium animated brand intro. Auto-calls onComplete after a short intro.
 // Uses Poppins typeface + Reanimated spring/timing sequences.
 
 import React, { useEffect } from 'react';
@@ -49,40 +49,40 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   const d3 = useSharedValue(0);
 
   useEffect(() => {
-    // Total target: ~1.2 s from mount to onComplete
+    // Keep the branded intro short so it does not block the first screen.
 
     // Glow radiates in (fast)
-    glowOpacity.value = withTiming(1, { duration: 400 });
-    glowScale.value = withTiming(1, { duration: 500 });
+    glowOpacity.value = withTiming(1, { duration: 220 });
+    glowScale.value = withTiming(1, { duration: 300 });
 
     // Logo bounces in immediately
-    logoOpacity.value = withTiming(1, { duration: 300 });
-    logoScale.value = withSpring(1, { damping: 12, stiffness: 180 });
+    logoOpacity.value = withTiming(1, { duration: 180 });
+    logoScale.value = withSpring(1, { damping: 12, stiffness: 220 });
 
     // Wordmark slides up quickly
-    wordmarkOpacity.value = withDelay(200, withTiming(1, { duration: 280 }));
-    wordmarkY.value = withDelay(200, withSpring(0, { damping: 18, stiffness: 180 }));
+    wordmarkOpacity.value = withDelay(90, withTiming(1, { duration: 180 }));
+    wordmarkY.value = withDelay(90, withSpring(0, { damping: 18, stiffness: 220 }));
 
     // Tagline fades
-    tagOpacity.value = withDelay(380, withTiming(1, { duration: 220 }));
+    tagOpacity.value = withDelay(210, withTiming(1, { duration: 160 }));
 
     // Loading dots — one quick bounce each, then onComplete
     const dotConfig = { damping: 12, stiffness: 260 };
     d1.value = withDelay(
-      580,
+      280,
       withSequence(withSpring(1, dotConfig), withSpring(0.35, dotConfig)),
     );
     d2.value = withDelay(
-      680,
+      350,
       withSequence(withSpring(1, dotConfig), withSpring(0.35, dotConfig)),
     );
     d3.value = withDelay(
-      780,
+      420,
       withSequence(
         withSpring(1, dotConfig),
         withSpring(0.35, dotConfig),
         withDelay(
-          120,
+          80,
           withTiming(0, { duration: 200 }, () => {
             runOnJS(onComplete)();
           }),

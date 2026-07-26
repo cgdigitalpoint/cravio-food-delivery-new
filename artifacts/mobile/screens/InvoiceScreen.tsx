@@ -231,7 +231,7 @@ export function InvoiceScreen({ orderId, onBack }: InvoiceScreenProps) {
               PAYMENT
             </Text>
             <BillRow label="Method" value={order.payment_method} />
-            <BillRow label="Status" value="Paid" isSaving />
+            <BillRow label="Status" value="Pay on delivery" isSaving />
           </View>
 
           {/* ── Download placeholder ── */}

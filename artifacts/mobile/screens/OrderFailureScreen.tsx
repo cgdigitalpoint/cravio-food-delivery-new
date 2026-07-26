@@ -17,7 +17,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { AlertCircle, ArrowLeft, CreditCard, RefreshCw } from 'lucide-react-native';
+import { AlertCircle, ArrowLeft, RefreshCw } from 'lucide-react-native';
 import { useColors } from '@/hooks/useColors';
 import { PP } from '@/theme/poppins';
 import { borderRadius, spacing } from '@/theme';
@@ -26,14 +26,12 @@ export interface OrderFailureScreenProps {
   error: string;
   onRetry: () => void;
   onBackToCheckout: () => void;
-  onChangePayment: () => void;
 }
 
 export function OrderFailureScreen({
   error,
   onRetry,
   onBackToCheckout,
-  onChangePayment,
 }: OrderFailureScreenProps) {
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -120,21 +118,6 @@ export function OrderFailureScreen({
           >
             <RefreshCw size={17} color="#fff" />
             <Text style={[PP.label, { color: '#fff', marginLeft: 8 }]}>Try Again</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={onChangePayment}
-            activeOpacity={0.85}
-            style={[
-              styles.actionBtn,
-              { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
-            ]}
-            accessibilityLabel="Change payment method"
-          >
-            <CreditCard size={17} color={colors.foreground} />
-            <Text style={[PP.label, { color: colors.foreground, marginLeft: 8 }]}>
-              Change Payment
-            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
