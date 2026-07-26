@@ -40,7 +40,7 @@ const queryClient = new QueryClient({
 });
 
 // Protected route segments — redirect to /welcome if unauthenticated
-const PROTECTED = new Set(['home', 'search', 'profile', 'orders', 'favorites', 'recently-viewed', 'address', 'restaurant', 'cart', 'checkout', 'order-success', 'order-failure', 'invoice']);
+const PROTECTED = new Set(['home', 'search', 'profile', 'profile-edit', 'orders', 'favorites', 'recently-viewed', 'address', 'restaurant', 'cart', 'checkout', 'order-success', 'order-failure', 'invoice']);
 // Auth-only segments — redirect to /home if already authenticated
 const AUTH_ONLY = new Set(['auth']);
 
@@ -108,6 +108,7 @@ function RootLayoutNav() {
 
         {/* ── Profile & supporting screens ── */}
         <Stack.Screen name="profile" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="profile-edit" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="orders" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="orders/[id]" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="favorites" options={{ animation: 'slide_from_right' }} />

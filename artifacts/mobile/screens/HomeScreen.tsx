@@ -44,6 +44,8 @@ import { PP } from '@/theme/poppins';
 import { useCartStore } from '@/store/useCartStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useFavoriteStore } from '@/store/useFavoriteStore';
+import { useAddressStore } from '@/store/useAddressStore';
+import { useNotificationStore } from '@/store/useNotificationStore';
 import { Alert } from 'react-native';
 import { getMenuItems, type RestaurantMenuItem } from '@/data/restaurantData';
 import {
@@ -65,8 +67,8 @@ const CARD_W = SCREEN_W - 80;    // restaurant card in horizontal scroll
 const FOOD_W = SCREEN_W - 48;    // food card in horizontal scroll
 const H_GAP = 12;
 
-// ─── Bottom Nav Items ─────────────────────────────────────────────────────────
-const NAV_ITEMS: BottomNavItem[] = [
+// ─── Bottom Nav Items (static — badge injected dynamically in component) ──────
+const BASE_NAV_ITEMS: BottomNavItem[] = [
   {
     label: 'Home',
     icon: (active, c) => <Ionicons name={active ? 'home' : 'home-outline'} size={22} color={c} />,
@@ -78,7 +80,6 @@ const NAV_ITEMS: BottomNavItem[] = [
   {
     label: 'Orders',
     icon: (active, c) => <Ionicons name={active ? 'receipt' : 'receipt-outline'} size={22} color={c} />,
-    badge: 1,
   },
   {
     label: 'Profile',
@@ -87,8 +88,18 @@ const NAV_ITEMS: BottomNavItem[] = [
 ];
 
 // ─── Home Header ──────────────────────────────────────────────────────────────
-function HomeHeader() {
+function HomeHeader({ onNotificationsPress }: { onNotificationsPress?: () => void }) {
   const colors = useColors();
+  const { user } = useAuthStore();
+  const { getDefault } = useAddressStore();
+  const { unreadCount } = useNotificationStore();
+
+  const defaultAddr = getDefault();
+  const locationLabel = defaultAddr
+    ? `${defaultAddr.house}, ${defaultAddr.city}`
+    : 'Set delivery location';
+  const displayName = user?.name ?? 'Cravio User';
+
   return (
     <View style={[hdrStyles.wrap, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
       {/* Left: location */}
@@ -101,7 +112,7 @@ function HomeHeader() {
         </View>
         <TouchableOpacity style={hdrStyles.addressRow} activeOpacity={0.7}>
           <Text style={[PP.subtitle, { color: colors.foreground }]} numberOfLines={1}>
-            123 Baker Street
+            {locationLabel}
           </Text>
           <ChevronDown size={16} color={colors.primary} strokeWidth={2.5} />
         </TouchableOpacity>
@@ -110,13 +121,14 @@ function HomeHeader() {
       {/* Right: notification + avatar */}
       <View style={hdrStyles.right}>
         <TouchableOpacity
+          onPress={onNotificationsPress}
           style={[hdrStyles.iconBtn, { backgroundColor: colors.card, borderColor: colors.border }]}
         >
-          <NotificationBadge count={3}>
+          <NotificationBadge count={unreadCount}>
             <Bell size={20} color={colors.foreground} strokeWidth={1.8} />
           </NotificationBadge>
         </TouchableOpacity>
-        <Avatar name="Alex Johnson" size="sm" />
+        <Avatar name={displayName} size="sm" />
       </View>
     </View>
   );
@@ -959,7 +971,7 @@ export function HomeScreen() {
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       {/* Fixed header + safe area top */}
       <View style={{ paddingTop }}>
-        <HomeHeader />
+        <HomeHeader onNotificationsPress={() => router.push('/profile')} />
       </View>
 
       {/* Main content area */}
@@ -979,7 +991,7 @@ export function HomeScreen() {
 
       {/* Bottom navigation — sits at bottom naturally as flex child */}
       <BottomNavigation
-        items={NAV_ITEMS}
+        items={BASE_NAV_ITEMS}
         activeIndex={activeTab}
         onPress={(index: number) => {
           if (index === 1) { router.push('/search'); return; }

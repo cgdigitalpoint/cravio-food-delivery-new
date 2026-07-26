@@ -11,6 +11,7 @@ export default function ProfileRoute() {
       onFavorites={() => router.push('/favorites')}
       onRecentlyViewed={() => router.push('/recently-viewed')}
       onAddresses={() => router.push('/address')}
+      onEditProfile={() => router.push('/profile-edit')}
       onLogout={() => router.replace('/welcome')}
     />
   );

@@ -25,6 +25,9 @@ export type { OrderFailureScreenProps } from './OrderFailureScreen';
 export { InvoiceScreen } from './InvoiceScreen';
 export type { InvoiceScreenProps } from './InvoiceScreen';
 
+// Profile edit
+export { EditProfileScreen } from './EditProfileScreen';
+
 // Auth screens
 export { LoginScreen } from './auth/LoginScreen';
 export { SignupScreen } from './auth/SignupScreen';

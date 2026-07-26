@@ -32,6 +32,7 @@ interface ProfileScreenProps {
   onFavorites?: () => void;
   onAddresses?: () => void;
   onRecentlyViewed?: () => void;
+  onEditProfile?: () => void;
   onLogout?: () => void;
 }
 
@@ -65,7 +66,7 @@ function MenuRow({ icon, label, subtitle, onPress, isDanger = false }: MenuRowPr
   );
 }
 
-export function ProfileScreen({ onOrders, onFavorites, onAddresses, onRecentlyViewed, onLogout }: ProfileScreenProps) {
+export function ProfileScreen({ onOrders, onFavorites, onAddresses, onRecentlyViewed, onEditProfile, onLogout }: ProfileScreenProps) {
   const insets = useSafeAreaInsets();
   const colors = useColors();
   const { user, supabaseUserId, isLoading, logout } = useAuthStore();
@@ -119,6 +120,13 @@ export function ProfileScreen({ onOrders, onFavorites, onAddresses, onRecentlyVi
               <Text style={[PP.caption, { color: colors.mutedForeground }]}>{displayPhone}</Text>
             ) : null}
           </View>
+          <TouchableOpacity
+            onPress={onEditProfile}
+            style={[styles.editBtn, { backgroundColor: `${colors.primary}15`, borderColor: `${colors.primary}30` }]}
+            activeOpacity={0.75}
+          >
+            <Text style={[PP.caption, { color: colors.primary, fontFamily: 'Poppins_600SemiBold' }]}>Edit</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Menu sections */}
@@ -225,4 +233,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   menuText: { flex: 1 },
+  editBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignSelf: 'flex-start',
+  },
 });
