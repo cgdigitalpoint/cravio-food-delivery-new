@@ -665,11 +665,42 @@ export function HomeScreen() {
     }
   };
 
-  // Category filter for "Popular Near You" vertical section
+  // Category filter — when a category is selected, search all restaurants (not just the top-5 slice)
   const filteredPopular =
     activeCategory === 'all'
       ? POPULAR_RESTAURANTS
-      : POPULAR_RESTAURANTS.filter((r) => r.category === activeCategory);
+      : RESTAURANTS.filter((r) => r.category === activeCategory && r.isOpen);
+
+  // Also filter horizontal sections by category when one is selected
+  const filteredFeatured =
+    activeCategory === 'all'
+      ? FEATURED_RESTAURANTS
+      : FEATURED_RESTAURANTS.filter((r) => r.category === activeCategory);
+
+  const filteredFastDelivery =
+    activeCategory === 'all'
+      ? FAST_DELIVERY_RESTAURANTS
+      : FAST_DELIVERY_RESTAURANTS.filter((r) => r.category === activeCategory);
+
+  const filteredTopRated =
+    activeCategory === 'all'
+      ? TOP_RATED_RESTAURANTS
+      : TOP_RATED_RESTAURANTS.filter((r) => r.category === activeCategory);
+
+  // Smart recommendation: sort all open restaurants by a composite score
+  const recommendedRestaurants = React.useMemo(() => {
+    const scored = RESTAURANTS.filter((r) => r.isOpen).map((r) => ({
+      r,
+      score:
+        r.rating * 20 +
+        (r.offerText ? 15 : 0) +
+        (r.isNew ? 10 : 0) +
+        Math.max(0, 30 - r.deliveryTime) * 0.5 +
+        (r.deliveryFee === 0 ? 8 : 0) +
+        (r.isVeg ? 3 : 0),
+    }));
+    return scored.sort((a, b) => b.score - a.score).map((x) => x.r);
+  }, []);
 
   // ── Home Tab Content ────────────────────────────────────────────────────────
   const HomeContent = (
@@ -699,33 +730,24 @@ export function HomeScreen() {
       <BannerCarousel />
 
       {/* ── Featured Restaurants ── */}
-      <View style={styles.section}>
-        <View style={styles.sectionHead}>
-          <SectionHeader
-            title="Featured Restaurants"
-            subtitle="Handpicked for you"
-            onSeeAllPress={() => {}}
+      {filteredFeatured.length > 0 && (
+        <View style={styles.section}>
+          <View style={styles.sectionHead}>
+            <SectionHeader
+              title="Featured Restaurants"
+              subtitle="Handpicked for you"
+              onSeeAllPress={() => {}}
+            />
+          </View>
+          <HorizontalRestaurantScroll
+            data={filteredFeatured}
+            favorites={favorites}
+            onFavoriteToggle={toggleFavorite}
+            onRestaurantPress={(id) => router.push(`/restaurant/${id}`)}
           />
         </View>
-        <HorizontalRestaurantScroll
-          data={FEATURED_RESTAURANTS}
-          favorites={favorites}
-          onFavoriteToggle={toggleFavorite}
-          onRestaurantPress={(id) => router.push(`/restaurant/${id}`)}
-        />
-      </View>
+      )}
 
-      {/* ── Quick Picks (food items) ── */}
-      <View style={styles.section}>
-        <View style={styles.sectionHead}>
-          <SectionHeader
-            title="Quick Picks 🍽️"
-            subtitle="Trending dishes right now"
-            onSeeAllPress={() => {}}
-          />
-        </View>
-        <FoodRecommendationScroll data={FOOD_ITEMS.slice(0, 4)} />
-      </View>
 
       {/* ── Popular Near You (vertical, filterable by category) ── */}
       <View style={styles.section}>
@@ -757,50 +779,75 @@ export function HomeScreen() {
       </View>
 
       {/* ── Fast Delivery ── */}
-      <View style={styles.section}>
-        <View style={styles.sectionHead}>
-          <SectionHeader
-            title="Fast Delivery ⚡"
-            subtitle="Arrives in 30 min or less"
-            onSeeAllPress={() => {}}
+      {filteredFastDelivery.length > 0 && (
+        <View style={styles.section}>
+          <View style={styles.sectionHead}>
+            <SectionHeader
+              title="Fast Delivery ⚡"
+              subtitle="Arrives in 30 min or less"
+              onSeeAllPress={() => {}}
+            />
+          </View>
+          <HorizontalRestaurantScroll
+            data={filteredFastDelivery}
+            favorites={favorites}
+            onFavoriteToggle={toggleFavorite}
+            onRestaurantPress={(id) => router.push(`/restaurant/${id}`)}
           />
         </View>
-        <HorizontalRestaurantScroll
-          data={FAST_DELIVERY_RESTAURANTS}
-          favorites={favorites}
-          onFavoriteToggle={toggleFavorite}
-          onRestaurantPress={(id) => router.push(`/restaurant/${id}`)}
-        />
-      </View>
+      )}
 
       {/* ── Top Rated ── */}
-      <View style={styles.section}>
-        <View style={styles.sectionHead}>
-          <SectionHeader
-            title="Top Rated ⭐"
-            subtitle="Highly reviewed by the community"
-            onSeeAllPress={() => {}}
+      {filteredTopRated.length > 0 && (
+        <View style={styles.section}>
+          <View style={styles.sectionHead}>
+            <SectionHeader
+              title="Top Rated ⭐"
+              subtitle="Highly reviewed by the community"
+              onSeeAllPress={() => {}}
+            />
+          </View>
+          <HorizontalRestaurantScroll
+            data={filteredTopRated}
+            favorites={favorites}
+            onFavoriteToggle={toggleFavorite}
+            onRestaurantPress={(id) => router.push(`/restaurant/${id}`)}
           />
         </View>
-        <HorizontalRestaurantScroll
-          data={TOP_RATED_RESTAURANTS}
-          favorites={favorites}
-          onFavoriteToggle={toggleFavorite}
-          onRestaurantPress={(id) => router.push(`/restaurant/${id}`)}
-        />
-      </View>
+      )}
 
-      {/* ── Recommended ── */}
-      <View style={styles.section}>
-        <View style={styles.sectionHead}>
-          <SectionHeader
-            title="Recommended For You"
-            subtitle="Based on your preferences"
-            onSeeAllPress={() => {}}
+      {/* ── Recommended (smart-sorted, category-aware) ── */}
+      {activeCategory === 'all' && (
+        <View style={styles.section}>
+          <View style={styles.sectionHead}>
+            <SectionHeader
+              title="Recommended For You"
+              subtitle="Top picks based on rating, speed & offers"
+              onSeeAllPress={() => {}}
+            />
+          </View>
+          <HorizontalRestaurantScroll
+            data={recommendedRestaurants.slice(0, 5)}
+            favorites={favorites}
+            onFavoriteToggle={toggleFavorite}
+            onRestaurantPress={(id) => router.push(`/restaurant/${id}`)}
           />
         </View>
-        <FoodRecommendationScroll data={FOOD_ITEMS.slice(2)} />
-      </View>
+      )}
+
+      {/* ── Quick Picks (food) ── keep visible always ── */}
+      {activeCategory === 'all' && (
+        <View style={styles.section}>
+          <View style={styles.sectionHead}>
+            <SectionHeader
+              title="Quick Picks 🍽️"
+              subtitle="Trending dishes right now"
+              onSeeAllPress={() => {}}
+            />
+          </View>
+          <FoodRecommendationScroll data={FOOD_ITEMS.slice(2)} />
+        </View>
+      )}
     </View>
   );
 

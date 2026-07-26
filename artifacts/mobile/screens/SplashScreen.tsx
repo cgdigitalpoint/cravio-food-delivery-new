@@ -49,60 +49,41 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   const d3 = useSharedValue(0);
 
   useEffect(() => {
-    // Glow radiates in
-    glowOpacity.value = withTiming(1, { duration: 900 });
-    glowScale.value = withTiming(1, { duration: 1100 });
+    // Total target: ~1.2 s from mount to onComplete
 
-    // Logo bounces in
-    logoOpacity.value = withDelay(250, withTiming(1, { duration: 500 }));
-    logoScale.value = withDelay(250, withSpring(1, { damping: 12, stiffness: 120 }));
+    // Glow radiates in (fast)
+    glowOpacity.value = withTiming(1, { duration: 400 });
+    glowScale.value = withTiming(1, { duration: 500 });
 
-    // Wordmark slides up
-    wordmarkOpacity.value = withDelay(650, withTiming(1, { duration: 500 }));
-    wordmarkY.value = withDelay(650, withSpring(0, { damping: 16, stiffness: 120 }));
+    // Logo bounces in immediately
+    logoOpacity.value = withTiming(1, { duration: 300 });
+    logoScale.value = withSpring(1, { damping: 12, stiffness: 180 });
+
+    // Wordmark slides up quickly
+    wordmarkOpacity.value = withDelay(200, withTiming(1, { duration: 280 }));
+    wordmarkY.value = withDelay(200, withSpring(0, { damping: 18, stiffness: 180 }));
 
     // Tagline fades
-    tagOpacity.value = withDelay(950, withTiming(1, { duration: 400 }));
+    tagOpacity.value = withDelay(380, withTiming(1, { duration: 220 }));
 
-    // Loading dots bounce
-    const dotConfig = { damping: 10, stiffness: 200 };
+    // Loading dots — one quick bounce each, then onComplete
+    const dotConfig = { damping: 12, stiffness: 260 };
     d1.value = withDelay(
-      1300,
-      withRepeat(
-        withSequence(
-          withSpring(1, dotConfig),
-          withSpring(0.35, { damping: 12, stiffness: 180 }),
-        ),
-        3,
-        false,
-      ),
+      580,
+      withSequence(withSpring(1, dotConfig), withSpring(0.35, dotConfig)),
     );
     d2.value = withDelay(
-      1450,
-      withRepeat(
-        withSequence(
-          withSpring(1, dotConfig),
-          withSpring(0.35, { damping: 12, stiffness: 180 }),
-        ),
-        3,
-        false,
-      ),
+      680,
+      withSequence(withSpring(1, dotConfig), withSpring(0.35, dotConfig)),
     );
     d3.value = withDelay(
-      1600,
+      780,
       withSequence(
-        withRepeat(
-          withSequence(
-            withSpring(1, dotConfig),
-            withSpring(0.35, { damping: 12, stiffness: 180 }),
-          ),
-          2,
-          false,
-        ),
         withSpring(1, dotConfig),
+        withSpring(0.35, dotConfig),
         withDelay(
-          300,
-          withTiming(0, { duration: 400 }, () => {
+          120,
+          withTiming(0, { duration: 200 }, () => {
             runOnJS(onComplete)();
           }),
         ),

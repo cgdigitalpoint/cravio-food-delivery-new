@@ -1,0 +1,167 @@
+CUSTOMER APP - COMPLETE STABILITY, PERFORMANCE & FUNCTIONALITY FIX
+
+You are working on the Cravio Customer App.
+
+IMPORTANT:
+Do NOT redesign the UI.
+Do NOT remove any feature.
+Do NOT change branding.
+Focus only on fixing, optimizing and making the app production-ready.
+
+=========================
+1. FIX ALL CRASHES
+=========================
+
+Find and fix every runtime crash in the app.
+
+Current issue:
+
+- Home screen opens successfully.
+- Restaurant list opens successfully.
+- Restaurant Details screen opens successfully.
+- But tapping any food item, Add button, image, variant, menu card or any clickable component inside Restaurant Details causes the app to crash.
+
+Find the exact root cause.
+
+Fix all:
+- onPress errors
+- navigation errors
+- undefined objects
+- null values
+- state update issues
+- image loading issues
+- FlatList issues
+- ScrollView issues
+- Reanimated issues
+- Add to Cart logic
+- Food Details navigation
+
+No screen should crash.
+
+=========================
+2. IMPROVE STARTUP SPEED
+=========================
+
+Current startup time is approximately 20–30 seconds.
+
+Target:
+App should open within 2–4 seconds.
+
+Optimize:
+- Splash screen duration
+- Font loading
+- Image loading
+- Supabase initialization
+- Authentication initialization
+- API calls
+- Lazy loading
+- Caching
+- Initial rendering
+- Remove unnecessary re-renders
+
+=========================
+3. FIX CATEGORY BUTTONS
+=========================
+
+Pizza
+Burger
+Biryani
+North Indian
+Chinese
+Cafe
+Desserts
+etc.
+
+Currently category buttons are not working.
+
+Implement:
+- Proper filtering
+- Active state
+- Smooth animation
+- Instant restaurant filtering
+
+=========================
+4. IMPROVE HOME SCREEN
+=========================
+
+Fix:
+- Loading issues
+- Empty states
+- Flickering
+- Layout jumps
+
+Restaurant list should load smoothly.
+
+=========================
+5. RECOMMENDED RESTAURANTS
+=========================
+
+Generate recommendations like a real food delivery app.
+
+Sort restaurants using:
+- Rating
+- Distance
+- Delivery time
+- Popularity
+- Offers
+- Availability
+
+Remove placeholder/demo behaviour.
+
+=========================
+6. OPTIMIZE PERFORMANCE
+=========================
+
+Fix:
+- Memory leaks
+- Runtime warnings
+- Console errors
+- Slow rendering
+- Large image loading
+- FlatList optimization
+- Component memoization
+
+=========================
+7. COMPLETE APP TEST
+=========================
+
+Automatically test every navigation flow.
+
+Verify:
+
+✓ App launches in 2–4 seconds
+
+✓ Home Screen works
+
+✓ Search works
+
+✓ Category buttons work
+
+✓ Restaurant list works
+
+✓ Restaurant Details works
+
+✓ Food cards work
+
+✓ Add to Cart works
+
+✓ Cart works
+
+✓ Checkout works
+
+✓ Profile works
+
+✓ Orders work
+
+✓ No runtime crashes
+
+✓ No blank screens
+
+✓ No navigation errors
+
+Continue fixing until all critical issues are resolved.
+
+Finally:
+1. Explain every bug found.
+2. Explain every fix.
+3. Commit all changes to GitHub with a proper commit message.

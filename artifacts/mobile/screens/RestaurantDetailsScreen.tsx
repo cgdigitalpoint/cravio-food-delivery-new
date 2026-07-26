@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import Animated, {
   interpolate,
+  runOnJS,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
@@ -522,6 +523,8 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
     }
   }, [restaurantId, supabaseUserId, toggleFavoriteInStore]);
 
+  // JS-thread scroll handler — called from the UI thread worklet via runOnJS.
+  // Must be stable (useCallback) so the worklet reference stays fresh.
   const handleScroll = useCallback(
     (offset: number) => {
       setShowStickyTabs(offset > COVER_HEIGHT - TOP_BAR_HEIGHT);
@@ -538,11 +541,19 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
     [insets.top],
   );
 
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
+  // Reanimated worklet: tracks scroll position on the UI thread AND calls the
+  // JS-side handleScroll via runOnJS (safe cross-thread bridge).
+  // Passing [handleScroll] as the dependency array re-creates the handler only
+  // when insets change (i.e. on rotation), keeping it otherwise stable.
+  const scrollHandler = useAnimatedScrollHandler(
+    {
+      onScroll: (event) => {
+        scrollY.value = event.contentOffset.y;
+        runOnJS(handleScroll)(event.contentOffset.y);
+      },
     },
-  });
+    [handleScroll],
+  );
 
   const coverStyle = useAnimatedStyle(() => ({
     transform: [
@@ -600,10 +611,7 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
     >
       <Animated.ScrollView
         ref={scrollRef as any}
-        onScroll={(event) => {
-          scrollHandler(event);
-          handleScroll(event.nativeEvent.contentOffset.y);
-        }}
+        onScroll={scrollHandler}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -697,7 +705,7 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
           items={recommendedItems}
           favoriteIds={favoriteFoodIds}
           onFavorite={(item) => toggleFoodFavorite(item.id)}
-          onFoodPress={(item) => shareFood(item)}
+          onFoodPress={(item) => handleAdd(item)}
         />
 
         <RatingSummary

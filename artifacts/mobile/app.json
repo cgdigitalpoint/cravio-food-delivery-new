@@ -16,7 +16,9 @@
     "ios": {
       "supportsTablet": false
     },
-    "android": {},
+    "android": {
+      "package": "com.cgdigitalpoint.cravio.customer"
+    },
     "web": {
       "favicon": "./assets/images/icon.png"
     },
@@ -33,6 +35,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "31cfc03e-a691-4184-b6b4-20b7f68f4907"
+      }
+    },
+    "owner": "cgdigitalpoint"
   }
 }
