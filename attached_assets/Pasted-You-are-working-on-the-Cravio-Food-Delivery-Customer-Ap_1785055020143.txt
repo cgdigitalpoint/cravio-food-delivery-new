@@ -1,0 +1,249 @@
+You are working on the Cravio Food Delivery Customer App.
+
+Current Status
+
+- Customer App is functional.
+- Navigation works.
+- Supabase is connected.
+- Email Authentication is already configured.
+- Payment Gateway should NOT be implemented in this phase.
+
+This phase is ONLY about performance, stability and fixing the order system.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Completely optimize the Customer App and eliminate all critical bugs.
+
+Do NOT add any new features unless they are required to fix existing functionality.
+
+==================================================
+PART 1 — Startup Performance
+==================================================
+
+Investigate why the app opens slowly.
+
+Audit and optimize:
+
+- Splash Screen
+- App initialization
+- Fonts loading
+- Images loading
+- API requests
+- Supabase initialization
+- Zustand store hydration
+- AsyncStorage usage
+- Navigation initialization
+- Component rendering
+- Lazy loading
+- Bundle optimization
+- Unnecessary re-renders
+- Heavy useEffect calls
+- Network requests on startup
+
+Reduce startup time as much as possible.
+
+==================================================
+PART 2 — Customer App Performance
+==================================================
+
+Optimize:
+
+Home Screen
+
+Restaurant List
+
+Restaurant Details
+
+Food Details
+
+Cart
+
+Search
+
+Profile
+
+Orders
+
+Categories
+
+Images
+
+Banner loading
+
+Scrolling
+
+Memory usage
+
+Rendering performance
+
+Remove unnecessary API calls.
+
+==================================================
+PART 3 — Fix Order Failed
+==================================================
+
+Investigate the complete order flow.
+
+Cart
+
+↓
+
+Address
+
+↓
+
+Create Order
+
+↓
+
+Create Order Items
+
+↓
+
+Order Success
+
+Payment integration is NOT required.
+
+Temporarily use:
+
+Payment Method = Cash on Delivery (COD)
+
+Find the exact reason for:
+
+"Order Failed"
+
+Fix every issue.
+
+==================================================
+PART 4 — Database Audit
+==================================================
+
+Audit:
+
+profiles
+
+addresses
+
+orders
+
+order_items
+
+cart
+
+favorites
+
+Verify:
+
+Insert
+
+Select
+
+Update
+
+Relationships
+
+Foreign Keys
+
+RLS Policies
+
+Fix every issue.
+
+==================================================
+PART 5 — Error Handling
+==================================================
+
+Replace generic errors with meaningful messages.
+
+Handle:
+
+No Internet
+
+Timeout
+
+Supabase errors
+
+Invalid session
+
+Database insert failure
+
+Missing address
+
+Empty cart
+
+==================================================
+PART 6 — Code Cleanup
+==================================================
+
+Refactor code where necessary.
+
+Remove:
+
+Unused components
+
+Unused imports
+
+Duplicate logic
+
+Dead code
+
+Optimize folder structure.
+
+==================================================
+PART 7 — QA
+==================================================
+
+Perform complete testing.
+
+Verify:
+
+App startup
+
+Home
+
+Restaurants
+
+Categories
+
+Food Details
+
+Search
+
+Cart
+
+Address
+
+Checkout
+
+Order Creation
+
+Order History
+
+Profile
+
+Logout
+
+No crashes.
+
+==================================================
+PART 8 — Git
+==================================================
+
+Commit all changes.
+
+Push to GitHub.
+
+Generate a detailed report.
+
+Do NOT stop for manual confirmation.
+
+If any Supabase Dashboard configuration is still required, complete everything possible first and provide one final checklist at the end.
+
+Phase 11B is complete only when:
+
+✓ App startup is significantly faster.
+✓ Customer app feels smooth.
+✓ Order creation works successfully.
+✓ Cash on Delivery order is stored correctly in Supabase.
+✓ No critical bugs remain.
