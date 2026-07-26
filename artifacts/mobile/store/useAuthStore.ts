@@ -10,6 +10,8 @@ interface AuthStoreState {
   supabaseUserId: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  pendingEmailVerification: boolean;
+  pendingVerificationEmail: string | null;
   error: string | null;
 
   // Actions
@@ -23,14 +25,21 @@ interface AuthStoreState {
   /** Full sign-in: auth + profile fetch. */
   login: (email: string, password: string) => Promise<void>;
 
-  /** Full sign-up: auth + profile insert. */
-  register: (email: string, password: string, name: string, phone?: string) => Promise<void>;
+  /** Google OAuth sign-in. */
+  loginWithGoogle: () => Promise<void>;
+
+  /** Full sign-up: auth + profile insert.
+   *  Returns true if email confirmation is required (no immediate session). */
+  register: (email: string, password: string, name: string, phone?: string) => Promise<boolean>;
 
   /** Sign out and reset state. */
   logout: () => Promise<void>;
 
   /** Send forgot-password email. */
   forgotPassword: (email: string) => Promise<void>;
+
+  /** Resend verification email. */
+  resendVerification: (email: string) => Promise<void>;
 
   /** Load profile from DB after session is established. */
   loadProfile: (userId: string) => Promise<void>;
@@ -47,13 +56,15 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
   supabaseUserId: null,
   isLoading: false,
   isAuthenticated: false,
+  pendingEmailVerification: false,
+  pendingVerificationEmail: null,
   error: null,
 
   setLoading: (isLoading) => set({ isLoading }),
   setError: (error) => set({ error }),
 
   setAuthenticatedUser: (userId) =>
-    set({ supabaseUserId: userId, isAuthenticated: true }),
+    set({ supabaseUserId: userId, isAuthenticated: true, pendingEmailVerification: false }),
 
   setUnauthenticated: () =>
     set({ user: null, supabaseUserId: null, isAuthenticated: false, error: null }),
@@ -68,6 +79,7 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
         supabaseUserId: authUser.id,
         user: profile,
         isAuthenticated: true,
+        pendingEmailVerification: false,
         isLoading: false,
         error: null,
       });
@@ -78,19 +90,47 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
     }
   },
 
+  loginWithGoogle: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      await authService.signInWithGoogle();
+      // Auth state change handler in _layout.tsx will pick up the session
+      set({ isLoading: false, error: null });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Google sign-in failed.';
+      set({ isLoading: false, error: msg });
+      throw err;
+    }
+  },
+
   register: async (email, password, name, phone) => {
     set({ isLoading: true, error: null });
     try {
-      const { user: authUser } = await authService.signUp(email, password, name, phone);
+      const { user: authUser, session } = await authService.signUp(email, password, name, phone);
       if (!authUser) throw new Error('Sign-up failed — no user returned.');
+
+      // When email confirmation is required, session is null
+      if (!session) {
+        set({
+          isLoading: false,
+          pendingEmailVerification: true,
+          pendingVerificationEmail: email,
+          error: null,
+        });
+        return true; // caller should navigate to email verification screen
+      }
+
+      // Immediate session — load profile and proceed
       const profile = await userService.getProfile(authUser.id);
       set({
         supabaseUserId: authUser.id,
         user: profile,
         isAuthenticated: true,
+        pendingEmailVerification: false,
         isLoading: false,
         error: null,
       });
+      return false;
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Registration failed.';
       set({ isLoading: false, error: msg });
@@ -109,6 +149,8 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
       user: null,
       supabaseUserId: null,
       isAuthenticated: false,
+      pendingEmailVerification: false,
+      pendingVerificationEmail: null,
       isLoading: false,
       error: null,
     });
@@ -121,6 +163,18 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
       set({ isLoading: false });
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Could not send reset email.';
+      set({ isLoading: false, error: msg });
+      throw err;
+    }
+  },
+
+  resendVerification: async (email) => {
+    set({ isLoading: true, error: null });
+    try {
+      await authService.resendVerification(email);
+      set({ isLoading: false });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Could not resend verification email.';
       set({ isLoading: false, error: msg });
       throw err;
     }

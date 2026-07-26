@@ -173,9 +173,6 @@ export function ProfileScreen({ onOrders, onFavorites, onAddresses, onRecentlyVi
           />
         </View>
 
-        <Text style={[PP.caption, styles.version, { color: colors.mutedForeground }]}>
-          Cravio v1.0 · Phase 9
-        </Text>
       </ScrollView>
 
       {isLoading && <CircularLoader overlay />}
@@ -228,5 +225,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   menuText: { flex: 1 },
-  version: { textAlign: 'center', marginTop: 32, marginBottom: 8 },
 });

@@ -1,0 +1,245 @@
+# CRAVIO CUSTOMER APP V1.0 - FINAL PRODUCTION STABILIZATION
+
+IMPORTANT:
+Do NOT add any new features.
+Do NOT start Restaurant App.
+Only fix, optimize, audit and stabilize the existing Customer App until it is production-ready.
+
+The Customer App is NOT complete.
+
+==================================================
+CRITICAL ISSUES TO FIX
+==================================================
+
+1. SIGNUP
+- Signup is not working correctly.
+- Verify Supabase Auth configuration.
+- Verify Email Authentication.
+- Verify Email Confirmation.
+- Verify Signup API.
+- Verify Session creation.
+- Verify User Profile creation.
+- Ensure every new user is automatically created in the profiles table.
+
+2. LOGIN
+- Login must work perfectly.
+- Session persistence.
+- Auto Login after app restart.
+- Logout must work.
+
+3. GOOGLE LOGIN
+- "Continue with Google" is not working.
+- Audit complete Google OAuth configuration.
+- Verify Expo Auth Session.
+- Verify Redirect URI.
+- Verify Android configuration.
+- Verify SHA-1/SHA-256 if required.
+- Verify Supabase Google Provider.
+- Fix Google Login completely.
+
+4. EMAIL OTP / VERIFICATION
+- Verification email is not being received.
+- Audit Supabase Email settings.
+- Verify SMTP configuration.
+- Verify Auth Email Templates.
+- Verify Redirect URL.
+- Verify Email Confirmation flow.
+- Ensure verification emails are delivered successfully.
+
+5. ADDRESS MODULE
+Current Error:
+new row violates row-level security policy for table "addresses"
+
+Audit everything:
+- addresses table
+- schema
+- foreign keys
+- RLS policies
+- auth.uid()
+- user_id mapping
+- INSERT
+- UPDATE
+- DELETE
+- Default Address
+- Address Selection
+- Checkout Address
+
+Address module must work perfectly.
+
+6. STARTUP PERFORMANCE
+The app takes around 15 seconds to open.
+
+Find the root cause.
+
+Optimize:
+- Splash Screen
+- Font loading
+- Image loading
+- API calls
+- Async Storage
+- Zustand initialization
+- Supabase initialization
+- Duplicate requests
+- Navigation startup
+- Lazy Loading
+- Bundle optimization
+
+Target startup time:
+Under 3 seconds.
+
+7. REMOVE DEBUG TEXT
+Remove every development label.
+
+Example:
+"Version 1.0"
+"Phase 9"
+Any debug badges
+Developer labels
+Testing labels
+
+Release build should look like a professional production app.
+
+==================================================
+FULL APP AUDIT
+==================================================
+
+Audit every module.
+
+HOME
+- Categories
+- Search
+- Filters
+- Restaurants
+- Banners
+
+RESTAURANT
+- Details
+- Menu
+- Reviews
+- Ratings
+
+CART
+- Add
+- Remove
+- Quantity
+- Pricing
+
+CHECKOUT
+- Address
+- COD
+- Order Placement
+
+ORDERS
+- History
+- Details
+
+PROFILE
+- Edit
+- Logout
+- Addresses
+
+FAVOURITES
+- Add
+- Remove
+
+NOTIFICATIONS
+
+SETTINGS
+
+==================================================
+SUPABASE AUDIT
+==================================================
+
+Audit:
+- Auth
+- Storage
+- Database
+- Functions
+- Triggers
+- Policies
+- Environment Variables
+- Indexes
+- Constraints
+
+Verify every table:
+profiles
+restaurants
+foods
+categories
+cart
+addresses
+orders
+order_items
+favorites
+reviews
+
+Fix every issue.
+
+==================================================
+UI / UX
+==================================================
+
+Fix:
+- Keyboard issues
+- Alignment
+- Responsive layout
+- Loading states
+- Empty states
+- Error messages
+- Animations
+- Dark Mode
+- Performance
+
+==================================================
+TESTING
+==================================================
+
+Run complete end-to-end testing.
+
+Signup
+↓
+Email Verification
+↓
+Login
+↓
+Google Login
+↓
+Add Address
+↓
+Browse Restaurants
+↓
+Add to Cart
+↓
+Checkout
+↓
+COD Order
+↓
+Order Success
+↓
+Order History
+↓
+Profile
+↓
+Logout
+
+Every module must work successfully.
+
+==================================================
+DELIVERABLE
+==================================================
+
+1. Fix every bug.
+2. Generate any required SQL migrations.
+3. Apply code fixes.
+4. Commit all fixes.
+5. Push to GitHub.
+6. Generate a detailed report with:
+   - Bugs found
+   - Bugs fixed
+   - Database fixes
+   - RLS fixes
+   - Auth fixes
+   - Performance improvements
+   - Remaining issues (if any)
+
+The Customer App must be production-ready before starting the Restaurant Partner App.

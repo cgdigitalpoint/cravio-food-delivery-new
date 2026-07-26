@@ -11,8 +11,13 @@ export default function SignupRoute() {
   const handleSignUp = async (name: string, email: string, phone: string, password: string) => {
     setError(null);
     try {
-      await register(email, password, name, phone || undefined);
-      router.replace('/home');
+      const needsVerification = await register(email, password, name, phone || undefined);
+      if (needsVerification) {
+        // Email confirmation required — send to OTP/verification screen
+        router.replace({ pathname: '/auth/otp', params: { email, mode: 'signup' } });
+      } else {
+        router.replace('/home');
+      }
     } catch (_) {
       // Error already set in store
     }

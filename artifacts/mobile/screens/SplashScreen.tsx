@@ -172,8 +172,6 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         <Animated.View style={[styles.dot, d3Style]} />
       </View>
 
-      {/* ── Version tag ── */}
-      <Text style={[PP.caption, styles.version]}>v1.0</Text>
     </View>
   );
 }
@@ -250,10 +248,5 @@ const styles = StyleSheet.create({
     height: 7,
     borderRadius: 4,
     backgroundColor: '#FF6B00',
-  },
-  version: {
-    position: 'absolute',
-    bottom: 28,
-    color: 'rgba(255,255,255,0.2)',
   },
 });

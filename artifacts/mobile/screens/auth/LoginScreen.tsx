@@ -20,6 +20,7 @@ interface LoginScreenProps {
   onForgotPassword?: () => void;
   onSignUp?: () => void;
   onLogin?: (email: string, password: string) => void;
+  onGoogleLogin?: () => void;
   isLoading?: boolean;
   error?: string | null;
 }
@@ -29,6 +30,7 @@ export function LoginScreen({
   onForgotPassword,
   onSignUp,
   onLogin,
+  onGoogleLogin,
   isLoading = false,
   error = null,
 }: LoginScreenProps) {
@@ -69,13 +71,13 @@ export function LoginScreen({
         </View>
 
         <View style={styles.socialRow}>
-          <TouchableOpacity style={styles.socialBtn} activeOpacity={0.8}>
+          <TouchableOpacity style={styles.socialBtn} activeOpacity={0.8} onPress={onGoogleLogin} disabled={isLoading}>
             <Ionicons name="logo-google" size={20} color="#EA4335" />
             <Text style={[PP.label, { color: '#111827' }]}>Google</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.socialBtn} activeOpacity={0.8}>
-            <Ionicons name="logo-apple" size={20} color="#111827" />
-            <Text style={[PP.label, { color: '#111827' }]}>Apple</Text>
+          <TouchableOpacity style={[styles.socialBtn, styles.socialBtnDisabled]} activeOpacity={0.8} disabled>
+            <Ionicons name="logo-apple" size={20} color="#9CA3AF" />
+            <Text style={[PP.label, { color: '#9CA3AF' }]}>Apple</Text>
           </TouchableOpacity>
         </View>
 
@@ -149,6 +151,7 @@ const styles = StyleSheet.create({
     gap: 8, height: 50, borderRadius: 14, borderWidth: 1.5, borderColor: '#E5E7EB',
     backgroundColor: '#FFFFFF',
   },
+  socialBtnDisabled: { opacity: 0.55 },
   dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   dividerLine: { flex: 1, height: 1, backgroundColor: '#E5E7EB' },
   dividerText: { color: '#9CA3AF' },

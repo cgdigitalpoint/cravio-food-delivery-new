@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 export default function LoginRoute() {
   const router = useRouter();
-  const { login, isLoading, error, setError } = useAuthStore();
+  const { login, loginWithGoogle, isLoading, error, setError } = useAuthStore();
 
   const handleLogin = async (email: string, password: string) => {
     setError(null);
@@ -18,10 +18,21 @@ export default function LoginRoute() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setError(null);
+    try {
+      await loginWithGoogle();
+      // Auth state change will trigger navigation via AuthGuard in _layout.tsx
+    } catch (_) {
+      // Error already set in store
+    }
+  };
+
   return (
     <LoginScreen
       onBack={() => router.back()}
       onLogin={handleLogin}
+      onGoogleLogin={handleGoogleLogin}
       onSignUp={() => { setError(null); router.push('/auth/signup'); }}
       onForgotPassword={() => { setError(null); router.push('/auth/forgot-password'); }}
       isLoading={isLoading}

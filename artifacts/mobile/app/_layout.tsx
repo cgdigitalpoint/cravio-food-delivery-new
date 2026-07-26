@@ -1,5 +1,5 @@
 // ─── Root Layout ──────────────────────────────────────────────────────────────
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
@@ -27,7 +27,17 @@ import { useAuthStore } from '@/store/useAuthStore';
 // Prevent the native splash screen from auto-hiding before assets load.
 SplashScreen.preventAutoHideAsync();
 
-const queryClient = new QueryClient();
+// Increase the font timeout so a slow network doesn't block the app forever.
+const FONT_TIMEOUT_MS = 5000;
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 1000 * 60 * 5, // 5 minutes — reduces redundant refetches
+    },
+  },
+});
 
 // Protected route segments — redirect to /welcome if unauthenticated
 const PROTECTED = new Set(['home', 'search', 'profile', 'orders', 'favorites', 'recently-viewed', 'address', 'restaurant', 'cart', 'checkout', 'order-success', 'order-failure', 'invoice']);
@@ -85,18 +95,18 @@ function RootLayoutNav() {
         <Stack.Screen name="auth/otp" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="auth/forgot-password" options={{ animation: 'slide_from_right' }} />
 
-        {/* ── Phase 4: Home ── */}
+        {/* ── Home ── */}
         <Stack.Screen name="home" options={{ animation: 'slide_from_right' }} />
 
-        {/* ── Phase 7: Search & Discovery ── */}
+        {/* ── Search & Discovery ── */}
         <Stack.Screen name="search" options={{ animation: 'fade' }} />
 
-        {/* ── Phase 5: Restaurant · Cart · Checkout ── */}
+        {/* ── Restaurant · Cart · Checkout ── */}
         <Stack.Screen name="restaurant/[id]" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="cart" options={{ animation: 'slide_from_bottom' }} />
         <Stack.Screen name="checkout" options={{ animation: 'slide_from_right' }} />
 
-        {/* ── Phase 6: Profile & supporting screens ── */}
+        {/* ── Profile & supporting screens ── */}
         <Stack.Screen name="profile" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="orders" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="orders/[id]" options={{ animation: 'slide_from_right' }} />
@@ -106,12 +116,12 @@ function RootLayoutNav() {
         <Stack.Screen name="address/new" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="address/[id]" options={{ animation: 'slide_from_right' }} />
 
-        {/* ── Phase 10B: Order Success / Failure / Invoice ── */}
+        {/* ── Order Success / Failure / Invoice ── */}
         <Stack.Screen name="order-success" options={{ animation: 'fade', gestureEnabled: false }} />
         <Stack.Screen name="order-failure" options={{ animation: 'slide_from_bottom' }} />
         <Stack.Screen name="invoice/[id]" options={{ animation: 'slide_from_right' }} />
 
-        {/* ── Design system (Phase 2) ── */}
+        {/* ── Design system (dev only — hidden in production) ── */}
         <Stack.Screen name="design-system" options={{ animation: 'slide_from_right' }} />
       </Stack>
     </>
@@ -131,13 +141,29 @@ export default function RootLayout() {
     Poppins_800ExtraBold,
   });
 
+  // Timeout fallback: if fonts take too long, reveal the app anyway so the
+  // user isn't stuck looking at a blank native splash screen.
+  const timedOut = useRef(false);
+  const [fontTimedOut, setFontTimedOut] = useState(false);
   useEffect(() => {
-    if (fontsLoaded || fontError) {
+    const t = setTimeout(() => {
+      if (!timedOut.current) {
+        timedOut.current = true;
+        setFontTimedOut(true);
+      }
+    }, FONT_TIMEOUT_MS);
+    return () => clearTimeout(t);
+  }, []);
+
+  const fontsReady = fontsLoaded || !!fontError || fontTimedOut;
+
+  useEffect(() => {
+    if (fontsReady) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, fontError]);
+  }, [fontsReady]);
 
-  if (!fontsLoaded && !fontError) return null;
+  if (!fontsReady) return null;
 
   return (
     <SafeAreaProvider>
