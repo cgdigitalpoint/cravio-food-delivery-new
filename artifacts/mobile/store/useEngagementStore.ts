@@ -60,7 +60,11 @@ export const useEngagementStore = create<EngagementStoreState>((set, get) => ({
     if (next.has(foodId)) next.delete(foodId);
     else next.add(foodId);
     set({ favoriteFoodIds: next });
-    await persist(next, get().viewedRestaurants);
+    try {
+      await persist(next, get().viewedRestaurants);
+    } catch (error) {
+      console.warn('[Cravio] Could not persist food favorite:', error);
+    }
   },
 
   isFoodFavorite: (foodId) => get().favoriteFoodIds.has(foodId),
@@ -71,11 +75,19 @@ export const useEngagementStore = create<EngagementStoreState>((set, get) => ({
       ...get().viewedRestaurants.filter((item) => item.restaurantId !== restaurantId),
     ].slice(0, 12);
     set({ viewedRestaurants: next });
-    await persist(get().favoriteFoodIds, next);
+    try {
+      await persist(get().favoriteFoodIds, next);
+    } catch (error) {
+      console.warn('[Cravio] Could not persist recently viewed:', error);
+    }
   },
 
   clearRecentlyViewed: async () => {
     set({ viewedRestaurants: [] });
-    await persist(get().favoriteFoodIds, []);
+    try {
+      await persist(get().favoriteFoodIds, []);
+    } catch (error) {
+      console.warn('[Cravio] Could not clear recently viewed:', error);
+    }
   },
 }));

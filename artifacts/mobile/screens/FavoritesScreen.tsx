@@ -1,6 +1,7 @@
 // ─── Favorites Screen ─────────────────────────────────────────────────────────
 import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   Platform,
   RefreshControl,
   ScrollView,
@@ -20,6 +21,7 @@ import { EmptyState, FavoriteButton } from '@/components/ui';
 import { RESTAURANTS } from '@/data/homeData';
 import { getMenuItems, type RestaurantMenuItem } from '@/data/restaurantData';
 import { useEngagementStore } from '@/store/useEngagementStore';
+import { useCartStore } from '@/store/useCartStore';
 import { RestaurantMenuItemCard } from '@/components/restaurant/RestaurantMenuItemCard';
 
 interface FavoritesScreenProps {
@@ -33,6 +35,15 @@ export function FavoritesScreen({ onBack, onRestaurantPress }: FavoritesScreenPr
   const { supabaseUserId } = useAuthStore();
   const { favorites, isLoading, fetchFavorites, removeFavorite } = useFavoriteStore();
   const { favoriteFoodIds, hydrate, toggleFoodFavorite } = useEngagementStore();
+  const {
+    items: cartItems,
+    restaurantId: cartRestaurantId,
+    restaurantName: cartRestaurantName,
+    addItem,
+    clearCart,
+    updateQuantity,
+    removeItem,
+  } = useCartStore();
   const [activeTab, setActiveTab] = useState<'restaurants' | 'dishes'>('restaurants');
   const [refreshing, setRefreshing] = useState(false);
 
@@ -53,7 +64,54 @@ export function FavoritesScreen({ onBack, onRestaurantPress }: FavoritesScreenPr
 
   const handleUnfavorite = async (restaurantId: string) => {
     if (!supabaseUserId) return;
-    await removeFavorite(supabaseUserId, restaurantId);
+    try {
+      await removeFavorite(supabaseUserId, restaurantId);
+    } catch {
+      Alert.alert('Could not update favorite', 'Please try again.');
+    }
+  };
+
+  const addFavoriteDishToCart = (item: RestaurantMenuItem) => {
+    const restaurant = RESTAURANTS.find((candidate) => candidate.id === item.restaurantId);
+    if (!restaurant) {
+      Alert.alert('Dish unavailable', 'This dish is not available right now.');
+      return;
+    }
+    if (cartRestaurantId && cartRestaurantId !== item.restaurantId) {
+      Alert.alert(
+        'Start a new cart?',
+        `Your cart has items from ${cartRestaurantName ?? 'another restaurant'}.`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Start new',
+            style: 'destructive',
+            onPress: () => {
+              clearCart();
+              addItem(item, 1, undefined, restaurant.name);
+            },
+          },
+        ],
+      );
+      return;
+    }
+    addItem(item, 1, undefined, restaurant.name);
+  };
+
+  const getFavoriteDishCartEntry = (item: RestaurantMenuItem) => {
+    const entries = cartItems.filter((cartItem) => cartItem.menuItem.id === item.id);
+    if (entries.length === 0) return null;
+    return {
+      id: entries[0].id,
+      quantity: entries.reduce((sum, entry) => sum + entry.quantity, 0),
+    };
+  };
+
+  const decreaseFavoriteDish = (item: RestaurantMenuItem) => {
+    const entry = getFavoriteDishCartEntry(item);
+    if (!entry) return;
+    if (entry.quantity <= 1) removeItem(entry.id);
+    else updateQuantity(entry.id, entry.quantity - 1);
   };
 
   // Find restaurant data for each favorite (from local data; Phase 6+ will query DB)
@@ -159,10 +217,10 @@ export function FavoritesScreen({ onBack, onRestaurantPress }: FavoritesScreenPr
             <RestaurantMenuItemCard
               key={item.id}
               item={item}
-              quantity={0}
-              onAdd={() => {}}
-              onIncrease={() => {}}
-              onDecrease={() => {}}
+              quantity={getFavoriteDishCartEntry(item)?.quantity ?? 0}
+              onAdd={() => addFavoriteDishToCart(item)}
+              onIncrease={() => addFavoriteDishToCart(item)}
+              onDecrease={() => decreaseFavoriteDish(item)}
               isFavorite
               onFavorite={() => toggleFoodFavorite(item.id)}
             />

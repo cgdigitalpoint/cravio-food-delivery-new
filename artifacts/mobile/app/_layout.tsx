@@ -1,5 +1,5 @@
 // ─── Root Layout ──────────────────────────────────────────────────────────────
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
@@ -38,6 +38,7 @@ function AuthGuard() {
   const router = useRouter();
   const segments = useSegments();
   const { isAuthenticated, setAuthenticatedUser, setUnauthenticated, loadProfile } = useAuthStore();
+  const [authReady, setAuthReady] = useState(false);
 
   // Subscribe to Supabase auth state on mount
   useEffect(() => {
@@ -48,6 +49,7 @@ function AuthGuard() {
       } else {
         setUnauthenticated();
       }
+      setAuthReady(true);
     });
     return () => subscription.data.subscription.unsubscribe();
   }, []);
@@ -55,14 +57,14 @@ function AuthGuard() {
   // Route guard — runs whenever auth state or segments change
   useEffect(() => {
     const seg0 = segments[0] as string | undefined;
-    if (!seg0) return; // still on splash — let it self-route
+    if (!seg0 || !authReady) return; // still resolving the persisted session
 
     if (isAuthenticated && AUTH_ONLY.has(seg0)) {
       router.replace('/home');
     } else if (!isAuthenticated && PROTECTED.has(seg0)) {
       router.replace('/welcome');
     }
-  }, [isAuthenticated, segments]);
+  }, [authReady, isAuthenticated, segments]);
 
   return null;
 }

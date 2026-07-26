@@ -18,6 +18,7 @@ export interface SearchBarProps {
   placeholder?: string;
   onClear?: () => void;
   onFilterPress?: () => void;
+  onSubmitEditing?: () => void;
   style?: StyleProp<ViewStyle>;
   autoFocus?: boolean;
 }
@@ -28,6 +29,7 @@ export function SearchBar({
   placeholder = 'Search restaurants, food...',
   onClear,
   onFilterPress,
+  onSubmitEditing,
   style,
   autoFocus,
 }: SearchBarProps) {
@@ -57,6 +59,7 @@ export function SearchBar({
         <TextInput
           value={value}
           onChangeText={onChangeText}
+          onSubmitEditing={onSubmitEditing}
           placeholder={placeholder}
           placeholderTextColor={colors.mutedForeground}
           style={[

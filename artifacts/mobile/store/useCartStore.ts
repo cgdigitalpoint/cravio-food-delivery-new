@@ -55,17 +55,30 @@ export const useCartStore = create<CartState>((set, get) => ({
   checkoutScrollTo: null,
 
   addItem: (menuItem, quantity = 1, notes, restaurantName) => {
-    const id = `${menuItem.id}_${Date.now()}${Math.random().toString(36).slice(2, 6)}`;
-    const cartItem: CartItem = {
-      id,
-      menuItem,
-      quantity,
-      selectedCustomizations: {},
-      notes,
-      totalPrice: menuItem.price * quantity,
-    };
     set((state) => {
-      const items = [...state.items, cartItem];
+      const existing = state.items.find((item) => item.menuItem.id === menuItem.id);
+      const items = existing
+        ? state.items.map((item) =>
+            item.id === existing.id
+              ? {
+                  ...item,
+                  quantity: item.quantity + quantity,
+                  notes: notes ?? item.notes,
+                  totalPrice: item.menuItem.price * (item.quantity + quantity),
+                }
+              : item,
+          )
+        : [
+            ...state.items,
+            {
+              id: `${menuItem.id}_${Date.now()}${Math.random().toString(36).slice(2, 6)}`,
+              menuItem,
+              quantity,
+              selectedCustomizations: {},
+              notes,
+              totalPrice: menuItem.price * quantity,
+            },
+          ];
       return {
         items,
         restaurantId: menuItem.restaurantId,

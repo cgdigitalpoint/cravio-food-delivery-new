@@ -45,6 +45,7 @@ import { useCartStore } from '@/store/useCartStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useFavoriteStore } from '@/store/useFavoriteStore';
 import { Alert } from 'react-native';
+import { getMenuItems, type RestaurantMenuItem } from '@/data/restaurantData';
 import {
   BANNERS,
   CATEGORIES,
@@ -401,7 +402,15 @@ function HorizontalRestaurantScroll({
 }
 
 // ─── Food Recommendation Scroll ────────────────────────────────────────────────
-function FoodRecommendationScroll({ data }: { data: FoodItem[] }) {
+function FoodRecommendationScroll({
+  data,
+  onAdd,
+  onPress,
+}: {
+  data: FoodItem[];
+  onAdd: (item: FoodItem) => void;
+  onPress: (item: FoodItem) => void;
+}) {
   return (
     <ScrollView
       horizontal
@@ -422,8 +431,8 @@ function FoodRecommendationScroll({ data }: { data: FoodItem[] }) {
             isVeg={item.isVeg}
             isPopular={item.isPopular}
             isNew={item.isNew}
-            onAddPress={() => {}}
-            onPress={() => {}}
+            onAddPress={() => onAdd(item)}
+            onPress={() => onPress(item)}
           />
         </View>
       ))}
@@ -623,7 +632,14 @@ export function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { itemCount, totalAmount } = useCartStore();
+  const {
+    itemCount,
+    totalAmount,
+    restaurantId: cartRestaurantId,
+    restaurantName: cartRestaurantName,
+    addItem,
+    clearCart,
+  } = useCartStore();
   const { supabaseUserId } = useAuthStore();
   const {
     favoriteIds: storedFavoriteIds,
@@ -663,6 +679,58 @@ export function HomeScreen() {
     } catch {
       Alert.alert('Could not update favorite', 'Please try again.');
     }
+  };
+
+  const getFoodRestaurant = (food: FoodItem) =>
+    RESTAURANTS.find((restaurant) => restaurant.name === food.restaurantName);
+
+  const getCartMenuItem = (food: FoodItem): RestaurantMenuItem | null => {
+    const restaurant = getFoodRestaurant(food);
+    if (!restaurant) return null;
+    return (
+      getMenuItems(restaurant.id).find((item) => item.name === food.name) ?? {
+        id: food.id,
+        restaurantId: restaurant.id,
+        name: food.name,
+        description: food.description,
+        price: food.price,
+        imageUrl: food.imageUri ?? '',
+        category: 'popular',
+        tags: [],
+        isAvailable: true,
+        isPopular: food.isPopular ?? false,
+        isVeg: food.isVeg,
+        rating: food.rating,
+      }
+    );
+  };
+
+  const addFoodToCart = (food: FoodItem) => {
+    const restaurant = getFoodRestaurant(food);
+    const menuItem = getCartMenuItem(food);
+    if (!restaurant || !menuItem) {
+      Alert.alert('Dish unavailable', 'This dish is not available right now.');
+      return;
+    }
+    if (cartRestaurantId && cartRestaurantId !== restaurant.id) {
+      Alert.alert(
+        'Start a new cart?',
+        `Your cart has items from ${cartRestaurantName ?? 'another restaurant'}.`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Start new',
+            style: 'destructive',
+            onPress: () => {
+              clearCart();
+              addItem(menuItem, 1, undefined, restaurant.name);
+            },
+          },
+        ],
+      );
+      return;
+    }
+    addItem(menuItem, 1, undefined, restaurant.name);
   };
 
   // Category filter — when a category is selected, search all restaurants (not just the top-5 slice)
@@ -711,7 +779,13 @@ export function HomeScreen() {
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholder="Search restaurants, food, dishes..."
-          onFilterPress={() => {}}
+          onSubmitEditing={() =>
+            router.push({
+              pathname: '/search',
+              params: searchQuery.trim() ? { query: searchQuery.trim() } : undefined,
+            })
+          }
+          onFilterPress={() => router.push('/search')}
         />
       </View>
 
@@ -736,7 +810,7 @@ export function HomeScreen() {
             <SectionHeader
               title="Featured Restaurants"
               subtitle="Handpicked for you"
-              onSeeAllPress={() => {}}
+              onSeeAllPress={() => router.push('/search')}
             />
           </View>
           <HorizontalRestaurantScroll
@@ -755,7 +829,7 @@ export function HomeScreen() {
           <SectionHeader
             title="Popular Near You"
             subtitle="Most ordered in your area"
-            onSeeAllPress={() => {}}
+            onSeeAllPress={() => router.push('/search')}
           />
         </View>
         {filteredPopular.length === 0 ? (
@@ -785,7 +859,7 @@ export function HomeScreen() {
             <SectionHeader
               title="Fast Delivery ⚡"
               subtitle="Arrives in 30 min or less"
-              onSeeAllPress={() => {}}
+              onSeeAllPress={() => router.push('/search')}
             />
           </View>
           <HorizontalRestaurantScroll
@@ -804,7 +878,7 @@ export function HomeScreen() {
             <SectionHeader
               title="Top Rated ⭐"
               subtitle="Highly reviewed by the community"
-              onSeeAllPress={() => {}}
+              onSeeAllPress={() => router.push('/search')}
             />
           </View>
           <HorizontalRestaurantScroll
@@ -823,7 +897,7 @@ export function HomeScreen() {
             <SectionHeader
               title="Recommended For You"
               subtitle="Top picks based on rating, speed & offers"
-              onSeeAllPress={() => {}}
+              onSeeAllPress={() => router.push('/search')}
             />
           </View>
           <HorizontalRestaurantScroll
@@ -842,10 +916,17 @@ export function HomeScreen() {
             <SectionHeader
               title="Quick Picks 🍽️"
               subtitle="Trending dishes right now"
-              onSeeAllPress={() => {}}
+              onSeeAllPress={() => router.push('/search')}
             />
           </View>
-          <FoodRecommendationScroll data={FOOD_ITEMS.slice(2)} />
+           <FoodRecommendationScroll
+             data={FOOD_ITEMS.slice(2)}
+             onAdd={addFoodToCart}
+             onPress={(food) => {
+               const restaurant = getFoodRestaurant(food);
+               if (restaurant) router.push(`/restaurant/${restaurant.id}`);
+             }}
+           />
         </View>
       )}
     </View>

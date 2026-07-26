@@ -11,6 +11,7 @@ import React, {
 } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Platform,
   ScrollView,
@@ -32,7 +33,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
@@ -51,16 +52,19 @@ import {
   CATEGORIES,
   FOOD_ITEMS,
   POPULAR_RESTAURANTS,
+  RESTAURANTS,
   type Category,
   type FoodItem,
   type Restaurant,
 } from '@/data/homeData';
+import { getMenuItems, type RestaurantMenuItem } from '@/data/restaurantData';
 import {
   getSuggestions,
   searchAll,
   type SearchSuggestion,
 } from '@/services/searchService';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useCartStore } from '@/store/useCartStore';
 import { useFavoriteStore } from '@/store/useFavoriteStore';
 import { useEngagementStore } from '@/store/useEngagementStore';
 
@@ -470,6 +474,8 @@ function IdleContent({
   onClearRecent,
   onSelectTrending,
   onRestaurantPress,
+  onFoodPress,
+  onFoodAdd,
 }: {
   recentSearches: string[];
   onSelectRecent: (q: string) => void;
@@ -477,6 +483,8 @@ function IdleContent({
   onClearRecent: () => void;
   onSelectTrending: (q: string) => void;
   onRestaurantPress: (id: string) => void;
+  onFoodPress: (food: FoodItem) => void;
+  onFoodAdd: (food: FoodItem) => void;
 }) {
   const router = useRouter();
   const [loadingPopular, setLoadingPopular] = useState(true);
@@ -552,8 +560,8 @@ function IdleContent({
                   isVeg={f.isVeg}
                   isPopular={f.isPopular}
                   isNew={f.isNew}
-                  onPress={() => {}}
-                  onAddPress={() => {}}
+                   onPress={() => onFoodPress(f)}
+                   onAddPress={() => onFoodAdd(f)}
                   isFavorite={isFoodFavorite(f.id)}
                   onFavoritePress={() => toggleFoodFavorite(f.id)}
                 />
@@ -706,6 +714,9 @@ function ResultsContent({
   query,
   onTabChange,
   onRestaurantPress,
+  onFoodPress,
+  onFoodAdd,
+  onCategoryPress,
 }: {
   restaurants: Restaurant[];
   foods: FoodItem[];
@@ -714,6 +725,9 @@ function ResultsContent({
   query: string;
   onTabChange: (t: ResultTab) => void;
   onRestaurantPress: (id: string) => void;
+  onFoodPress: (food: FoodItem) => void;
+  onFoodAdd: (food: FoodItem) => void;
+  onCategoryPress: (category: Category) => void;
 }) {
   const colors = useColors();
   const { supabaseUserId } = useAuthStore();
@@ -810,8 +824,8 @@ function ResultsContent({
                   isVeg={f.isVeg}
                   isPopular={f.isPopular}
                   isNew={f.isNew}
-                  onPress={() => {}}
-                  onAddPress={() => {}}
+                   onPress={() => onFoodPress(f)}
+                   onAddPress={() => onFoodAdd(f)}
                   isFavorite={isFoodFavorite(f.id)}
                   onFavoritePress={() => toggleFoodFavorite(f.id)}
                 />
@@ -829,8 +843,8 @@ function ResultsContent({
               </View>
             )}
             <View style={resultsStyles.catGrid}>
-              {categories.map((c) => (
-                <CategoryGridItem key={c.id} category={c} onPress={() => {}} />
+               {categories.map((c) => (
+                 <CategoryGridItem key={c.id} category={c} onPress={() => onCategoryPress(c)} />
               ))}
             </View>
           </View>
@@ -879,6 +893,7 @@ function ErrorContent({ onRetry }: { onRetry: () => void }) {
 export function SearchScreen() {
   const colors = useColors();
   const router = useRouter();
+  const { query: initialQuery } = useLocalSearchParams<{ query?: string }>();
 
   const inputRef = useRef<TextInput>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -892,6 +907,7 @@ export function SearchScreen() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [foods, setFoods] = useState<FoodItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const { itemCount: cartItemCount, restaurantId: cartRestaurantId, restaurantName: cartRestaurantName, addItem, clearCart } = useCartStore();
 
   // ── Load recent searches on mount ────────────────────────────────────────────
   useEffect(() => {
@@ -998,6 +1014,13 @@ export function SearchScreen() {
     [runSearch],
   );
 
+  useEffect(() => {
+    const incomingQuery = Array.isArray(initialQuery) ? initialQuery[0] : initialQuery;
+    if (incomingQuery?.trim()) {
+      handleSuggestionSelect(incomingQuery);
+    }
+  }, [handleSuggestionSelect, initialQuery]);
+
   const handleClear = useCallback(() => {
     setQuery('');
     setSuggestions([]);
@@ -1014,6 +1037,75 @@ export function SearchScreen() {
       router.push(`/restaurant/${id}` as any);
     },
     [router],
+  );
+
+  const getFoodRestaurant = useCallback(
+    (food: FoodItem) => RESTAURANTS.find((restaurant) => restaurant.name === food.restaurantName),
+    [],
+  );
+
+  const getCartMenuItem = useCallback((food: FoodItem): RestaurantMenuItem | null => {
+    const restaurant = getFoodRestaurant(food);
+    if (!restaurant) return null;
+    return (
+      getMenuItems(restaurant.id).find((item) => item.name === food.name) ?? {
+        id: food.id,
+        restaurantId: restaurant.id,
+        name: food.name,
+        description: food.description,
+        price: food.price,
+        imageUrl: food.imageUri ?? '',
+        category: 'popular',
+        tags: [],
+        isAvailable: true,
+        isPopular: food.isPopular ?? false,
+        isVeg: food.isVeg,
+        rating: food.rating,
+      }
+    );
+  }, [getFoodRestaurant]);
+
+  const handleFoodPress = useCallback(
+    (food: FoodItem) => {
+      const restaurant = getFoodRestaurant(food);
+      if (restaurant) handleRestaurantPress(restaurant.id);
+    },
+    [getFoodRestaurant, handleRestaurantPress],
+  );
+
+  const handleFoodAdd = useCallback(
+    (food: FoodItem) => {
+      const restaurant = getFoodRestaurant(food);
+      const menuItem = getCartMenuItem(food);
+      if (!restaurant || !menuItem) return;
+      if (cartRestaurantId && cartRestaurantId !== restaurant.id) {
+        Alert.alert(
+          'Start a new cart?',
+          `Your cart has items from ${cartRestaurantName ?? 'another restaurant'}.`,
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Start new',
+              style: 'destructive',
+              onPress: () => {
+                clearCart();
+                addItem(menuItem, 1, undefined, restaurant.name);
+              },
+            },
+          ],
+        );
+        return;
+      }
+      addItem(menuItem, 1, undefined, restaurant.name);
+    },
+    [addItem, cartRestaurantId, cartRestaurantName, clearCart, getCartMenuItem, getFoodRestaurant],
+  );
+
+  const handleCategoryPress = useCallback(
+    (category: Category) => {
+      handleSuggestionSelect(category.name);
+    },
+    [handleSuggestionSelect],
   );
 
   // ── Cleanup debounce on unmount ───────────────────────────────────────────────
@@ -1058,6 +1150,8 @@ export function SearchScreen() {
               onClearRecent={clearRecentSearches}
               onSelectTrending={handleSuggestionSelect}
               onRestaurantPress={handleRestaurantPress}
+              onFoodPress={handleFoodPress}
+              onFoodAdd={handleFoodAdd}
             />
           </Animated.View>
         )}
@@ -1078,6 +1172,9 @@ export function SearchScreen() {
               query={committedQuery}
               onTabChange={setActiveTab}
               onRestaurantPress={handleRestaurantPress}
+              onFoodPress={handleFoodPress}
+              onFoodAdd={handleFoodAdd}
+              onCategoryPress={handleCategoryPress}
             />
           </Animated.View>
         )}
