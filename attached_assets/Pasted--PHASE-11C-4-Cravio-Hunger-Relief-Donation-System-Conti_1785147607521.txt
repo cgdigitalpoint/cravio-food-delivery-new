@@ -1,0 +1,254 @@
+# PHASE 11C-4 — Cravio Hunger Relief Donation System
+
+Continue from the current GitHub project state.
+
+Do NOT restart, redesign or modify any completed work.
+
+Preserve all completed phases, especially:
+
+- Phase 11A
+- Phase 11B
+- Phase 11C-1 (Premium UI/UX)
+- Phase 11C-2 (Veg Toggle, Grocery Toggle, Grocery Coming Soon)
+- Phase 11C-3 (Minimum Order & Dynamic Delivery Charges)
+
+Implement ONLY Phase 11C-4.
+
+--------------------------------------------------
+
+OBJECTIVE
+
+Build a complete, production-ready Cravio Hunger Relief Donation System.
+
+This phase must include:
+
+- Customer Donation Experience
+- Donation Wallet
+- Donation Database
+- Donation APIs
+- Future-ready Donation Management Foundation
+- Standalone Donation Management Module (only this module, not the complete Admin Panel)
+
+--------------------------------------------------
+
+CUSTOMER CHECKOUT
+
+During Checkout display:
+
+❤️ Feed Someone Today
+
+"Your small contribution can help provide food to hungry people."
+
+Donation is completely optional.
+
+Donation Options
+
+- ₹10
+- ₹20
+- ₹50
+- ₹100
+- ₹200
+- ₹500
+- Custom Amount
+
+Customer can:
+
+- Donate
+- Skip Donation
+
+Only one donation option can be selected at a time.
+
+--------------------------------------------------
+
+CHECKOUT SUMMARY
+
+Display:
+
+- Food Total
+- Delivery Charge
+- Donation
+- Grand Total
+
+Grand Total must update instantly whenever the donation amount changes.
+
+Customer pays everything together in one payment.
+
+--------------------------------------------------
+
+DONATION WALLET
+
+Donation money must NEVER mix with:
+
+- Restaurant Settlements
+- Delivery Partner Earnings
+- Platform Commission
+
+Create a dedicated Donation Wallet.
+
+Store:
+
+- Donation ID
+- Order ID
+- Customer ID
+- Donation Amount
+- Payment Status
+- Transaction ID
+- Payment Method
+- Date & Time
+
+--------------------------------------------------
+
+DONATION DATABASE
+
+Create scalable database models, services and APIs.
+
+Support:
+
+- Donation History
+- Donation Reports
+- Wallet Balance
+- Future Withdrawals
+- Utilization Tracking
+
+--------------------------------------------------
+
+DONATION MANAGEMENT MODULE
+
+Prepare a reusable Donation Management Module that can be directly integrated into the future Admin Panel.
+
+Do NOT build the complete Admin Panel.
+
+Build ONLY the Donation Module.
+
+Include:
+
+Dashboard Cards
+
+- Total Donations
+- Today's Donations
+- Monthly Donations
+- Yearly Donations
+- Donation Wallet Balance
+
+Recent Donations
+
+Display:
+
+- Donation ID
+- Customer
+- Order ID
+- Amount
+- Payment Status
+- Date
+
+Financial Summary
+
+- Donation Collection
+- Donation Balance
+- Donation Utilized
+- Remaining Balance
+
+Donation Withdrawal History
+
+Prepare the complete structure for future withdrawals.
+
+Donation Utilization
+
+Prepare the complete structure for future utilization records.
+
+Design this module so it can be plugged directly into the full Admin Panel during Phase 14 without redevelopment.
+
+--------------------------------------------------
+
+SUCCESS EXPERIENCE
+
+After successful donation display:
+
+❤️ Thank you for helping feed someone in need.
+
+Optionally show:
+
+"You have helped support the Cravio Hunger Relief Initiative."
+
+--------------------------------------------------
+
+TECHNICAL REQUIREMENTS
+
+- Do NOT break any existing feature.
+- Do NOT redesign completed screens.
+- Do NOT modify authentication.
+- Do NOT modify unrelated APIs.
+- Do NOT modify Restaurant, Delivery Partner or Platform earnings logic.
+- Reuse existing components.
+- Maintain clean architecture.
+- Keep zero TypeScript errors.
+- Keep Expo healthy.
+- Keep Android & iOS builds passing.
+- Follow the existing project coding standards.
+
+--------------------------------------------------
+
+VERIFICATION
+
+Before completing:
+
+- Verify Customer Donation Flow.
+- Verify Checkout Calculations.
+- Verify Donation Wallet.
+- Verify Database Records.
+- Verify APIs.
+- Verify Donation Module.
+- Verify Android Build.
+- Verify iOS Build.
+- Verify Expo Preview.
+- Verify TypeScript.
+- Verify that no previously completed feature is broken.
+
+--------------------------------------------------
+
+DELIVERABLES
+
+✅ Customer Donation UI
+
+✅ Checkout Integration
+
+✅ Donation Wallet
+
+✅ Donation Database
+
+✅ Donation APIs
+
+✅ Standalone Donation Management Module
+
+✅ Production-ready Architecture
+
+❌ Do NOT start Restaurant Partner App.
+
+❌ Do NOT start Delivery Partner App.
+
+❌ Do NOT build the complete Admin Panel.
+
+--------------------------------------------------
+
+IMPORTANT
+
+Before writing any code:
+
+1. Inspect the existing project architecture.
+
+2. Reuse the current state management, database structure, API patterns, UI components and coding conventions.
+
+3. Avoid duplicate components and duplicate business logic.
+
+4. Keep the implementation modular, scalable and production-ready.
+
+5. When the implementation is complete:
+
+- Run full TypeScript checks.
+- Verify Android build.
+- Verify iOS build.
+- Verify Expo workflow.
+- Fix any errors found.
+- Commit all changes.
+- Push the final code to GitHub.
+- Report the final Git commit hash.
