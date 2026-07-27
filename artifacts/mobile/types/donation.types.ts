@@ -11,6 +11,8 @@ export interface DbDonation {
   transaction_id: string | null;
   payment_method: string;
   created_at: string;
+  customer_name?: string | null;
+  customer_email?: string | null;
 }
 
 export interface DbDonationWithdrawal {

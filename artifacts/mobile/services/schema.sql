@@ -301,10 +301,10 @@ create policy "Customers can read their own donations"
   on public.donation_wallet_entries for select
   using (auth.uid() = customer_id);
 
+-- Wallet entries are never directly writable by a customer. The only
+-- authenticated write path is the validated order-plus-donation RPC below.
 drop policy if exists "Customers can create their own donations" on public.donation_wallet_entries;
-create policy "Customers can create their own donations"
-  on public.donation_wallet_entries for insert
-  with check (auth.uid() = customer_id);
+revoke insert, update, delete on public.donation_wallet_entries from anon, authenticated;
 
 drop policy if exists "Donation admins can read wallet entries" on public.donation_wallet_entries;
 create policy "Donation admins can read wallet entries"
@@ -360,8 +360,8 @@ create or replace function public.create_order_with_donation(
 )
 returns public.orders
 language plpgsql
-security invoker
-set search_path = public
+security definer
+set search_path = ''
 as $$
 declare
   new_order public.orders;
@@ -402,6 +402,8 @@ begin
 end;
 $$;
 
+revoke all on function public.create_order_with_donation(text, text, uuid, numeric, text, jsonb, numeric)
+  from public;
 grant execute on function public.create_order_with_donation(text, text, uuid, numeric, text, jsonb, numeric)
   to authenticated;
 
@@ -440,8 +442,13 @@ begin
     'recentDonations', coalesce((
       select jsonb_agg(to_jsonb(recent) order by recent.created_at desc)
       from (
-        select * from public.donation_wallet_entries
-        order by created_at desc
+        select
+          donation.*,
+          coalesce(customer.name, customer.email) as customer_name,
+          customer.email as customer_email
+        from public.donation_wallet_entries donation
+        left join public.users customer on customer.id = donation.customer_id
+        order by donation.created_at desc
         limit 50
       ) recent
     ), '[]'::jsonb),

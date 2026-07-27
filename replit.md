@@ -55,7 +55,7 @@ A food delivery mobile app (Expo / React Native / TypeScript) with customer chec
 
 ⚠️ **Supabase checklist:** Run the complete `artifacts/mobile/services/schema.sql` in the Supabase SQL Editor. This adds the address reference, aligns catalog ID columns to text, creates the atomic `create_order_with_items` RPC, and grants it to authenticated users. Then sign in, create/select an address, and place a COD test order.
 
-**Donation checklist:** Re-run `artifacts/mobile/services/schema.sql` after pulling the Phase 11C-4 changes. This adds the isolated donation wallet, withdrawal/utilization foundations, the atomic `create_order_with_donation` RPC, and the admin-only donation management snapshot RPC. COD donations remain `pending` until payment is collected; no donation funds are mixed with order settlements.
+**Donation checklist:** Re-run `artifacts/mobile/services/schema.sql` after pulling the Phase 11C-4 changes. This adds the isolated donation wallet, withdrawal/utilization foundations, the customer-read-only ledger, the secured atomic `create_order_with_donation` RPC, and the admin-only donation management snapshot RPC. COD donations remain `pending` until payment is collected; no donation funds are mixed with order settlements.
 
 ## User preferences
 

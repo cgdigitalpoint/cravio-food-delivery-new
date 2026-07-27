@@ -75,6 +75,7 @@ export function DonationManagementModule({ snapshot }: DonationManagementModuleP
                   {donation.id.slice(0, 8).toUpperCase()}
                 </Text>
                 <Text style={[PP.caption, { color: colors.mutedForeground }]}>
+                  {donation.customer_name ?? donation.customer_email ?? 'Customer'} ·{' '}
                   Order {donation.order_id.slice(0, 8).toUpperCase()} · {new Date(donation.created_at).toLocaleDateString()}
                 </Text>
               </View>
