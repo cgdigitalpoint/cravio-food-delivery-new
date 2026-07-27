@@ -14,6 +14,8 @@ import {
   View,
 } from 'react-native';
 import Animated, {
+  interpolate,
+  interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
