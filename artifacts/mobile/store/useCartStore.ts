@@ -3,6 +3,7 @@
 
 import { create } from 'zustand';
 import type { CartItem, MenuItem } from '@/types';
+import { getDeliveryFee } from '@/utils/orderPricing';
 
 interface CartState {
   items: CartItem[];
@@ -36,6 +37,7 @@ function calcTotals(items: CartItem[], tip: number, discount: number) {
   const subtotal = items.reduce((sum, i) => sum + i.totalPrice, 0);
   return {
     subtotal,
+    deliveryFee: getDeliveryFee(subtotal),
     totalAmount: Math.max(0, subtotal - discount) + tip,
     itemCount: items.reduce((sum, i) => sum + i.quantity, 0),
   };
@@ -155,6 +157,7 @@ export const useCartStore = create<CartState>((set, get) => ({
       restaurantId: null,
       restaurantName: null,
       subtotal: 0,
+      deliveryFee: 0,
       tip: 0,
       promoCode: null,
       promoDiscount: 0,

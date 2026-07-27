@@ -48,11 +48,14 @@ import {
 import type { DeliveryOptionsValue, PaymentMethod } from '@/components/checkout';
 import type { DbAddress } from '@/types/db.types';
 import { RESTAURANTS } from '@/data/homeData';
+import {
+  meetsMinimumOrder,
+  MINIMUM_ORDER_MESSAGE,
+} from '@/utils/orderPricing';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const PLATFORM_FEE = 0.99;
 const GST_RATE = 0.05;
-const DEFAULT_DELIVERY_FEE = 2.99;
 
 // ─── Section Label ────────────────────────────────────────────────────────────
 function SectionLabel({ children }: { children: string }) {
@@ -300,7 +303,7 @@ export function CheckoutScreen() {
   }, [checkoutScrollTo]);
 
   // ── Price calculation ─────────────────────────────────────────────────────
-  const actualDeliveryFee = deliveryFee > 0 ? deliveryFee : DEFAULT_DELIVERY_FEE;
+  const actualDeliveryFee = deliveryFee;
   const gst = subtotal * GST_RATE;
   const grandTotal =
     Math.max(0, subtotal - promoDiscount) +
@@ -311,11 +314,12 @@ export function CheckoutScreen() {
   // ── Validation ────────────────────────────────────────────────────────────
   const validationError = useMemo(() => {
     if (itemCount === 0) return 'Your cart is empty. Add items before checkout.';
+    if (!meetsMinimumOrder(subtotal)) return MINIMUM_ORDER_MESSAGE;
     if (!selectedAddressId) return 'Please select a delivery address.';
     if (!selectedPayment) return 'Cash on Delivery is required to place an order.';
     if (!supabaseUserId) return 'Your session has expired. Please sign in again.';
     return null;
-  }, [itemCount, selectedAddressId, selectedPayment, supabaseUserId]);
+  }, [itemCount, subtotal, selectedAddressId, selectedPayment, supabaseUserId]);
 
   const handleCookingNote = useCallback(
     (cartItemId: string, note: string) => {
@@ -645,7 +649,7 @@ export function CheckoutScreen() {
                 <View>
                   <Text style={[PP.button, { color: '#fff' }]}>Place Order</Text>
                   <Text style={[PP.caption, { color: 'rgba(255,255,255,0.8)', textAlign: 'center' }]}>
-                    ${grandTotal.toFixed(2)} ·{' '}
+                    ₹{grandTotal.toFixed(2)} ·{' '}
                     {selectedPayment === 'cod' ? 'Cash on Delivery' : 'Select payment'}
                   </Text>
                 </View>

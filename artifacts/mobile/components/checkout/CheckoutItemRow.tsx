@@ -84,10 +84,10 @@ export function CheckoutItemRow({
             {name}
           </Text>
           <Text style={[PP.bodySM, { color: colors.primary, fontFamily: 'Poppins_600SemiBold', marginTop: 2 }]}>
-            ${(price * quantity).toFixed(2)}
+            ₹{(price * quantity).toFixed(2)}
           </Text>
           <Text style={[PP.caption, { color: colors.mutedForeground }]}>
-            ${price.toFixed(2)} × {quantity}
+            ₹{price.toFixed(2)} × {quantity}
           </Text>
         </View>
 

@@ -39,6 +39,10 @@ import { useColors } from '@/hooks/useColors';
 import { PP } from '@/theme/poppins';
 import { useCartStore } from '@/store/useCartStore';
 import { PROMO_CODES } from '@/data/restaurantData';
+import {
+  meetsMinimumOrder,
+  MINIMUM_ORDER_MESSAGE,
+} from '@/utils/orderPricing';
 
 // ─── Cart Item Row ─────────────────────────────────────────────────────────────
 
@@ -82,10 +86,10 @@ function CartItemRow({
             {name}
           </Text>
           <Text style={[PP.subtitle, { color: colors.primary, fontFamily: 'Poppins_700Bold', marginTop: 4 }]}>
-            ${(price * quantity).toFixed(2)}
+            ₹{(price * quantity).toFixed(2)}
           </Text>
           <Text style={[PP.caption, { color: colors.mutedForeground }]}>
-            ${price.toFixed(2)} each
+            ₹{price.toFixed(2)} each
           </Text>
         </View>
 
@@ -257,7 +261,8 @@ export function CartScreen() {
   const [couponError, setCouponError] = useState('');
   const [couponApplying, setCouponApplying] = useState(false);
 
-  const DELIVERY = deliveryFee > 0 ? deliveryFee : 2.49;
+  const isMinimumOrderMet = meetsMinimumOrder(subtotal);
+  const DELIVERY = deliveryFee;
   const PLATFORM_FEE = 0.99;
   const TAX_RATE = 0.05;
   const taxes = subtotal * TAX_RATE;
@@ -379,7 +384,7 @@ export function CartScreen() {
             <View style={[styles.couponApplied, { backgroundColor: '#F0FDF4', borderColor: '#BBF7D0' }]}>
               <View>
                 <Text style={[PP.label, { color: '#16A34A' }]}>🎉 {promoCode} applied!</Text>
-                <Text style={[PP.caption, { color: '#16A34A' }]}>You save ${promoDiscount.toFixed(2)}</Text>
+                <Text style={[PP.caption, { color: '#16A34A' }]}>You save ₹{promoDiscount.toFixed(2)}</Text>
               </View>
               <TouchableOpacity onPress={handleRemoveCoupon} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
                 <X size={16} color="#16A34A" />
@@ -421,28 +426,32 @@ export function CartScreen() {
         <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Text style={[PP.label, { color: colors.foreground, marginBottom: 12 }]}>Bill Details</Text>
 
-          <BillRow label="Item Total" value={`$${subtotal.toFixed(2)}`} />
-          <BillRow label="Delivery Charges" value={`$${DELIVERY.toFixed(2)}`} info="Based on distance" />
-          <BillRow label="Platform Fee" value={`$${PLATFORM_FEE.toFixed(2)}`} info="One-time charge" />
-          <BillRow label="Taxes & Charges" value={`$${taxes.toFixed(2)}`} info="GST & local taxes" />
+          <BillRow label="Item Total" value={`₹${subtotal.toFixed(2)}`} />
+          <BillRow
+            label="Delivery Charges"
+            value={DELIVERY === 0 ? 'Free' : `₹${DELIVERY.toFixed(2)}`}
+            info="Based on order value"
+          />
+          <BillRow label="Platform Fee" value={`₹${PLATFORM_FEE.toFixed(2)}`} info="One-time charge" />
+          <BillRow label="Taxes & Charges" value={`₹${taxes.toFixed(2)}`} info="GST & local taxes" />
 
           {promoDiscount > 0 && (
             <BillRow
               label={`Coupon (${promoCode})`}
-              value={`-$${promoDiscount.toFixed(2)}`}
+              value={`-₹${promoDiscount.toFixed(2)}`}
               isSaving
             />
           )}
 
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
-          <BillRow label="Grand Total" value={`$${grandTotal.toFixed(2)}`} isTotal />
+          <BillRow label="Grand Total" value={`₹${grandTotal.toFixed(2)}`} isTotal />
         </View>
 
         {/* ── Savings callout ── */}
         {promoDiscount > 0 && (
           <View style={[styles.savingsBar, { backgroundColor: '#F0FDF4' }]}>
             <Text style={[PP.label, { color: '#16A34A' }]}>
-              🎉 You are saving ${promoDiscount.toFixed(2)} on this order!
+              🎉 You are saving ₹{promoDiscount.toFixed(2)} on this order!
             </Text>
           </View>
         )}
@@ -450,14 +459,25 @@ export function CartScreen() {
 
       {/* ── Checkout CTA ── */}
       <View style={[styles.footer, { paddingBottom: insets.bottom + 12, backgroundColor: colors.background, borderColor: colors.border }]}>
+        {!isMinimumOrderMet && (
+          <Text
+            style={[styles.minimumOrderMessage, { color: colors.error }]}
+            accessibilityRole="alert"
+          >
+            {MINIMUM_ORDER_MESSAGE}
+          </Text>
+        )}
         <View style={styles.footerTotal}>
           <Text style={[PP.caption, { color: colors.mutedForeground }]}>Total</Text>
-          <Text style={[PP.title, { color: colors.foreground }]}>${grandTotal.toFixed(2)}</Text>
+          <Text style={[PP.title, { color: colors.foreground }]}>₹{grandTotal.toFixed(2)}</Text>
         </View>
         <TouchableOpacity
           onPress={() => router.push('/checkout')}
+          disabled={!isMinimumOrderMet}
           activeOpacity={0.9}
-          style={styles.checkoutBtnWrap}
+          style={[styles.checkoutBtnWrap, { opacity: isMinimumOrderMet ? 1 : 0.55 }]}
+          accessibilityLabel="Proceed to checkout"
+          accessibilityState={{ disabled: !isMinimumOrderMet }}
         >
           <LinearGradient
             colors={['#FF8C38', '#FF6B00']}
@@ -540,6 +560,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 14,
     borderTopWidth: 1,
+  },
+  minimumOrderMessage: {
+    position: 'absolute',
+    left: 20,
+    right: 20,
+    bottom: '100%',
+    paddingBottom: 8,
+    fontSize: 12,
+    fontFamily: 'Poppins_500Medium',
+    textAlign: 'center',
   },
   footerTotal: { alignItems: 'flex-start' },
   checkoutBtnWrap: { flex: 1, borderRadius: 16, overflow: 'hidden' },

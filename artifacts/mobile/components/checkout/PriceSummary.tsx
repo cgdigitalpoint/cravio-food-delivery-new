@@ -73,29 +73,29 @@ export function PriceSummary({
 
   return (
     <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-      <Row label="Subtotal" value={`$${subtotal.toFixed(2)}`} />
+      <Row label="Subtotal" value={`₹${subtotal.toFixed(2)}`} />
       {discount > 0 && (
-        <Row label="Discount" value={`-$${discount.toFixed(2)}`} isSaving />
+        <Row label="Discount" value={`-₹${discount.toFixed(2)}`} isSaving />
       )}
       {couponDiscount > 0 && (
-        <Row label="Coupon Discount" value={`-$${couponDiscount.toFixed(2)}`} isSaving />
+        <Row label="Coupon Discount" value={`-₹${couponDiscount.toFixed(2)}`} isSaving />
       )}
       <Row
         label="Delivery Fee"
-        value={deliveryFee === 0 ? 'Free' : `$${deliveryFee.toFixed(2)}`}
+        value={deliveryFee === 0 ? 'Free' : `₹${deliveryFee.toFixed(2)}`}
         dimmed
       />
-      <Row label="Platform Fee" value={`$${platformFee.toFixed(2)}`} dimmed />
-      <Row label="GST (5%)" value={`$${gst.toFixed(2)}`} dimmed />
+      <Row label="Platform Fee" value={`₹${platformFee.toFixed(2)}`} dimmed />
+      <Row label="GST (5%)" value={`₹${gst.toFixed(2)}`} dimmed />
 
       <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-      <Row label="Grand Total" value={`$${grandTotal.toFixed(2)}`} isTotal />
+      <Row label="Grand Total" value={`₹${grandTotal.toFixed(2)}`} isTotal />
 
       {totalSavings > 0 && (
         <View style={styles.savingChip}>
           <Text style={[PP.caption, { color: '#16A34A', fontFamily: 'Poppins_600SemiBold' }]}>
-            🎉 You save ${totalSavings.toFixed(2)} on this order
+            🎉 You save ₹{totalSavings.toFixed(2)} on this order
           </Text>
         </View>
       )}
