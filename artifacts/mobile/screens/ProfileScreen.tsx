@@ -32,6 +32,7 @@ interface ProfileScreenProps {
   onFavorites?: () => void;
   onAddresses?: () => void;
   onRecentlyViewed?: () => void;
+  onDonations?: () => void;
   onEditProfile?: () => void;
   onLogout?: () => void;
 }
@@ -66,7 +67,7 @@ function MenuRow({ icon, label, subtitle, onPress, isDanger = false }: MenuRowPr
   );
 }
 
-export function ProfileScreen({ onOrders, onFavorites, onAddresses, onRecentlyViewed, onEditProfile, onLogout }: ProfileScreenProps) {
+export function ProfileScreen({ onOrders, onFavorites, onAddresses, onRecentlyViewed, onDonations, onEditProfile, onLogout }: ProfileScreenProps) {
   const insets = useSafeAreaInsets();
   const colors = useColors();
   const { user, supabaseUserId, isLoading, logout } = useAuthStore();
@@ -160,6 +161,12 @@ export function ProfileScreen({ onOrders, onFavorites, onAddresses, onRecentlyVi
             icon={<CreditCard size={16} color="#10B981" />}
             label="Payment Methods"
             subtitle="Coming soon"
+          />
+          <MenuRow
+            icon={<Heart size={16} color="#EC4899" />}
+            label="Hunger Relief Donations"
+            subtitle="View your donation history"
+            onPress={onDonations}
           />
         </View>
 

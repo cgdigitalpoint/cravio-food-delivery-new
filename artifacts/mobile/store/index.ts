@@ -6,3 +6,4 @@ export { useUserStore } from './useUserStore';
 export { useOrderStore } from './useOrderStore';
 export { useFavoriteStore } from './useFavoriteStore';
 export { useAddressStore } from './useAddressStore';
+export { useDonationStore } from './useDonationStore';

@@ -14,6 +14,7 @@ export interface PriceSummaryProps {
   deliveryFee: number;
   platformFee: number;
   gst: number;
+  donation: number;
   grandTotal: number;
 }
 
@@ -66,6 +67,7 @@ export function PriceSummary({
   deliveryFee,
   platformFee,
   gst,
+  donation,
   grandTotal,
 }: PriceSummaryProps) {
   const colors = useColors();
@@ -87,6 +89,7 @@ export function PriceSummary({
       />
       <Row label="Platform Fee" value={`₹${platformFee.toFixed(2)}`} dimmed />
       <Row label="GST (5%)" value={`₹${gst.toFixed(2)}`} dimmed />
+      {donation > 0 && <Row label="Donation" value={`₹${donation.toFixed(2)}`} />}
 
       <View style={[styles.divider, { backgroundColor: colors.border }]} />
 

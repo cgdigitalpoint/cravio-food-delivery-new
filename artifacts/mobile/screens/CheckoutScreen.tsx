@@ -45,6 +45,7 @@ import {
   PaymentSelector,
   PriceSummary,
 } from '@/components/checkout';
+import { DonationSelector } from '@/components/donations';
 import type { DeliveryOptionsValue, PaymentMethod } from '@/components/checkout';
 import type { DbAddress } from '@/types/db.types';
 import { RESTAURANTS } from '@/data/homeData';
@@ -273,6 +274,8 @@ export function CheckoutScreen() {
     note: '',
   });
   const [isPlacing, setIsPlacing] = useState(false);
+  const [selectedDonation, setSelectedDonation] = useState<number | null>(null);
+  const [customDonation, setCustomDonation] = useState('');
 
   // ── Scroll-to-section refs (used when returning from Order Failure screen) ─
   const scrollViewRef = useRef<ScrollView>(null);
@@ -305,21 +308,39 @@ export function CheckoutScreen() {
   // ── Price calculation ─────────────────────────────────────────────────────
   const actualDeliveryFee = deliveryFee;
   const gst = subtotal * GST_RATE;
+  const donationAmount =
+    selectedDonation === null
+      ? 0
+      : selectedDonation > 0 && ![10, 20, 50, 100, 200, 500].includes(selectedDonation)
+        ? Number(customDonation) || 0
+        : selectedDonation;
   const grandTotal =
     Math.max(0, subtotal - promoDiscount) +
     actualDeliveryFee +
     PLATFORM_FEE +
-    gst;
+    gst +
+    donationAmount;
 
   // ── Validation ────────────────────────────────────────────────────────────
   const validationError = useMemo(() => {
     if (itemCount === 0) return 'Your cart is empty. Add items before checkout.';
     if (!meetsMinimumOrder(subtotal)) return MINIMUM_ORDER_MESSAGE;
+    if (selectedDonation !== null && donationAmount <= 0) {
+      return 'Enter a donation amount or choose Skip Donation.';
+    }
     if (!selectedAddressId) return 'Please select a delivery address.';
     if (!selectedPayment) return 'Cash on Delivery is required to place an order.';
     if (!supabaseUserId) return 'Your session has expired. Please sign in again.';
     return null;
-  }, [itemCount, subtotal, selectedAddressId, selectedPayment, supabaseUserId]);
+  }, [
+    itemCount,
+    subtotal,
+    selectedDonation,
+    donationAmount,
+    selectedAddressId,
+    selectedPayment,
+    supabaseUserId,
+  ]);
 
   const handleCookingNote = useCallback(
     (cartItemId: string, note: string) => {
@@ -340,6 +361,7 @@ export function CheckoutScreen() {
         addressId: selectedAddressId as string,
         total: grandTotal,
         paymentMethod: 'Cash on Delivery',
+        donationAmount,
         items: items.map((ci) => ({
           foodId: ci.menuItem.id,
           foodName: ci.menuItem.name,
@@ -369,6 +391,7 @@ export function CheckoutScreen() {
           restaurantName: restaurantName ?? 'Restaurant',
           total: grandTotal.toFixed(2),
           paymentMethod: 'cod',
+          donationAmount: donationAmount.toFixed(2),
         },
       } as any);
     } catch (err) {
@@ -594,6 +617,20 @@ export function CheckoutScreen() {
           />
         </Animated.View>
 
+        {/* ── Optional Hunger Relief Donation ── */}
+        <Animated.View
+          entering={FadeInDown.delay(220).duration(280).springify()}
+          style={styles.section}
+        >
+          <SectionLabel>HUNGER RELIEF</SectionLabel>
+          <DonationSelector
+            selectedAmount={selectedDonation}
+            customAmount={customDonation}
+            onSelect={setSelectedDonation}
+            onCustomAmountChange={setCustomDonation}
+          />
+        </Animated.View>
+
         {/* ── Price Summary ── */}
         <Animated.View
           entering={FadeInDown.delay(240).duration(280).springify()}
@@ -607,6 +644,7 @@ export function CheckoutScreen() {
             deliveryFee={actualDeliveryFee}
             platformFee={PLATFORM_FEE}
             gst={gst}
+            donation={donationAmount}
             grandTotal={grandTotal}
           />
         </Animated.View>

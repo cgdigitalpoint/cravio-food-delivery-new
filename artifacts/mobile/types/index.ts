@@ -4,3 +4,4 @@
 export * from './food.types';
 export * from './user.types';
 export * from './navigation.types';
+export * from './donation.types';

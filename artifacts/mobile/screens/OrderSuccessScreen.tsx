@@ -69,6 +69,7 @@ export interface OrderSuccessScreenProps {
   restaurantName: string;
   grandTotal: number;
   paymentMethod: string;
+  donationAmount?: number;
   onContinueShopping: () => void;
   onViewOrder: () => void;
 }
@@ -79,6 +80,7 @@ export function OrderSuccessScreen({
   restaurantName,
   grandTotal,
   paymentMethod,
+  donationAmount = 0,
   onContinueShopping,
   onViewOrder,
 }: OrderSuccessScreenProps) {
@@ -155,6 +157,21 @@ export function OrderSuccessScreen({
             </Text>{' '}
             is confirmed and being prepared.
           </Text>
+          {donationAmount > 0 && (
+            <Text
+              style={[
+                PP.bodySM,
+                {
+                  color: '#16A34A',
+                  textAlign: 'center',
+                  marginTop: 10,
+                  fontFamily: 'Poppins_600SemiBold',
+                },
+              ]}
+            >
+              ❤️ Thank you for helping feed someone in need.
+            </Text>
+          )}
 
           {/* ── Order detail card ── */}
           <View

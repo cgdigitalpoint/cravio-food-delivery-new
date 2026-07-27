@@ -5,12 +5,13 @@ import { OrderSuccessScreen } from '@/screens';
 
 export default function OrderSuccessRoute() {
   const router = useRouter();
-  const { orderId, restaurantName, total, paymentMethod } =
+  const { orderId, restaurantName, total, paymentMethod, donationAmount } =
     useLocalSearchParams<{
       orderId: string;
       restaurantName: string;
       total: string;
       paymentMethod: string;
+      donationAmount?: string;
     }>();
 
   return (
@@ -19,6 +20,7 @@ export default function OrderSuccessRoute() {
       restaurantName={restaurantName ?? 'Restaurant'}
       grandTotal={parseFloat(total ?? '0')}
       paymentMethod={paymentMethod ?? 'cod'}
+      donationAmount={parseFloat(donationAmount ?? '0')}
       onContinueShopping={() => router.replace('/home')}
       onViewOrder={() => router.replace(`/orders/${orderId}` as any)}
     />

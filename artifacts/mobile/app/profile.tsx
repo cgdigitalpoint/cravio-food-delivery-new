@@ -10,6 +10,7 @@ export default function ProfileRoute() {
       onOrders={() => router.push('/orders')}
       onFavorites={() => router.push('/favorites')}
       onRecentlyViewed={() => router.push('/recently-viewed')}
+      onDonations={() => router.push('/donations')}
       onAddresses={() => router.push('/address')}
       onEditProfile={() => router.push('/profile-edit')}
       onLogout={() => router.replace('/welcome')}

@@ -10,6 +10,8 @@ export { DesignSystemScreen } from './DesignSystemScreen';
 
 // Phase 6 screens
 export { ProfileScreen } from './ProfileScreen';
+export { DonationHistoryScreen } from './DonationHistoryScreen';
+export { DonationManagementScreen } from './DonationManagementScreen';
 export { OrdersScreen } from './OrdersScreen';
 export { OrderDetailsScreen } from './OrderDetailsScreen';
 export { FavoritesScreen } from './FavoritesScreen';

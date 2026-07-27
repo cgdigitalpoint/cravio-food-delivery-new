@@ -256,3 +256,215 @@ alter table public.favorites
   alter column restaurant_id type text using restaurant_id::text;
 alter table public.cart
   alter column food_id type text using food_id::text;
+
+-- ── Phase 11C-4 — Hunger Relief donation wallet ───────────────────────────────
+-- Donations are a separate financial ledger. They must never be mixed with
+-- restaurant settlements, delivery partner earnings, or platform commission.
+create table if not exists public.donation_wallet_entries (
+  id              uuid primary key default uuid_generate_v4(),
+  order_id        uuid not null unique references public.orders(id) on delete restrict,
+  customer_id     uuid not null references auth.users(id) on delete restrict,
+  amount          numeric(12, 2) not null check (amount > 0),
+  payment_status  text not null default 'paid'
+                  check (payment_status in ('pending', 'paid', 'failed', 'refunded')),
+  transaction_id  text,
+  payment_method  text not null,
+  created_at      timestamptz not null default now()
+);
+
+create table if not exists public.donation_withdrawals (
+  id              uuid primary key default uuid_generate_v4(),
+  amount          numeric(12, 2) not null check (amount > 0),
+  status          text not null default 'requested'
+                  check (status in ('requested', 'approved', 'completed', 'rejected')),
+  requested_at    timestamptz not null default now(),
+  completed_at    timestamptz
+);
+
+create table if not exists public.donation_utilization (
+  id                uuid primary key default uuid_generate_v4(),
+  amount            numeric(12, 2) not null check (amount > 0),
+  purpose           text not null,
+  beneficiary_count int check (beneficiary_count is null or beneficiary_count >= 0),
+  status            text not null default 'planned'
+                    check (status in ('planned', 'approved', 'completed', 'cancelled')),
+  utilized_at       timestamptz,
+  created_at        timestamptz not null default now()
+);
+
+alter table public.donation_wallet_entries enable row level security;
+alter table public.donation_withdrawals enable row level security;
+alter table public.donation_utilization enable row level security;
+
+drop policy if exists "Customers can read their own donations" on public.donation_wallet_entries;
+create policy "Customers can read their own donations"
+  on public.donation_wallet_entries for select
+  using (auth.uid() = customer_id);
+
+drop policy if exists "Customers can create their own donations" on public.donation_wallet_entries;
+create policy "Customers can create their own donations"
+  on public.donation_wallet_entries for insert
+  with check (auth.uid() = customer_id);
+
+drop policy if exists "Donation admins can read wallet entries" on public.donation_wallet_entries;
+create policy "Donation admins can read wallet entries"
+  on public.donation_wallet_entries for select
+  using (
+    coalesce(auth.jwt()->'app_metadata'->>'role', '') in ('admin', 'super_admin')
+    or auth.role() = 'service_role'
+  );
+
+drop policy if exists "Donation admins can manage withdrawals" on public.donation_withdrawals;
+create policy "Donation admins can manage withdrawals"
+  on public.donation_withdrawals for all
+  using (
+    coalesce(auth.jwt()->'app_metadata'->>'role', '') in ('admin', 'super_admin')
+    or auth.role() = 'service_role'
+  )
+  with check (
+    coalesce(auth.jwt()->'app_metadata'->>'role', '') in ('admin', 'super_admin')
+    or auth.role() = 'service_role'
+  );
+
+drop policy if exists "Donation admins can manage utilization" on public.donation_utilization;
+create policy "Donation admins can manage utilization"
+  on public.donation_utilization for all
+  using (
+    coalesce(auth.jwt()->'app_metadata'->>'role', '') in ('admin', 'super_admin')
+    or auth.role() = 'service_role'
+  )
+  with check (
+    coalesce(auth.jwt()->'app_metadata'->>'role', '') in ('admin', 'super_admin')
+    or auth.role() = 'service_role'
+  );
+
+create index if not exists donation_wallet_customer_created_idx
+  on public.donation_wallet_entries (customer_id, created_at desc);
+create index if not exists donation_wallet_status_created_idx
+  on public.donation_wallet_entries (payment_status, created_at desc);
+create index if not exists donation_withdrawals_status_idx
+  on public.donation_withdrawals (status, requested_at desc);
+create index if not exists donation_utilization_status_idx
+  on public.donation_utilization (status, created_at desc);
+
+-- Atomic order + donation creation. The donation entry shares the order
+-- transaction, so a successful checkout cannot leave an unlinked donation.
+create or replace function public.create_order_with_donation(
+  p_restaurant_id   text,
+  p_restaurant_name text,
+  p_address_id      uuid,
+  p_total           numeric,
+  p_payment_method  text,
+  p_items           jsonb,
+  p_donation_amount numeric
+)
+returns public.orders
+language plpgsql
+security invoker
+set search_path = public
+as $$
+declare
+  new_order public.orders;
+begin
+  if auth.uid() is null then raise exception 'Not authenticated'; end if;
+  if p_address_id is null or not exists (
+    select 1 from public.addresses where id = p_address_id and user_id = auth.uid()
+  ) then raise exception 'Delivery address is invalid or does not belong to this user'; end if;
+  if p_items is null or jsonb_array_length(p_items) = 0 then raise exception 'Cart is empty'; end if;
+  if p_donation_amount is null or p_donation_amount <= 0 then raise exception 'Donation amount must be positive'; end if;
+
+  insert into public.orders (
+    user_id, restaurant_id, restaurant_name, address_id, status, total, payment_method
+  )
+  values (
+    auth.uid(), p_restaurant_id, p_restaurant_name, p_address_id, 'pending', p_total, p_payment_method
+  )
+  returning * into new_order;
+
+  insert into public.order_items (order_id, food_id, food_name, food_image, quantity, price)
+  select
+    new_order.id, item->>'foodId', item->>'foodName', nullif(item->>'foodImage', ''),
+    (item->>'quantity')::int, (item->>'price')::numeric
+  from jsonb_array_elements(p_items) as item;
+
+  insert into public.donation_wallet_entries (
+    order_id, customer_id, amount, payment_status, payment_method
+  )
+  values (
+    new_order.id,
+    auth.uid(),
+    p_donation_amount,
+    case when lower(p_payment_method) = 'cash on delivery' then 'pending' else 'paid' end,
+    p_payment_method
+  );
+
+  return new_order;
+end;
+$$;
+
+grant execute on function public.create_order_with_donation(text, text, uuid, numeric, text, jsonb, numeric)
+  to authenticated;
+
+-- Read-only contract for the future Admin Panel's donation module.
+create or replace function public.get_donation_management_snapshot()
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  result jsonb;
+begin
+  if not (
+    coalesce(auth.jwt()->'app_metadata'->>'role', '') in ('admin', 'super_admin')
+    or auth.role() = 'service_role'
+  ) then
+    raise exception 'Donation management access denied';
+  end if;
+
+  select jsonb_build_object(
+    'totalDonations', (select count(*) from public.donation_wallet_entries where payment_status = 'paid'),
+    'todaysDonations', coalesce((select sum(amount) from public.donation_wallet_entries where payment_status = 'paid' and created_at >= date_trunc('day', now())), 0),
+    'monthlyDonations', coalesce((select sum(amount) from public.donation_wallet_entries where payment_status = 'paid' and created_at >= date_trunc('month', now())), 0),
+    'yearlyDonations', coalesce((select sum(amount) from public.donation_wallet_entries where payment_status = 'paid' and created_at >= date_trunc('year', now())), 0),
+    'walletBalance', coalesce((select sum(amount) from public.donation_wallet_entries where payment_status = 'paid'), 0),
+    'donationCollection', coalesce((select sum(amount) from public.donation_wallet_entries where payment_status = 'paid'), 0),
+    'donationBalance', coalesce((select sum(amount) from public.donation_wallet_entries where payment_status = 'paid'), 0),
+    'donationUtilized', coalesce((select sum(amount) from public.donation_utilization where status = 'completed'), 0),
+    'remainingBalance',
+      greatest(
+        coalesce((select sum(amount) from public.donation_wallet_entries where payment_status = 'paid'), 0)
+        - coalesce((select sum(amount) from public.donation_utilization where status = 'completed'), 0),
+        0
+      ),
+    'recentDonations', coalesce((
+      select jsonb_agg(to_jsonb(recent) order by recent.created_at desc)
+      from (
+        select * from public.donation_wallet_entries
+        order by created_at desc
+        limit 50
+      ) recent
+    ), '[]'::jsonb),
+    'withdrawalHistory', coalesce((
+      select jsonb_agg(to_jsonb(withdrawal) order by withdrawal.requested_at desc)
+      from (
+        select * from public.donation_withdrawals
+        order by requested_at desc
+        limit 50
+      ) withdrawal
+    ), '[]'::jsonb),
+    'utilizationRecords', coalesce((
+      select jsonb_agg(to_jsonb(utilization) order by utilization.created_at desc)
+      from (
+        select * from public.donation_utilization
+        order by created_at desc
+        limit 50
+      ) utilization
+    ), '[]'::jsonb)
+  ) into result;
+  return result;
+end;
+$$;
+
+revoke all on function public.get_donation_management_snapshot() from public;
+grant execute on function public.get_donation_management_snapshot() to authenticated;

@@ -42,6 +42,7 @@ export const orderService = {
     addressId: string;
     total: number;
     paymentMethod: string;
+    donationAmount?: number;
     items: Array<{ foodId: string; foodName: string; foodImage: string; quantity: number; price: number }>;
   }): Promise<DbOrder> {
     if (!params.userId) throw new Error('Your session has expired. Please sign in again.');
@@ -52,7 +53,7 @@ export const orderService = {
     // Order creation is intentionally one database transaction. The SQL function
     // also validates the authenticated user and address, so the client cannot
     // create an order with a different user's data or leave orphan rows behind.
-    const { data, error } = await supabase.rpc('create_order_with_items', {
+    const rpcParams = {
       p_restaurant_id: params.restaurantId,
       p_restaurant_name: params.restaurantName,
       p_address_id: params.addressId,
@@ -66,7 +67,14 @@ export const orderService = {
         quantity: item.quantity,
         price: item.price,
       })),
-    });
+    };
+    const donationAmount = Math.max(0, params.donationAmount ?? 0);
+    const { data, error } = donationAmount > 0
+      ? await supabase.rpc('create_order_with_donation', {
+          ...rpcParams,
+          p_donation_amount: donationAmount,
+        })
+      : await supabase.rpc('create_order_with_items', rpcParams);
 
     if (error) {
       throw new Error(formatOrderError(error.message));
