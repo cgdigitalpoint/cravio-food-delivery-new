@@ -63,8 +63,8 @@ import {
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const BANNER_W = SCREEN_W - 48;  // slight peek to show next card
-const CARD_W = SCREEN_W - 80;    // restaurant card in horizontal scroll
-const FOOD_W = SCREEN_W - 48;    // food card in horizontal scroll
+const CARD_W = SCREEN_W * 0.44;    // approx 2.2 cards on screen
+const FOOD_W = SCREEN_W * 0.44;    // horizontal scroll food cards
 const H_GAP = 12;
 
 // ─── Bottom Nav Items (static — badge injected dynamically in component) ──────
@@ -465,7 +465,7 @@ function VerticalRestaurantList({
   onRestaurantPress: (id: string) => void;
 }) {
   return (
-    <View style={{ gap: 12 }}>
+    <View style={{ gap: 16 }}>
       {data.map((r) => (
         <RestaurantCard
           key={r.id}

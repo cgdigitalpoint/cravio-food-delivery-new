@@ -56,7 +56,7 @@ export function RestaurantMenuItemCard({
           <VegIndicator isVeg={item.isVeg} />
           <Text
             numberOfLines={2}
-            style={[PP.label, { color: colors.foreground, marginLeft: 8, flex: 1 }]}
+            style={[PP.label, { color: colors.foreground, marginLeft: 8, flex: 1, fontFamily: 'Poppins_600SemiBold', fontSize: 14 }]}
           >
             {item.name}
           </Text>
@@ -88,7 +88,7 @@ export function RestaurantMenuItemCard({
 
         <Text
           numberOfLines={2}
-          style={[PP.bodySM, { color: colors.mutedForeground, marginTop: 5 }]}
+          style={[PP.bodySM, { color: colors.mutedForeground, marginTop: 4, fontSize: 12, lineHeight: 16 }]}
         >
           {item.description}
         </Text>
@@ -106,7 +106,7 @@ export function RestaurantMenuItemCard({
         </View>
 
         <View className="flex-row items-center" style={styles.priceRow}>
-          <Text style={[PP.subtitle, { color: colors.foreground, fontFamily: 'Poppins_700Bold' }]}>
+          <Text style={[PP.subtitle, { color: colors.primary, fontFamily: 'Poppins_700Bold', fontSize: 15 }]}>
             ${discountedPrice.toFixed(2)}
           </Text>
           {item.discount ? (
@@ -133,16 +133,17 @@ export function RestaurantMenuItemCard({
             style={[styles.addButton, { backgroundColor: colors.primary }]}
           >
             <Plus size={16} color="#FFFFFF" strokeWidth={3} />
-            <Text style={[PP.buttonSM, { color: '#FFFFFF', marginLeft: 3 }]}>ADD</Text>
           </TouchableOpacity>
         ) : (
-          <QuantitySelector
-            value={quantity}
-            onIncrement={onIncrease}
-            onDecrement={onDecrease}
-            min={0}
-            size="sm"
-          />
+          <View style={styles.qtyWrap}>
+            <QuantitySelector
+              value={quantity}
+              onIncrement={onIncrease}
+              onDecrement={onDecrease}
+              min={0}
+              size="sm"
+            />
+          </View>
         )}
       </View>
     </View>
@@ -153,43 +154,58 @@ const styles = StyleSheet.create({
   card: {
     marginHorizontal: 16,
     marginBottom: 12,
-    padding: 14,
+    padding: 12,
     borderRadius: 16,
     borderWidth: 1,
     gap: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.04,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 1,
   },
   vegBox: {
-    width: 14,
-    height: 14,
+    width: 12,
+    height: 12,
     borderWidth: 1.5,
     borderRadius: 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  vegDot: { width: 7, height: 7, borderRadius: 4 },
+  vegDot: { width: 6, height: 6, borderRadius: 3 },
   badgeText: {
-    marginTop: 7,
+    marginTop: 6,
     fontFamily: 'Poppins_600SemiBold',
     fontSize: 10,
   },
-  metaRow: { marginTop: 7 },
+  metaRow: { marginTop: 6 },
   priceRow: { marginTop: 8 },
-  imageColumn: { width: 104, alignItems: 'center' },
-  image: { width: 104, height: 104, borderRadius: 12 },
+  imageColumn: { width: 88, alignItems: 'center' },
+  image: { width: 88, height: 88, borderRadius: 10 },
   shareButton: { padding: 5 },
   addButton: {
-    flexDirection: 'row',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 82,
-    marginTop: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 10,
+    marginTop: -14,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    shadowColor: '#FF6B00',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 3,
   },
+  qtyWrap: {
+    marginTop: -16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  }
 });

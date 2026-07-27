@@ -24,7 +24,7 @@ export function BannerCard({
   gradientColors = ['#111827', '#374151'],
   imageUri,
   onPress,
-  height = 180,
+  height = 140,
 }: BannerCardProps) {
   const colors = useColors();
 
@@ -33,7 +33,7 @@ export function BannerCard({
       <View
         style={[
           styles.container,
-          { height, borderRadius: borderRadius.xl, overflow: 'hidden' },
+          { height, borderRadius: 16, overflow: 'hidden' },
         ]}
       >
         {/* Background */}
@@ -54,17 +54,20 @@ export function BannerCard({
 
         {/* Dark scrim for text legibility */}
         <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.65)']}
-          style={[StyleSheet.absoluteFillObject, { top: '40%' }]}
+          colors={['transparent', 'rgba(0,0,0,0.8)']}
+          style={[StyleSheet.absoluteFillObject]}
+          start={{ x: 0, y: 0.3 }}
+          end={{ x: 0, y: 1 }}
         />
 
         {/* Decorative accent */}
         <View style={styles.circle} />
+        <View style={styles.circle2} />
 
         {/* Content */}
         <View style={styles.content}>
           <Text
-            style={[typography.heading2, { color: '#FFFFFF' }]}
+            style={[typography.heading2, { color: '#FFFFFF', fontSize: 20 }]}
             numberOfLines={2}
           >
             {title}
@@ -74,7 +77,7 @@ export function BannerCard({
             <Text
               style={[
                 typography.body,
-                { color: 'rgba(255,255,255,0.75)', marginTop: 4 },
+                { color: 'rgba(255,255,255,0.85)', marginTop: 2, fontSize: 13 },
               ]}
               numberOfLines={2}
             >
@@ -87,7 +90,7 @@ export function BannerCard({
               <Text
                 style={[
                   typography.buttonText,
-                  { color: '#FFFFFF', marginRight: 4 },
+                  { color: '#FFFFFF', marginRight: 4, fontSize: 13 },
                 ]}
               >
                 {ctaText}
@@ -105,17 +108,26 @@ const styles = StyleSheet.create({
   container: { justifyContent: 'flex-end' },
   circle: {
     position: 'absolute',
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: 'rgba(255,255,255,0.07)',
-    top: -40,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    top: -30,
     right: -20,
   },
-  content: { padding: spacing.lg, gap: 4 },
+  circle2: {
+    position: 'absolute',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    top: 40,
+    right: 40,
+  },
+  content: { padding: 16, gap: 2 },
   cta: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: spacing.sm,
+    marginTop: 6,
   },
 });

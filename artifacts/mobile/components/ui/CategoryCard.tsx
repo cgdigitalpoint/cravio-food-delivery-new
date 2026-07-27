@@ -32,10 +32,10 @@ export function CategoryCard({
         style={[
           styles.iconCircle,
           {
-            backgroundColor: isSelected ? bg : `${bg}18`,
-            borderRadius: borderRadius.xl,
-            borderWidth: isSelected ? 2 : 0,
-            borderColor: bg,
+            backgroundColor: isSelected ? bg : colors.surfaceVariant,
+            borderRadius: 28,
+            borderWidth: isSelected ? 0 : 1,
+            borderColor: colors.border,
           },
         ]}
       >
@@ -47,9 +47,10 @@ export function CategoryCard({
           typography.caption,
           {
             color: isSelected ? bg : colors.foreground,
-            fontFamily: isSelected ? 'Inter_600SemiBold' : 'Inter_400Regular',
-            marginTop: spacing.xs,
+            fontFamily: isSelected ? 'Inter_600SemiBold' : 'Inter_500Medium',
+            marginTop: 6,
             textAlign: 'center',
+            fontSize: 9,
           },
         ]}
         numberOfLines={1}
@@ -63,11 +64,11 @@ export function CategoryCard({
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    width: 72,
+    width: 64,
   },
   iconCircle: {
-    width: 64,
-    height: 64,
+    width: 56,
+    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
   },

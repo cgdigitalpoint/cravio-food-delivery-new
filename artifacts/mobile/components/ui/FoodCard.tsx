@@ -64,7 +64,7 @@ export function FoodCard({
         </View>
 
         <Text
-          style={[typography.subtitle, { color: colors.foreground, marginTop: spacing.xs }]}
+          style={[typography.subtitle, { color: colors.foreground, marginTop: 6, fontFamily: 'Inter_600SemiBold', fontSize: 14 }]}
           numberOfLines={2}
         >
           {name}
@@ -75,7 +75,7 @@ export function FoodCard({
           <View style={styles.restaurantRow}>
             <Ionicons name="storefront-outline" size={11} color={colors.mutedForeground} />
             <Text
-              style={[typography.caption, { color: colors.mutedForeground, marginLeft: 3 }]}
+              style={[typography.caption, { color: colors.mutedForeground, marginLeft: 3, fontSize: 11 }]}
               numberOfLines={1}
             >
               {restaurantName}
@@ -87,7 +87,7 @@ export function FoodCard({
           <Text
             style={[
               typography.caption,
-              { color: colors.mutedForeground, marginTop: 2 },
+              { color: colors.mutedForeground, marginTop: 4, fontSize: 11, lineHeight: 15 },
             ]}
             numberOfLines={2}
           >
@@ -100,7 +100,7 @@ export function FoodCard({
             <Text
               style={[
                 typography.title,
-                { color: colors.foreground, fontFamily: 'Inter_700Bold' },
+                { color: colors.primary, fontFamily: 'Inter_700Bold', fontSize: 15 },
               ]}
             >
               ${price.toFixed(2)}
@@ -126,18 +126,18 @@ export function FoodCard({
             style={[
               styles.addBtn,
               {
-                borderColor: colors.primary,
-                borderRadius: borderRadius.md,
+                backgroundColor: colors.primary,
+                borderRadius: borderRadius.pill,
               },
             ]}
           >
-            <Ionicons name="add" size={20} color={colors.primary} />
+            <Ionicons name="add" size={18} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
       </View>
 
       {/* Right image */}
-      <View style={[styles.imageWrapper, { borderRadius: borderRadius.md }]}>
+      <View style={[styles.imageWrapper, { borderRadius: 12 }]}>
         {imageUri ? (
           <Image
             source={{ uri: imageUri }}
@@ -151,14 +151,14 @@ export function FoodCard({
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
-            <Ionicons name="fast-food" size={28} color="rgba(255,255,255,0.7)" />
+            <Ionicons name="fast-food" size={24} color="rgba(255,255,255,0.7)" />
           </LinearGradient>
         )}
         {/* Favorite button overlay */}
         {onFavoritePress != null && (
           <TouchableOpacity
             onPress={onFavoritePress}
-            style={[styles.favBtn, { backgroundColor: 'rgba(0,0,0,0.35)' }]}
+            style={[styles.favBtn, { backgroundColor: 'rgba(255,255,255,0.2)' }]}
             hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
           >
             <Ionicons
@@ -177,16 +177,16 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: spacing.md,
+    padding: 12,
     borderWidth: 1,
-    gap: spacing.md,
+    gap: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
   },
-  content: { flex: 1, gap: 3 },
+  content: { flex: 1, gap: 1 },
   chips: { flexDirection: 'row', gap: 6 },
   restaurantRow: {
     flexDirection: 'row',
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: spacing.sm,
+    marginTop: 8,
   },
   priceBlock: {
     flexDirection: 'row',
@@ -212,15 +212,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   addBtn: {
-    width: 32,
-    height: 32,
+    width: 28,
+    height: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1.5,
   },
   imageWrapper: {
-    width: 100,
-    height: 100,
+    width: 80,
+    height: 80,
     overflow: 'hidden',
     flexShrink: 0,
   },
@@ -228,11 +227,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 4,
     right: 4,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     alignItems: 'center',
     justifyContent: 'center',
+    backdropFilter: 'blur(4px)',
   },
   image: {
     width: '100%',

@@ -46,12 +46,17 @@ export function SearchBar({
             borderRadius: borderRadius.pill,
             borderColor: isFocused ? colors.primary : colors.border,
             borderWidth: isFocused ? 1.5 : 1,
+            shadowColor: isFocused ? colors.primary : '#000',
+            shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: isFocused ? 0.15 : 0.03,
+            shadowRadius: isFocused ? 8 : 4,
+            elevation: isFocused ? 3 : 1,
           },
         ]}
       >
         <Ionicons
           name="search"
-          size={20}
+          size={18}
           color={isFocused ? colors.primary : colors.mutedForeground}
           style={styles.searchIcon}
         />
@@ -65,7 +70,7 @@ export function SearchBar({
           style={[
             styles.input,
             typography.body,
-            { color: colors.foreground },
+            { color: colors.foreground, fontFamily: 'Inter_500Medium', fontSize: 13 },
           ]}
           returnKeyType="search"
           autoFocus={autoFocus}
@@ -81,17 +86,14 @@ export function SearchBar({
             }}
             style={styles.clearBtn}
           >
-            <Ionicons name="close-circle" size={18} color={colors.mutedForeground} />
+            <Ionicons name="close-circle" size={16} color={colors.mutedForeground} />
           </TouchableOpacity>
         )}
 
         {onFilterPress != null && (
-          <>
-            <View style={[styles.divider, { backgroundColor: colors.border }]} />
-            <TouchableOpacity onPress={onFilterPress} style={styles.filterBtn}>
-              <Ionicons name="options" size={20} color={colors.primary} />
-            </TouchableOpacity>
-          </>
+          <TouchableOpacity onPress={onFilterPress} style={[styles.filterBtn, { backgroundColor: colors.primary }]}>
+            <Ionicons name="options" size={16} color="#FFFFFF" />
+          </TouchableOpacity>
         )}
       </View>
     </View>
@@ -103,16 +105,22 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 52,
+    height: 48,
     paddingHorizontal: spacing.md,
   },
-  searchIcon: { marginRight: spacing.sm },
+  searchIcon: { marginRight: 8 },
   input: {
     flex: 1,
     height: '100%',
     paddingVertical: 0,
   },
-  clearBtn: { padding: 4 },
-  divider: { width: 1, height: 24, marginHorizontal: spacing.sm },
-  filterBtn: { padding: 4 },
+  clearBtn: { padding: 4, marginRight: 4 },
+  filterBtn: { 
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 4,
+  },
 });

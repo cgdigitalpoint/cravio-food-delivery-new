@@ -133,31 +133,31 @@ export function ProfileScreen({ onOrders, onFavorites, onAddresses, onRecentlyVi
         <View style={[styles.section, { backgroundColor: colors.card }]}>
           <Text style={[PP.caption, styles.sectionLabel, { color: colors.mutedForeground }]}>ACCOUNT</Text>
           <MenuRow
-            icon={<Package size={18} color="#FF6B00" />}
+            icon={<Package size={16} color="#FF6B00" />}
             label="My Orders"
             subtitle="Track and view order history"
             onPress={onOrders}
           />
           <MenuRow
-            icon={<Heart size={18} color="#EC4899" />}
+            icon={<Heart size={16} color="#EC4899" />}
             label="Favorites"
             subtitle="Your saved restaurants and dishes"
             onPress={onFavorites}
           />
           <MenuRow
-            icon={<Clock3 size={18} color="#F97316" />}
+            icon={<Clock3 size={16} color="#F97316" />}
             label="Recently Viewed"
             subtitle="Restaurants you visited recently"
             onPress={onRecentlyViewed}
           />
           <MenuRow
-            icon={<MapPin size={18} color="#6366F1" />}
+            icon={<MapPin size={16} color="#6366F1" />}
             label="Saved Addresses"
             subtitle="Manage delivery addresses"
             onPress={onAddresses}
           />
           <MenuRow
-            icon={<CreditCard size={18} color="#10B981" />}
+            icon={<CreditCard size={16} color="#10B981" />}
             label="Payment Methods"
             subtitle="Coming soon"
           />
@@ -166,7 +166,7 @@ export function ProfileScreen({ onOrders, onFavorites, onAddresses, onRecentlyVi
         <View style={[styles.section, { backgroundColor: colors.card, marginTop: 12 }]}>
           <Text style={[PP.caption, styles.sectionLabel, { color: colors.mutedForeground }]}>PREFERENCES</Text>
           <MenuRow
-            icon={<Settings size={18} color="#6B7280" />}
+            icon={<Settings size={16} color="#6B7280" />}
             label="Settings"
             subtitle="App preferences & notifications"
           />
@@ -174,7 +174,7 @@ export function ProfileScreen({ onOrders, onFavorites, onAddresses, onRecentlyVi
 
         <View style={[styles.section, { backgroundColor: colors.card, marginTop: 12 }]}>
           <MenuRow
-            icon={<LogOut size={18} color="#DC2626" />}
+            icon={<LogOut size={16} color="#DC2626" />}
             label="Log Out"
             onPress={handleLogout}
             isDanger
@@ -222,12 +222,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 14,
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingVertical: 11,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   menuIcon: {
-    width: 38,
-    height: 38,
+    width: 34,
+    height: 34,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',

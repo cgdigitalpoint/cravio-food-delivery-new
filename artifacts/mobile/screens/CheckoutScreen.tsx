@@ -786,12 +786,12 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md12,
     borderTopWidth: 1,
   },
-  orderBtnWrap: { borderRadius: borderRadius.lg, overflow: 'hidden' },
+  orderBtnWrap: { borderRadius: 16, overflow: 'hidden' },
   orderBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: 14,
   },
 });
