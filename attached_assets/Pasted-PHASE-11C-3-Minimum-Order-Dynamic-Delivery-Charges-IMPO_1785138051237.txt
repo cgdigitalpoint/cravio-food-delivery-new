@@ -1,0 +1,109 @@
+PHASE 11C-3 – Minimum Order & Dynamic Delivery Charges
+
+IMPORTANT
+
+Continue from the current GitHub project state.
+
+Do NOT restart any completed work.
+
+Preserve all completed phases including:
+
+• Phase 11C-1 Premium UI/UX
+• Phase 11C-2 Veg Toggle
+• Grocery Toggle
+• Grocery Coming Soon Screen
+• Countdown Timer
+• Food Delivery Flow
+
+Do NOT modify authentication, database schema, payment gateway, APIs, navigation, restaurant flow or existing UI.
+
+=====================================================
+
+1. MINIMUM ORDER RULES
+
+Food Minimum Order = ₹250
+
+Grocery Minimum Order = ₹250
+
+If cart total is below ₹250:
+
+• Disable "Proceed to Checkout".
+• Show message:
+
+"Minimum order value is ₹250. Please add more items to continue."
+
+When cart total becomes ₹250 or above:
+
+• Automatically enable Checkout.
+• Remove the warning message.
+
+=====================================================
+
+2. DYNAMIC DELIVERY CHARGES
+
+Food Orders
+
+₹250–₹499
+Delivery Charge = ₹40
+
+₹500–₹999
+Delivery Charge = ₹20
+
+₹1000+
+FREE Delivery
+
+Apply the same logic to Grocery after Grocery launches.
+
+=====================================================
+
+3. CART & CHECKOUT
+
+Display dynamically:
+
+• Subtotal
+• Delivery Charge
+• Discount (if applicable)
+• Grand Total
+
+Update totals instantly whenever items are added or removed.
+
+=====================================================
+
+4. PERFORMANCE
+
+• No UI lag
+• No unnecessary re-renders
+• Smooth calculations
+• Responsive on all devices
+
+=====================================================
+
+5. SAFETY
+
+Do NOT break:
+
+• Signup
+• Login
+• OTP
+• Restaurants
+• Veg Toggle
+• Grocery Mode
+• Cart
+• Checkout
+• Orders
+• Payments
+• Notifications
+
+=====================================================
+
+6. FINAL QA
+
+Verify:
+
+✓ Minimum order validation works correctly.
+✓ Delivery charges update dynamically.
+✓ Free delivery applies at ₹1000+.
+✓ Checkout remains disabled below ₹250.
+✓ Existing functionality remains unchanged.
+✓ Zero TypeScript errors.
+✓ Production-ready implementation.
