@@ -25,7 +25,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Bell, ChevronDown, MapPin, Mic, ShoppingCart } from 'lucide-react-native';
+import { Bell, Check, ChevronDown, Clock3, Leaf, MapPin, Mic, ShoppingBasket, ShoppingCart } from 'lucide-react-native';
 
 import {
   Avatar,
@@ -68,6 +68,8 @@ const BANNER_W = SCREEN_W - 48;  // slight peek to show next card
 const CARD_W = SCREEN_W * 0.44;    // approx 2.2 cards on screen
 const FOOD_W = SCREEN_W * 0.44;    // horizontal scroll food cards
 const H_GAP = 12;
+const FOOD_LAUNCH_LABEL = 'Launching 13 September 2026';
+const GROCERY_LAUNCH_DATE = new Date(2027, 0, 1);
 
 // ─── Bottom Nav Items (static — badge injected dynamically in component) ──────
 const BASE_NAV_ITEMS: BottomNavItem[] = [
@@ -225,6 +227,268 @@ const catStyles = StyleSheet.create({
     elevation: 1,
   },
   emoji: { fontSize: 16 },
+});
+
+// ─── Service switch ────────────────────────────────────────────────────────────
+type ServiceMode = 'food' | 'grocery';
+
+function ServiceSwitcher({
+  mode,
+  onChange,
+  vegOnly,
+  onVegOnlyChange,
+}: {
+  mode: ServiceMode;
+  onChange: (mode: ServiceMode) => void;
+  vegOnly: boolean;
+  onVegOnlyChange: (enabled: boolean) => void;
+}) {
+  const colors = useColors();
+
+  return (
+    <View style={serviceStyles.wrap}>
+      <View style={[serviceStyles.segmented, { backgroundColor: colors.muted, borderColor: colors.border }]}>
+        <TouchableOpacity
+          testID="food-delivery-toggle"
+          activeOpacity={0.8}
+          onPress={() => onChange('food')}
+          style={[
+            serviceStyles.segment,
+            mode === 'food' && { backgroundColor: colors.card, shadowColor: colors.primary },
+          ]}
+        >
+          <Leaf size={16} color={mode === 'food' ? colors.primary : colors.mutedForeground} strokeWidth={2.2} />
+          <View style={serviceStyles.segmentText}>
+            <Text style={[PP.buttonSM, { color: mode === 'food' ? colors.foreground : colors.mutedForeground }]}>
+              Food Delivery
+            </Text>
+            <Text style={[PP.overline, { color: mode === 'food' ? colors.success : colors.mutedForeground }]}>
+              {FOOD_LAUNCH_LABEL}
+            </Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          testID="grocery-toggle"
+          activeOpacity={0.8}
+          onPress={() => onChange('grocery')}
+          style={[
+            serviceStyles.segment,
+            mode === 'grocery' && { backgroundColor: colors.card, shadowColor: colors.success },
+          ]}
+        >
+          <ShoppingBasket size={16} color={mode === 'grocery' ? colors.success : colors.mutedForeground} strokeWidth={2.2} />
+          <View style={serviceStyles.segmentText}>
+            <Text style={[PP.buttonSM, { color: mode === 'grocery' ? colors.foreground : colors.mutedForeground }]}>
+              Grocery
+            </Text>
+            <Text style={[PP.overline, { color: mode === 'grocery' ? colors.success : colors.mutedForeground }]}>
+              Launching 1 Jan 2027
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      {mode === 'food' && (
+        <TouchableOpacity
+          testID="veg-only-toggle"
+          activeOpacity={0.8}
+          onPress={() => onVegOnlyChange(!vegOnly)}
+          style={[
+            serviceStyles.vegButton,
+            {
+              backgroundColor: vegOnly ? `${colors.success}18` : colors.card,
+              borderColor: vegOnly ? colors.success : colors.border,
+            },
+          ]}
+        >
+          <View style={[serviceStyles.vegIcon, { backgroundColor: vegOnly ? colors.success : colors.muted }]}>
+            {vegOnly ? (
+              <Check size={13} color="#FFFFFF" strokeWidth={3} />
+            ) : (
+              <Leaf size={13} color={colors.mutedForeground} strokeWidth={2.3} />
+            )}
+          </View>
+          <Text style={[PP.caption, { color: vegOnly ? colors.success : colors.foreground, fontFamily: 'Poppins_600SemiBold' }]}>
+            Veg Only
+          </Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+}
+
+const serviceStyles = StyleSheet.create({
+  wrap: { paddingHorizontal: 16, paddingTop: 12, gap: 10 },
+  segmented: {
+    flexDirection: 'row',
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 3,
+    gap: 3,
+  },
+  segment: {
+    flex: 1,
+    minHeight: 52,
+    borderRadius: 13,
+    paddingHorizontal: 9,
+    paddingVertical: 7,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  segmentText: { flex: 1 },
+  vegButton: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+  },
+  vegIcon: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
+
+function getCountdown(target: Date) {
+  const totalSeconds = Math.max(0, Math.floor((target.getTime() - Date.now()) / 1000));
+  return {
+    days: Math.floor(totalSeconds / 86400),
+    hours: Math.floor((totalSeconds % 86400) / 3600),
+    minutes: Math.floor((totalSeconds % 3600) / 60),
+    seconds: totalSeconds % 60,
+  };
+}
+
+function GroceryCountdown() {
+  const colors = useColors();
+  const [remaining, setRemaining] = useState(() => getCountdown(GROCERY_LAUNCH_DATE));
+
+  useEffect(() => {
+    const timer = setInterval(() => setRemaining(getCountdown(GROCERY_LAUNCH_DATE)), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const units = [
+    ['Days', remaining.days],
+    ['Hours', remaining.hours],
+    ['Minutes', remaining.minutes],
+    ['Seconds', remaining.seconds],
+  ] as const;
+
+  return (
+    <View style={groceryStyles.timerRow}>
+      {units.map(([label, value]) => (
+        <View key={label} style={[groceryStyles.timerUnit, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <Text style={[PP.h2, { color: colors.foreground }]}>{String(value).padStart(2, '0')}</Text>
+          <Text style={[PP.overline, { color: colors.mutedForeground }]}>{label}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+function GroceryComingSoonScreen({
+  isNotified,
+  onNotify,
+}: {
+  isNotified: boolean;
+  onNotify: () => void;
+}) {
+  const colors = useColors();
+
+  return (
+    <View style={groceryStyles.content}>
+      <LinearGradient
+        colors={[`${colors.success}20`, `${colors.success}08`]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[groceryStyles.hero, { borderColor: `${colors.success}35` }]}
+      >
+        <View style={[groceryStyles.heroIcon, { backgroundColor: `${colors.success}20` }]}>
+          <ShoppingBasket size={34} color={colors.success} strokeWidth={1.8} />
+        </View>
+        <Text style={[PP.h1, { color: colors.foreground, textAlign: 'center', marginTop: 16 }]}>
+          Grocery is coming soon
+        </Text>
+        <Text style={[PP.body, { color: colors.mutedForeground, textAlign: 'center', marginTop: 8, maxWidth: 300 }]}>
+          Fresh groceries and everyday essentials, delivered to your door by Cravio.
+        </Text>
+        <View style={groceryStyles.launchRow}>
+          <Clock3 size={15} color={colors.success} strokeWidth={2.2} />
+          <Text style={[PP.buttonSM, { color: colors.success }]}>Launching 1 January 2027</Text>
+        </View>
+        <GroceryCountdown />
+        <TouchableOpacity
+          testID="grocery-notify-me"
+          activeOpacity={0.85}
+          onPress={onNotify}
+          style={[
+            groceryStyles.notifyButton,
+            { backgroundColor: isNotified ? colors.card : colors.success, borderColor: colors.success },
+          ]}
+        >
+          {isNotified && <Check size={17} color={colors.success} strokeWidth={2.5} />}
+          <Text style={[PP.button, { color: isNotified ? colors.success : '#FFFFFF' }]}>
+            {isNotified ? 'You’re on the list' : 'Notify Me'}
+          </Text>
+        </TouchableOpacity>
+      </LinearGradient>
+      <Text style={[PP.caption, { color: colors.mutedForeground, textAlign: 'center', marginTop: 18 }]}>
+        We’ll remind you when grocery delivery goes live.
+      </Text>
+    </View>
+  );
+}
+
+const groceryStyles = StyleSheet.create({
+  content: { paddingHorizontal: 16, paddingTop: 28, paddingBottom: 48 },
+  hero: {
+    alignItems: 'center',
+    borderRadius: 24,
+    borderWidth: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 28,
+    overflow: 'hidden',
+  },
+  heroIcon: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  launchRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 18 },
+  timerRow: { flexDirection: 'row', gap: 7, marginTop: 20, width: '100%' },
+  timerUnit: {
+    flex: 1,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingVertical: 9,
+  },
+  notifyButton: {
+    minHeight: 50,
+    minWidth: 170,
+    borderRadius: 15,
+    borderWidth: 1,
+    paddingHorizontal: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 7,
+    marginTop: 22,
+  },
 });
 
 // ─── Banner Carousel ──────────────────────────────────────────────────────────
@@ -668,6 +932,9 @@ export function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeTab, setActiveTab] = useState(0);
+  const [serviceMode, setServiceMode] = useState<ServiceMode>('food');
+  const [vegOnly, setVegOnly] = useState(false);
+  const [groceryNotified, setGroceryNotified] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const favorites = storedFavoriteIds;
 
@@ -747,31 +1014,43 @@ export function HomeScreen() {
     addItem(menuItem, 1, undefined, restaurant.name);
   };
 
-  // Category filter — when a category is selected, search all restaurants (not just the top-5 slice)
+  const handleGroceryNotify = () => {
+    if (groceryNotified) return;
+    setGroceryNotified(true);
+    Alert.alert('You’re on the list', 'We’ll remind you when Grocery launches on 1 January 2027.');
+  };
+
+  // Category filter — when a category is selected, search all restaurants (not just the top-5 slice).
+  // Veg Only is intentionally applied after each curated subset so the existing
+  // Phase 11C-1 ordering and section composition remain unchanged.
+  const matchesRestaurantFilter = (restaurant: Restaurant) =>
+    (activeCategory === 'all' || restaurant.category === activeCategory) &&
+    (!vegOnly || restaurant.isVeg === true);
+
   const filteredPopular =
     activeCategory === 'all'
-      ? POPULAR_RESTAURANTS
-      : RESTAURANTS.filter((r) => r.category === activeCategory && r.isOpen);
+      ? POPULAR_RESTAURANTS.filter(matchesRestaurantFilter)
+      : RESTAURANTS.filter((r) => r.isOpen && matchesRestaurantFilter(r));
 
   // Also filter horizontal sections by category when one is selected
   const filteredFeatured =
     activeCategory === 'all'
-      ? FEATURED_RESTAURANTS
-      : FEATURED_RESTAURANTS.filter((r) => r.category === activeCategory);
+      ? FEATURED_RESTAURANTS.filter(matchesRestaurantFilter)
+      : FEATURED_RESTAURANTS.filter(matchesRestaurantFilter);
 
   const filteredFastDelivery =
     activeCategory === 'all'
-      ? FAST_DELIVERY_RESTAURANTS
-      : FAST_DELIVERY_RESTAURANTS.filter((r) => r.category === activeCategory);
+      ? FAST_DELIVERY_RESTAURANTS.filter(matchesRestaurantFilter)
+      : FAST_DELIVERY_RESTAURANTS.filter(matchesRestaurantFilter);
 
   const filteredTopRated =
     activeCategory === 'all'
-      ? TOP_RATED_RESTAURANTS
-      : TOP_RATED_RESTAURANTS.filter((r) => r.category === activeCategory);
+      ? TOP_RATED_RESTAURANTS.filter(matchesRestaurantFilter)
+      : TOP_RATED_RESTAURANTS.filter(matchesRestaurantFilter);
 
   // Smart recommendation: sort all open restaurants by a composite score
   const recommendedRestaurants = React.useMemo(() => {
-    const scored = RESTAURANTS.filter((r) => r.isOpen).map((r) => ({
+    const scored = RESTAURANTS.filter((r) => r.isOpen && matchesRestaurantFilter(r)).map((r) => ({
       r,
       score:
         r.rating * 20 +
@@ -782,11 +1061,20 @@ export function HomeScreen() {
         (r.isVeg ? 3 : 0),
     }));
     return scored.sort((a, b) => b.score - a.score).map((x) => x.r);
-  }, []);
+  }, [activeCategory, vegOnly]);
+
+  const quickPickFood = FOOD_ITEMS.slice(2).filter((item) => !vegOnly || item.isVeg);
 
   // ── Home Tab Content ────────────────────────────────────────────────────────
   const HomeContent = (
     <View>
+      <ServiceSwitcher
+        mode={serviceMode}
+        onChange={setServiceMode}
+        vegOnly={vegOnly}
+        onVegOnlyChange={setVegOnly}
+      />
+
       {/* Search bar with mic */}
       <View style={{ paddingHorizontal: 16, paddingTop: 14, paddingBottom: 4 }}>
         <SearchBar
@@ -934,7 +1222,7 @@ export function HomeScreen() {
             />
           </View>
            <FoodRecommendationScroll
-             data={FOOD_ITEMS.slice(2)}
+             data={quickPickFood}
              onAdd={addFoodToCart}
              onPress={(food) => {
                const restaurant = getFoodRestaurant(food);
@@ -955,7 +1243,30 @@ export function HomeScreen() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: BOTTOM_NAV_H + 76 }}
           >
-            {isLoading ? <HomeSkeletons /> : HomeContent}
+            {isLoading ? (
+              <View>
+                <ServiceSwitcher
+                  mode={serviceMode}
+                  onChange={setServiceMode}
+                  vegOnly={vegOnly}
+                  onVegOnlyChange={setVegOnly}
+                />
+                <HomeSkeletons />
+              </View>
+            ) : serviceMode === 'grocery' ? (
+              <View>
+                <ServiceSwitcher
+                  mode={serviceMode}
+                  onChange={setServiceMode}
+                  vegOnly={vegOnly}
+                  onVegOnlyChange={setVegOnly}
+                />
+                <GroceryComingSoonScreen
+                  isNotified={groceryNotified}
+                  onNotify={handleGroceryNotify}
+                />
+              </View>
+            ) : HomeContent}
           </ScrollView>
         );
       case 1:

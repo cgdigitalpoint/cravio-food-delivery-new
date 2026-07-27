@@ -223,7 +223,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    backdropFilter: 'blur(4px)',
   },
   info: { padding: 12, gap: 2 },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },

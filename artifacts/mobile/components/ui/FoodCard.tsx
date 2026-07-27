@@ -232,7 +232,6 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     alignItems: 'center',
     justifyContent: 'center',
-    backdropFilter: 'blur(4px)',
   },
   image: {
     width: '100%',
