@@ -20,8 +20,10 @@ import {
   useFonts,
 } from '@expo-google-fonts/poppins';
 import { Stack, useRouter, useSegments } from 'expo-router';
+import * as Linking from 'expo-linking';
 import * as SplashScreen from 'expo-splash-screen';
 import { supabase } from '@/services/supabase';
+import { authService } from '@/services/authService';
 import { useAuthStore } from '@/store/useAuthStore';
 
 // Prevent the native splash screen from auto-hiding before assets load.
@@ -44,13 +46,36 @@ const PROTECTED = new Set(['home', 'search', 'profile', 'profile-edit', 'orders'
 // Auth-only segments — redirect to /home if already authenticated
 const AUTH_ONLY = new Set(['auth']);
 
+/** Process an incoming deep link URL.  If it's a cravio://auth/callback link
+ *  (from email verification, password reset, or Google OAuth), extract the
+ *  tokens and establish a Supabase session.  The onAuthStateChange listener
+ *  below will then redirect the user automatically.
+ */
+async function processDeepLink(url: string | null) {
+  if (!url) return;
+  await authService.handleDeepLink(url);
+}
+
 function AuthGuard() {
   const router = useRouter();
   const segments = useSegments();
   const { isAuthenticated, setAuthenticatedUser, setUnauthenticated, loadProfile } = useAuthStore();
   const [authReady, setAuthReady] = useState(false);
 
-  // Subscribe to Supabase auth state on mount
+  // ── Deep-link handler ──────────────────────────────────────────────────────
+  // Handles two cases:
+  //  1. Cold-start: app was closed, user tapped the link → getInitialURL()
+  //  2. Foreground: app was open, OS delivers the link → addEventListener
+  useEffect(() => {
+    // Cold-start link
+    Linking.getInitialURL().then(processDeepLink);
+
+    // Foreground / background-resume link
+    const sub = Linking.addEventListener('url', ({ url }) => processDeepLink(url));
+    return () => sub.remove();
+  }, []);
+
+  // ── Supabase auth state subscription ──────────────────────────────────────
   useEffect(() => {
     const subscription = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
@@ -64,7 +89,7 @@ function AuthGuard() {
     return () => subscription.data.subscription.unsubscribe();
   }, []);
 
-  // Route guard — runs whenever auth state or segments change
+  // ── Route guard — runs whenever auth state or segments change ─────────────
   useEffect(() => {
     const seg0 = segments[0] as string | undefined;
     if (!seg0 || !authReady) return; // still resolving the persisted session
@@ -94,6 +119,8 @@ function RootLayoutNav() {
         <Stack.Screen name="auth/signup" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="auth/otp" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="auth/forgot-password" options={{ animation: 'slide_from_right' }} />
+        {/* Deep-link callback — cravio://auth/callback from email/OAuth */}
+        <Stack.Screen name="auth/callback" options={{ animation: 'fade', headerShown: false }} />
 
         {/* ── Home ── */}
         <Stack.Screen name="home" options={{ animation: 'slide_from_right' }} />
