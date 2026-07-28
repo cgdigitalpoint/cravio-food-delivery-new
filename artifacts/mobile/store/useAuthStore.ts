@@ -47,6 +47,9 @@ interface AuthStoreState {
   /** Update local user data after profile edit. */
   updateLocalUser: (updates: Partial<DbUser>) => void;
 
+  /** Set a new password after a PASSWORD_RECOVERY deep-link. */
+  resetPassword: (newPassword: string) => Promise<void>;
+
   /** Initialize from persisted Supabase session. */
   initializeAuth: () => Promise<void>;
 }
@@ -163,6 +166,18 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
       set({ isLoading: false });
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Could not send reset email.';
+      set({ isLoading: false, error: msg });
+      throw err;
+    }
+  },
+
+  resetPassword: async (newPassword) => {
+    set({ isLoading: true, error: null });
+    try {
+      await authService.resetPassword(newPassword);
+      set({ isLoading: false });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Could not update password.';
       set({ isLoading: false, error: msg });
       throw err;
     }

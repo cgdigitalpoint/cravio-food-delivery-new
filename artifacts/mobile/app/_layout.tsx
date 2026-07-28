@@ -78,6 +78,15 @@ function AuthGuard() {
   // ── Supabase auth state subscription ──────────────────────────────────────
   useEffect(() => {
     const subscription = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        // The reset link was clicked. A temporary session is live but the user
+        // must choose a new password before we treat them as fully signed in.
+        // Do NOT call setAuthenticatedUser here — route them to the reset form.
+        setAuthReady(true);
+        router.replace('/auth/reset-password');
+        return;
+      }
+
       if (session?.user) {
         setAuthenticatedUser(session.user.id);
         loadProfile(session.user.id);
@@ -121,6 +130,8 @@ function RootLayoutNav() {
         <Stack.Screen name="auth/forgot-password" options={{ animation: 'slide_from_right' }} />
         {/* Deep-link callback — cravio://auth/callback from email/OAuth */}
         <Stack.Screen name="auth/callback" options={{ animation: 'fade', headerShown: false }} />
+        {/* Password reset form — reached via PASSWORD_RECOVERY deep link */}
+        <Stack.Screen name="auth/reset-password" options={{ animation: 'slide_from_right', headerShown: false }} />
 
         {/* ── Home ── */}
         <Stack.Screen name="home" options={{ animation: 'slide_from_right' }} />

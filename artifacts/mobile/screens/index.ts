@@ -35,3 +35,4 @@ export { LoginScreen } from './auth/LoginScreen';
 export { SignupScreen } from './auth/SignupScreen';
 export { OTPScreen } from './auth/OTPScreen';
 export { ForgotPasswordScreen } from './auth/ForgotPasswordScreen';
+export { ResetPasswordScreen } from './auth/ResetPasswordScreen';
