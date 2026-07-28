@@ -1,0 +1,135 @@
+# CRITICAL AUTHENTICATION PRODUCTION FIX
+# DO NOT ADD NEW FEATURES
+# DO NOT REDESIGN THE APP
+
+You are the lead Expo React Native + Supabase + Google OAuth engineer.
+
+The Customer App APK builds successfully, but authentication is NOT production ready.
+
+Current production issues:
+
+1. Google Sign-In
+- Google account picker opens.
+- After selecting an account, authentication fails.
+- Browser redirects to an old Replit preview URL.
+- Sometimes DNS_PROBE_FINISHED_NXDOMAIN appears.
+
+2. Email Signup
+- User creation is inconsistent.
+- Confirmation email sometimes arrives.
+- Clicking the confirmation email opens an old Replit URL instead of returning to the mobile app.
+
+3. Forgot Password
+- Reset email is sent.
+- Clicking the reset link opens the wrong URL.
+- Password reset flow fails.
+
+4. Login
+- Login is unreliable after signup.
+- Sessions are not always restored correctly.
+
+Current app requirements:
+
+- Expo SDK 54
+- Expo Router
+- Supabase Authentication
+- Google OAuth
+- Android APK
+- Deep Link Scheme:
+  cravio://
+
+The app MUST NOT depend on any Replit preview URL.
+
+==================================
+YOUR TASK
+==================================
+
+Perform a COMPLETE authentication audit.
+
+Search the ENTIRE repository for:
+
+- replit.dev
+- replit
+- redirectTo
+- emailRedirectTo
+- signInWithOAuth
+- signInWithOtp
+- signUp
+- resetPasswordForEmail
+- exchangeCodeForSession
+- Linking.createURL
+- AuthSession
+- WebBrowser
+- callback
+- cravio://
+- mobile://
+
+Inspect ALL authentication related files including:
+
+- services/authService.ts
+- services/supabase.ts
+- app/auth/*
+- app/_layout.tsx
+- auth callback handler
+- Expo config
+- app.json
+- AndroidManifest
+- Google OAuth
+- Deep Linking
+- Session Restore
+- Protected Routes
+
+Fix EVERYTHING required.
+
+Verify:
+
+✓ Signup
+✓ Confirmation Email
+✓ Confirmation Link
+✓ Google Login
+✓ Forgot Password
+✓ Reset Password
+✓ Email Login
+✓ Logout
+✓ Session Restore
+✓ Deep Linking
+✓ Android Intent Filters
+✓ Expo Scheme
+✓ Supabase Redirects
+
+Remove every remaining dependency on Replit preview URLs.
+
+Use only:
+
+cravio://auth/callback
+
+where appropriate for native authentication.
+
+If Supabase Dashboard settings are required,
+DO NOT guess.
+
+Instead clearly report:
+
+- Site URL required
+- Redirect URLs required
+- Google OAuth Redirect URLs required
+
+Before finishing:
+
+1. Run typecheck.
+2. Verify no TypeScript errors.
+3. Build a fresh Android Preview APK.
+4. Test the authentication flow.
+5. Do NOT finish until authentication is fully working.
+
+Output:
+
+- Root cause(s)
+- Files changed
+- Exact code changes
+- Dashboard settings required
+- APK build link
+- Final verification checklist
+
+Do not stop after fixing only one issue.
+Authentication must be completely production-ready before considering the task complete.

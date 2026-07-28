@@ -61,6 +61,12 @@ function AuthGuard() {
   const segments = useSegments();
   const { isAuthenticated, setAuthenticatedUser, setUnauthenticated, loadProfile } = useAuthStore();
   const [authReady, setAuthReady] = useState(false);
+  // Tracks whether we entered a PASSWORD_RECOVERY flow so we can navigate to
+  // /home automatically once the USER_UPDATED event confirms the new password
+  // was accepted. Without this, router.replace('/home') in reset-password.tsx
+  // fires before isAuthenticated is set, causing the route guard to redirect
+  // the user to /welcome instead.
+  const postRecovery = useRef(false);
 
   // ── Deep-link handler ──────────────────────────────────────────────────────
   // Handles two cases:
@@ -82,6 +88,7 @@ function AuthGuard() {
         // The reset link was clicked. A temporary session is live but the user
         // must choose a new password before we treat them as fully signed in.
         // Do NOT call setAuthenticatedUser here — route them to the reset form.
+        postRecovery.current = true;
         setAuthReady(true);
         router.replace('/auth/reset-password');
         return;
@@ -90,6 +97,15 @@ function AuthGuard() {
       if (session?.user) {
         setAuthenticatedUser(session.user.id);
         loadProfile(session.user.id);
+
+        // USER_UPDATED fires after a successful resetPassword() call. If we
+        // entered via PASSWORD_RECOVERY, navigate to /home here — doing it
+        // from reset-password.tsx is too early (isAuthenticated is not yet
+        // true at that point, so the route guard would redirect to /welcome).
+        if (event === 'USER_UPDATED' && postRecovery.current) {
+          postRecovery.current = false;
+          router.replace('/home');
+        }
       } else {
         setUnauthenticated();
       }

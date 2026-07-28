@@ -15,8 +15,10 @@ export default function ResetPasswordRoute() {
     setError(null);
     try {
       await resetPassword(newPassword);
-      // Success — navigate to home; the user is now fully authenticated.
-      router.replace('/home');
+      // Do NOT navigate here. The onAuthStateChange listener in _layout.tsx
+      // fires USER_UPDATED once the password is accepted. That handler sets
+      // isAuthenticated and calls router.replace('/home') so the route guard
+      // never sees an unauthenticated user on a protected route.
     } catch (_) {
       // Error already set in store
     }

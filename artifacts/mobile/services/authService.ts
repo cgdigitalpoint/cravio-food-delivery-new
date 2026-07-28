@@ -87,20 +87,38 @@ export const authService = {
       return;
     }
 
-    // Extract tokens from the redirect URL fragment/query and establish session.
-    // Supabase appends tokens as a hash fragment: cravio://auth/callback#access_token=...
+    // Extract tokens or PKCE code from the redirect URL and establish session.
+    //
+    // Supabase v2 defaults to PKCE flow, which returns a query-string code:
+    //   cravio://auth/callback?code=XXXX
+    //
+    // Older implicit-flow setups return tokens in a hash fragment:
+    //   cravio://auth/callback#access_token=...&refresh_token=...
+    //
+    // We must handle both so the app works regardless of the Supabase project's
+    // OAuth flow setting.
     const url = result.url;
-    const fragment = url.includes('#') ? url.split('#')[1] : url.split('?')[1] ?? '';
-    const params = new URLSearchParams(fragment);
-    const accessToken = params.get('access_token');
-    const refreshToken = params.get('refresh_token');
+    const fragment = url.includes('#') ? url.split('#')[1] : '';
+    const query = (url.split('?')[1] ?? '').split('#')[0]; // strip any trailing fragment
+
+    const fragmentParams = new URLSearchParams(fragment);
+    const queryParams = new URLSearchParams(query);
+
+    const accessToken = fragmentParams.get('access_token');
+    const refreshToken = fragmentParams.get('refresh_token');
+    const code = queryParams.get('code');
 
     if (accessToken && refreshToken) {
+      // Implicit flow — exchange tokens directly.
       const { error: sessionError } = await supabase.auth.setSession({
         access_token: accessToken,
         refresh_token: refreshToken,
       });
       if (sessionError) throw new Error(sessionError.message);
+    } else if (code) {
+      // PKCE flow (Supabase v2 default) — exchange the authorization code for a session.
+      const { error: codeError } = await supabase.auth.exchangeCodeForSession(code);
+      if (codeError) throw new Error(codeError.message);
     } else {
       throw new Error('Google sign-in succeeded but no tokens were returned.');
     }

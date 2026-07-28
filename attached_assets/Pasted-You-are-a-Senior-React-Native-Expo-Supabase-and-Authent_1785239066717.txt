@@ -1,0 +1,192 @@
+You are a Senior React Native, Expo, Supabase and Authentication Engineer.
+
+Your task is NOT to rewrite the authentication system.
+
+Your task is to perform a COMPLETE END-TO-END AUTHENTICATION AUDIT and fix ONLY verified issues.
+
+Current verified configuration:
+
+✓ Expo Scheme:
+cravio://auth/callback
+
+✓ app.json
+scheme = cravio
+
+✓ Android package
+com.cgdigitalpoint.cravio.customer
+
+✓ Supabase Redirect URL
+cravio://auth/callback
+
+✓ Google OAuth Redirect URI
+https://<project>.supabase.co/auth/v1/callback
+
+✓ authService already uses:
+
+- redirectTo = cravio://auth/callback
+- emailRedirectTo = cravio://auth/callback
+- exchangeCodeForSession()
+- setSession()
+- WebBrowser.openAuthSessionAsync()
+
+Do NOT change these unless you prove they are incorrect.
+
+----------------------------------
+PHASE 1 – PROJECT AUDIT
+----------------------------------
+
+Inspect the complete authentication flow.
+
+Check:
+
+• Supabase client configuration
+• authService
+• Google OAuth
+• Email Signup
+• Email Verification
+• Forgot Password
+• Password Reset
+• Deep Linking
+• Expo Router
+• Protected Routes
+• Session Restore
+• Auth State Listener
+• Navigation
+• Android Intent Filters
+• iOS URL Schemes
+• Environment Variables
+
+----------------------------------
+PHASE 2 – TRACE THE AUTH FLOW
+----------------------------------
+
+Verify this complete flow:
+
+User taps Google Login
+
+↓
+
+Supabase OAuth URL generated
+
+↓
+
+Browser opens
+
+↓
+
+Google Account selected
+
+↓
+
+Supabase callback
+
+↓
+
+cravio://auth/callback
+
+↓
+
+App receives deep link
+
+↓
+
+exchangeCodeForSession OR setSession executes
+
+↓
+
+Session stored
+
+↓
+
+onAuthStateChange fires
+
+↓
+
+User navigates to Home
+
+Find where this chain breaks.
+
+----------------------------------
+PHASE 3 – EMAIL AUTH
+----------------------------------
+
+Verify:
+
+Signup
+
+Confirmation Email
+
+Confirmation Link
+
+Deep Link
+
+Session Creation
+
+Forgot Password
+
+Password Reset
+
+New Password
+
+Automatic Login
+
+----------------------------------
+PHASE 4 – SESSION
+----------------------------------
+
+Verify:
+
+Persist Session
+
+Restore Session
+
+Refresh Token
+
+Logout
+
+App Restart
+
+Token Expiry
+
+----------------------------------
+PHASE 5 – FIX ONLY VERIFIED BUGS
+----------------------------------
+
+Do NOT refactor working code.
+
+Fix only verified issues.
+
+Do not introduce regressions.
+
+----------------------------------
+PHASE 6 – FINAL TEST
+----------------------------------
+
+Verify:
+
+✓ Google Login
+✓ Google Signup
+✓ Email Signup
+✓ Email Verification
+✓ Forgot Password
+✓ Password Reset
+✓ Logout
+✓ Session Restore
+✓ Deep Linking
+✓ Protected Routes
+
+----------------------------------
+FINAL REPORT
+----------------------------------
+
+Provide:
+
+1. Root Cause
+2. Files Checked
+3. Files Changed
+4. Exact Bugs Found
+5. Exact Fixes Applied
+6. Remaining Dashboard Settings (if any)
+7. Test Results
+
+Do NOT report success unless every authentication flow has been verified.
