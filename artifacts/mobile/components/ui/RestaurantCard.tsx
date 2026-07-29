@@ -1,11 +1,11 @@
-// ─── Restaurant Card ──────────────────────────────────────────────────────────
+// ─── Restaurant Card — Zomato-quality ─────────────────────────────────────────
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
+import { Star, Clock3, MapPin, Tag, Truck } from 'lucide-react-native';
 import { useColors } from '@/hooks/useColors';
-import { typography, borderRadius, spacing } from '@/theme';
+import { PP } from '@/theme/poppins';
 
 export interface RestaurantCardProps {
   name: string;
@@ -42,133 +42,112 @@ export function RestaurantCard({
 
   return (
     <TouchableOpacity
-      activeOpacity={0.9}
+      activeOpacity={0.92}
       onPress={onPress}
-      style={[
-        styles.card,
-        { backgroundColor: colors.card, borderRadius: borderRadius.lg },
-      ]}
+      style={[styles.card, { backgroundColor: colors.card }]}
     >
-      {/* Image area */}
+      {/* ── Image area ── */}
       <View style={styles.imageWrapper}>
         {imageUri ? (
-          <Image
-            source={{ uri: imageUri }}
-            style={styles.image}
-            contentFit="cover"
-          />
+          <Image source={{ uri: imageUri }} style={styles.image} contentFit="cover" />
         ) : (
           <LinearGradient
-            colors={['#FF6B00', '#FF9A4D']}
-            style={styles.image}
+            colors={['#FF8C38', '#FF6B00']}
+            style={[styles.image, styles.imagePlaceholder]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-          >
-            <Ionicons name="restaurant" size={40} color="rgba(255,255,255,0.6)" />
-          </LinearGradient>
+          />
         )}
 
-        {/* Gradient Scrim for legibility */}
+        {/* Bottom scrim for offer text legibility */}
         <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.4)']}
+          colors={['transparent', 'rgba(0,0,0,0.52)']}
           style={StyleSheet.absoluteFillObject}
-          start={{ x: 0, y: 0.5 }}
+          start={{ x: 0, y: 0.4 }}
           end={{ x: 0, y: 1 }}
         />
 
-        {/* Offer badge */}
-        {offerText != null && (
-          <View style={[styles.offerBadge, { backgroundColor: colors.primary }]}>
-            <Text style={[typography.caption, styles.offerText, { fontSize: 10 }]}>{offerText}</Text>
-          </View>
-        )}
-
-        {/* New badge */}
+        {/* NEW badge — top left */}
         {isNew === true && (
-          <View style={[styles.newBadge, { backgroundColor: colors.secondary }]}>
-            <Text style={[typography.caption, styles.offerText, { fontSize: 9 }]}>NEW</Text>
+          <View style={styles.newBadge}>
+            <Text style={styles.newBadgeText}>NEW</Text>
           </View>
         )}
 
-        {/* Favorite */}
+        {/* Favourite button — top right */}
         <TouchableOpacity
           onPress={onFavoritePress}
-          style={[styles.favBtn, { backgroundColor: 'rgba(255,255,255,0.2)' }]}
+          style={styles.favBtn}
           hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+          accessibilityRole="button"
+          accessibilityLabel={isFavorite ? 'Remove from favourites' : 'Add to favourites'}
         >
-          <Ionicons
-            name={isFavorite ? 'heart' : 'heart-outline'}
-            size={16}
-            color={isFavorite ? '#EF4444' : '#FFFFFF'}
-          />
+          <Text style={[styles.favIcon, { color: isFavorite ? '#EF4444' : '#FFFFFF' }]}>
+            {isFavorite ? '♥' : '♡'}
+          </Text>
         </TouchableOpacity>
+
+        {/* Rating pill — bottom left, overlaid on image */}
+        <View style={styles.ratingPill}>
+          <Star size={11} color="#FFFFFF" fill="#FFFFFF" />
+          <Text style={styles.ratingText}>{rating.toFixed(1)}</Text>
+        </View>
+
+        {/* Offer banner — bottom, full width */}
+        {offerText != null && (
+          <View style={styles.offerBar}>
+            <Tag size={11} color="#FFFFFF" />
+            <Text style={styles.offerBarText} numberOfLines={1}>
+              {offerText}
+            </Text>
+          </View>
+        )}
       </View>
 
-      {/* Info area */}
+      {/* ── Info area ── */}
       <View style={styles.info}>
-        {/* Name row with veg/non-veg indicator */}
+        {/* Name row */}
         <View style={styles.nameRow}>
           {isVeg !== undefined && (
-            <View
-              style={[
-                styles.vegIndicator,
-                { borderColor: isVeg ? '#22C55E' : '#EF4444' },
-              ]}
-            >
-              <View
-                style={[
-                  styles.vegDot,
-                  { backgroundColor: isVeg ? '#22C55E' : '#EF4444' },
-                ]}
-              />
+            <View style={[styles.vegBox, { borderColor: isVeg ? '#16A34A' : '#DC2626' }]}>
+              <View style={[styles.vegDot, { backgroundColor: isVeg ? '#16A34A' : '#DC2626' }]} />
             </View>
           )}
           <Text
-            style={[typography.title, { color: colors.foreground, flex: 1 }]}
+            style={[PP.subtitle, styles.name, { color: colors.foreground }]}
             numberOfLines={1}
           >
             {name}
           </Text>
         </View>
 
+        {/* Cuisine */}
         <Text
-          style={[typography.caption, { color: colors.mutedForeground, marginTop: 1, fontSize: 11 }]}
+          style={[PP.caption, { color: colors.mutedForeground, marginTop: 1 }]}
           numberOfLines={1}
         >
           {cuisine}
         </Text>
 
-        {/* Meta row */}
+        {/* Meta row: time · distance · fee */}
         <View style={styles.meta}>
-          {/* Rating */}
-          <View style={[styles.ratingPill, { backgroundColor: '#22C55E' }]}>
-            <Ionicons name="star" size={9} color="#FFFFFF" />
-            <Text style={[typography.caption, { color: '#FFFFFF', fontFamily: 'Inter_600SemiBold', marginLeft: 3, fontSize: 10 }]}>
-              {rating.toFixed(1)}
-            </Text>
-          </View>
-
-          <View style={[styles.dot, { backgroundColor: colors.border }]} />
-
-          <Ionicons name="time-outline" size={12} color={colors.mutedForeground} />
-          <Text style={[typography.caption, { color: colors.mutedForeground, marginLeft: 2, fontSize: 11 }]}>
+          <Clock3 size={12} color={colors.mutedForeground} />
+          <Text style={[styles.metaText, { color: colors.mutedForeground }]}>
             {deliveryTime} min
           </Text>
-
           {distance != null && (
             <>
-              <View style={[styles.dot, { backgroundColor: colors.border }]} />
-              <Ionicons name="location-outline" size={12} color={colors.mutedForeground} />
-              <Text style={[typography.caption, { color: colors.mutedForeground, marginLeft: 2, fontSize: 11 }]}>
+              <View style={[styles.metaDot, { backgroundColor: colors.border }]} />
+              <MapPin size={12} color={colors.mutedForeground} />
+              <Text style={[styles.metaText, { color: colors.mutedForeground }]}>
                 {distance}
               </Text>
             </>
           )}
-
-          <View style={[styles.dot, { backgroundColor: colors.border }]} />
-
-          <Text style={[typography.caption, { color: colors.mutedForeground, fontSize: 11 }]}>
-            {deliveryFee === 0 ? 'Free del' : `$${deliveryFee.toFixed(2)}`}
+          <View style={[styles.metaDot, { backgroundColor: colors.border }]} />
+          <Truck size={12} color={colors.mutedForeground} />
+          <Text style={[styles.metaText, { color: colors.mutedForeground }]}>
+            {deliveryFee === 0 ? 'Free' : `$${deliveryFee.toFixed(2)}`}
           </Text>
         </View>
       </View>
@@ -178,57 +157,105 @@ export function RestaurantCard({
 
 const styles = StyleSheet.create({
   card: {
+    borderRadius: 16,
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.07,
     shadowRadius: 10,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
+    elevation: 3,
   },
   imageWrapper: {
-    height: 120,
-    overflow: 'hidden',
+    height: 172,
+    position: 'relative',
   },
   image: {
     width: '100%',
     height: '100%',
+  },
+  imagePlaceholder: {
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  offerBadge: {
-    position: 'absolute',
-    bottom: spacing.sm,
-    left: spacing.sm,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: borderRadius.sm,
   },
   newBadge: {
     position: 'absolute',
-    top: spacing.sm,
-    left: spacing.sm,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: borderRadius.sm,
+    top: 10,
+    left: 10,
+    backgroundColor: '#16A34A',
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 6,
   },
-  offerText: { color: '#FFFFFF', fontFamily: 'Inter_600SemiBold' },
+  newBadgeText: {
+    fontFamily: 'Poppins_700Bold',
+    fontSize: 9,
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+  },
   favBtn: {
     position: 'absolute',
-    top: spacing.sm,
-    right: spacing.sm,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    top: 8,
+    right: 10,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0,0,0,0.28)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  info: { padding: 12, gap: 2 },
-  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  vegIndicator: {
-    width: 12,
-    height: 12,
+  favIcon: {
+    fontSize: 18,
+    lineHeight: 22,
+  },
+  ratingPill: {
+    position: 'absolute',
+    bottom: offerPillBottom(true),
+    left: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: '#22C55E',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
+  },
+  ratingText: {
+    fontFamily: 'Poppins_700Bold',
+    fontSize: 11,
+    color: '#FFFFFF',
+  },
+  offerBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(255,107,0,0.88)',
+  },
+  offerBarText: {
+    fontFamily: 'Poppins_600SemiBold',
+    fontSize: 11,
+    color: '#FFFFFF',
+    flex: 1,
+  },
+  info: {
+    paddingHorizontal: 12,
+    paddingTop: 10,
+    paddingBottom: 12,
+    gap: 2,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+  },
+  vegBox: {
+    width: 13,
+    height: 13,
     borderRadius: 2,
     borderWidth: 1.5,
     alignItems: 'center',
@@ -236,23 +263,36 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   vegDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+  },
+  name: {
+    flex: 1,
+    fontFamily: 'Poppins_600SemiBold',
   },
   meta: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexWrap: 'wrap',
+    flexWrap: 'nowrap',
     gap: 4,
     marginTop: 6,
   },
-  ratingPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 5,
-    paddingVertical: 1,
-    borderRadius: borderRadius.pill,
+  metaText: {
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 11,
   },
-  dot: { width: 3, height: 3, borderRadius: 1.5 },
+  metaDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+  },
 });
+
+// Helper: rating pill sits above offer bar if offer bar exists
+function offerPillBottom(_hasOffer: boolean) {
+  // We always position from bottom of image wrapper; offer bar is 0px from bottom.
+  // We offset rating pill above offer bar dynamically. Since we can't know at style
+  // creation time, we use a fixed value; offer bar is ~28px tall.
+  return 32;
+}
