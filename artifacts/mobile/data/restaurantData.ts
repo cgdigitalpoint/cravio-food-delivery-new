@@ -18,6 +18,7 @@ export interface RestaurantMenuItem {
   isPopular: boolean;
   // Display extras
   isVeg: boolean;
+  isEgg?: boolean;           // true = contains egg but no meat (shown with egg indicator)
   isBestSeller?: boolean;
   isCustomizable?: boolean;
   discount?: number;         // percent off, e.g. 20 => "20% OFF"

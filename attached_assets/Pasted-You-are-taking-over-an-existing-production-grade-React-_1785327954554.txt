@@ -1,0 +1,476 @@
+You are taking over an existing production-grade React Native Expo project named "Cravio".
+
+Repository:
+https://github.com/cgdigitalpoint/cravio-food-delivery-new
+
+Branch:
+main
+
+Latest stable checkpoint commit:
+87513e6
+Commit Message:
+Checkpoint: UI progress before continuation
+
+==================================================
+IMPORTANT
+==================================================
+
+This project has already been developed for many sessions.
+
+DO NOT create a new project.
+
+DO NOT restart development.
+
+DO NOT replace the existing architecture.
+
+DO NOT redesign completed screens.
+
+DO NOT regenerate existing code.
+
+Your first responsibility is to understand the current project completely before writing any code.
+
+==================================================
+STEP 1 — ANALYSE THE ENTIRE PROJECT
+==================================================
+
+Read and understand every important folder.
+
+Analyse:
+
+app/
+
+screens/
+
+components/
+
+navigation/
+
+hooks/
+
+store/
+
+services/
+
+utils/
+
+theme/
+
+constants/
+
+types/
+
+assets/
+
+firebase configuration
+
+authentication flow
+
+navigation flow
+
+cart flow
+
+restaurant flow
+
+profile flow
+
+settings flow
+
+home flow
+
+==================================================
+STEP 2 — VERIFY PROJECT HEALTH
+==================================================
+
+Before making ANY change:
+
+Run project.
+
+Fix build issues if any.
+
+Verify
+
+Zero TypeScript errors
+
+Zero ESLint errors
+
+Zero runtime errors
+
+Successful build
+
+Do not introduce new bugs.
+
+==================================================
+STEP 3 — CREATE A PROJECT REPORT
+==================================================
+
+Before writing new code generate a full report.
+
+Include
+
+Completed Screens
+
+Completed Components
+
+Completed Features
+
+Partially Completed Features
+
+Remaining Features
+
+Navigation Structure
+
+Authentication Status
+
+Firebase Status
+
+Cart Status
+
+Restaurant Module
+
+Profile Module
+
+Settings Module
+
+Known Issues
+
+Technical Debt
+
+Unused Files
+
+Reusable Components
+
+Current Architecture
+
+Do not modify anything while generating the report.
+
+==================================================
+STEP 4 — CONTINUE FROM CURRENT CHECKPOINT
+==================================================
+
+Continue ONLY from the latest checkpoint.
+
+Never redo completed work.
+
+Never replace already completed components unless broken.
+
+Continue exactly where previous development stopped.
+
+==================================================
+CURRENT COMPLETED WORK
+==================================================
+
+RestaurantMenuItemCard redesigned
+
+RestaurantDetails redesign started
+
+Profile redesign started
+
+Bottom Navigation improvements started
+
+RestaurantDetails food card updated
+
+ADD button animation improved
+
+Bookmark functionality improved
+
+Some UI modernization completed
+
+General TypeScript cleanup completed
+
+==================================================
+REMAINING WORK
+==================================================
+
+HOME SCREEN
+
+Premium search bar
+
+Banner carousel
+
+Horizontal category section
+
+HD transparent PNG food images
+
+Filter chips
+
+Restaurant recommendation section
+
+Restaurant cards
+
+Animations
+
+==================================================
+
+RESTAURANT LIST
+
+Premium cards
+
+Offers
+
+Ratings
+
+Distance
+
+Delivery Time
+
+Veg availability
+
+Favourite
+
+==================================================
+
+RESTAURANT DETAILS
+
+Finish remaining sections
+
+Sticky header
+
+Offer cards
+
+Veg
+
+Egg
+
+Non Veg filters
+
+Search inside restaurant
+
+Category navigation
+
+Sticky cart
+
+Floating menu button
+
+==================================================
+
+SEARCH SCREEN
+
+Modern UI
+
+Recent Searches
+
+Trending Searches
+
+Live Search
+
+==================================================
+
+PROFILE SCREEN
+
+Complete redesign
+
+Membership
+
+Wallet
+
+Coupons
+
+Address
+
+Orders
+
+==================================================
+
+SETTINGS SCREEN
+
+Complete redesign
+
+Wallet
+
+Payments
+
+Coupons
+
+Promo Codes
+
+Help Centre
+
+Privacy Policy
+
+Terms
+
+About
+
+Logout
+
+Dark Mode
+
+Language
+
+Notification Settings
+
+==================================================
+
+BOTTOM NAVIGATION
+
+Premium animation
+
+Better active indicator
+
+==================================================
+
+ANIMATIONS
+
+Fade
+
+Scale
+
+Slide
+
+Banner auto slider
+
+Cart animation
+
+Button animations
+
+==================================================
+
+RESPONSIVE DESIGN
+
+Android
+
+iOS
+
+Tablet
+
+==================================================
+DESIGN REQUIREMENTS
+==================================================
+
+Study all reference screenshots that I upload.
+
+Treat them as the primary UI reference.
+
+Match
+
+Layout
+
+Spacing
+
+Padding
+
+Typography
+
+Image placement
+
+Card design
+
+Animations
+
+Overall user experience
+
+Do NOT copy logos or branding.
+
+Keep Cravio branding.
+
+==================================================
+IMAGE REQUIREMENTS
+==================================================
+
+Use HD PNG food images.
+
+Transparent background.
+
+Store locally.
+
+Do not use emojis.
+
+Do not use placeholders.
+
+==================================================
+CODE REQUIREMENTS
+==================================================
+
+Reusable components only.
+
+Clean architecture.
+
+No duplicate code.
+
+Use NativeWind.
+
+Use FlatList.
+
+Memoization.
+
+Lazy Loading.
+
+Image Optimization.
+
+Maintainability.
+
+==================================================
+DO NOT MODIFY
+==================================================
+
+Authentication
+
+Google Login
+
+Email Login
+
+Signup
+
+Forgot Password
+
+OTP
+
+Firebase
+
+Backend
+
+Database
+
+API Structure
+
+Business Logic
+
+Navigation Architecture
+
+==================================================
+WORKFLOW
+==================================================
+
+Never stop after one component.
+
+Work screen-by-screen.
+
+Finish one screen completely.
+
+Verify.
+
+Move to the next.
+
+Continue automatically.
+
+==================================================
+AFTER EVERY MAJOR SCREEN
+==================================================
+
+Run TypeScript.
+
+Run ESLint.
+
+Fix errors immediately.
+
+Never allow errors to accumulate.
+
+==================================================
+FINAL GOAL
+==================================================
+
+The application should become a premium production-quality food delivery application with UI quality comparable to Zomato and Swiggy while keeping Cravio branding.
+
+Only stop when the assigned work for the current session is fully completed and verified.
+
+Before ending each session:
+
+Generate a summary of completed work.
+
+Generate remaining tasks.
+
+Create a safe checkpoint.
+
+Commit all verified changes with a meaningful Git commit message.
+
+Never leave partially broken code in the repository.

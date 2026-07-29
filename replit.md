@@ -59,7 +59,10 @@ A food delivery mobile app (Expo / React Native / TypeScript) with customer chec
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Reference screenshots from Zomato are the PRIMARY UI/UX guide — match layout, spacing, cards, typography. Use Cravio branding only.
+- Never recreate completed work; never restart the project; never replace the existing architecture.
+- Work screen by screen. Run typecheck after every major screen. Fix all errors immediately — never accumulate them.
+- End every session with a PROJECT_CHECKPOINT.md + NEXT_SESSION_PROMPT.md + meaningful git commit.
 
 ## Gotchas
 

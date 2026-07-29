@@ -17,6 +17,7 @@ import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
+  withTiming,
 } from 'react-native-reanimated';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -24,6 +25,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
   ArrowLeft,
+  Check,
+  ChevronDown,
   Clock3,
   Heart,
   MapPin,
@@ -31,7 +34,9 @@ import {
   Share2,
   ShoppingCart,
   Star,
+  Tag,
   Truck,
+  UtensilsCrossed,
   X,
 } from 'lucide-react-native';
 
@@ -276,19 +281,59 @@ function RestaurantSummary({
         </View>
       </View>
 
-      {restaurant.offerText ? (
-        <View style={styles.offerBanner}>
-          <Text style={styles.offerIcon}>%</Text>
-          <Text style={[PP.caption, { color: colors.primary, fontFamily: 'Poppins_600SemiBold' }]}>
-            {restaurant.offerText} on this order
+      {/* Info badges — No packaging charges + Frequently reordered */}
+      <View style={styles.infoBadgeRow}>
+        <View style={styles.infoBadge}>
+          <Check size={12} color="#16A34A" strokeWidth={2.5} />
+          <Text style={[PP.caption, { color: colors.foreground, marginLeft: 5 }]}>
+            No packaging charges
           </Text>
         </View>
+        <View style={[styles.infoBadge, { marginLeft: 10 }]}>
+          <Check size={12} color="#16A34A" strokeWidth={2.5} />
+          <Text style={[PP.caption, { color: colors.foreground, marginLeft: 5 }]}>
+            Frequently reordered
+          </Text>
+        </View>
+      </View>
+
+      {restaurant.offerText ? (
+        <TouchableOpacity activeOpacity={0.8} style={styles.offerBanner}>
+          <View style={styles.offerIconWrap}>
+            <Tag size={12} color="#FF6B00" />
+          </View>
+          <Text style={[PP.caption, { color: colors.foreground, flex: 1, fontFamily: 'Poppins_500Medium' }]}>
+            {restaurant.offerText} on this order
+          </Text>
+          <Text style={[PP.caption, { color: colors.primary, fontFamily: 'Poppins_600SemiBold' }]}>
+            4 offers ›
+          </Text>
+        </TouchableOpacity>
       ) : null}
     </View>
   );
 }
 
-function FloatingCartButton({
+// ─── Floating Menu pill button ────────────────────────────────────────────────
+
+function FloatingMenuButton({ onPress }: { onPress: () => void }) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.85}
+      accessibilityRole="button"
+      accessibilityLabel="Jump to menu"
+      style={styles.floatingMenuBtn}
+    >
+      <UtensilsCrossed size={15} color="#FFFFFF" strokeWidth={2} />
+      <Text style={styles.floatingMenuText}>Menu</Text>
+    </TouchableOpacity>
+  );
+}
+
+// ─── Sticky cart bar (full-width, reference style) ───────────────────────────
+
+function StickyCartBar({
   count,
   total,
   onPress,
@@ -299,36 +344,45 @@ function FloatingCartButton({
   onPress: () => void;
   bottom: number;
 }) {
-  const colors = useColors();
+  const opacity = useSharedValue(0);
+
+  useEffect(() => {
+    opacity.value = withTiming(count > 0 ? 1 : 0, { duration: 220 });
+  }, [count, opacity]);
+
+  const barStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: interpolate(opacity.value, [0, 1], [24, 0]) }],
+  }));
 
   if (count === 0) return null;
 
   return (
-    <View style={[styles.cartButtonWrap, { bottom: bottom + 16 }]}>
+    <Animated.View style={[styles.stickyCartWrap, { bottom: bottom }, barStyle]}>
       <TouchableOpacity
         accessibilityRole="button"
         accessibilityLabel={`View cart with ${count} items`}
         onPress={onPress}
-        activeOpacity={0.9}
-        style={styles.cartButton}
+        activeOpacity={0.92}
+        style={styles.stickyCartBar}
       >
-        <LinearGradient
-          colors={['#FF8C38', colors.primary]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.cartGradient}
-        >
-          <View style={styles.cartCount}>
-            <Text style={[PP.buttonSM, { color: colors.primary }]}>{count}</Text>
+        {/* Food icon circles */}
+        <View style={styles.stickyCartIconRow}>
+          <View style={styles.stickyCartIcon}>
+            <ShoppingCart size={14} color="#FF6B00" />
           </View>
-          <View className="flex-1" style={styles.cartLabel}>
-            <ShoppingCart size={17} color="#FFFFFF" />
-            <Text style={[PP.button, { color: '#FFFFFF', marginLeft: 7 }]}>View Cart</Text>
-          </View>
-          <Text style={[PP.button, { color: '#FFFFFF' }]}>${total.toFixed(2)}</Text>
-        </LinearGradient>
+        </View>
+        <View style={styles.stickyCartCenter}>
+          <Text style={styles.stickyCartCount}>
+            {count} {count === 1 ? 'item' : 'items'} added
+          </Text>
+        </View>
+        <View style={styles.stickyCartRight}>
+          <Text style={styles.stickyCartContinue}>Continue</Text>
+          <Text style={styles.stickyCartArrow}> ›</Text>
+        </View>
       </TouchableOpacity>
-    </View>
+    </Animated.View>
   );
 }
 
@@ -346,7 +400,7 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
   );
   const [isLoading, setIsLoading] = useState(true);
   const [query, setQuery] = useState('');
-  const [vegFilter, setVegFilter] = useState<'all' | 'veg' | 'nonveg'>('all');
+  const [vegFilter, setVegFilter] = useState<'all' | 'veg' | 'egg' | 'nonveg'>('all');
   const [activeCategory, setActiveCategory] = useState('popular');
   const [showStickyTabs, setShowStickyTabs] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
@@ -405,9 +459,10 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
                 .includes(menuQuery);
               if (!match) return false;
             }
-            // veg / non-veg filter
-            if (vegFilter === 'veg') return item.isVeg === true;
-            if (vegFilter === 'nonveg') return item.isVeg === false;
+            // veg / egg / non-veg filter
+            if (vegFilter === 'veg') return item.isVeg === true && !item.isEgg;
+            if (vegFilter === 'egg') return item.isEgg === true;
+            if (vegFilter === 'nonveg') return item.isVeg === false && !item.isEgg;
             return true;
           }),
         }))
@@ -664,50 +719,86 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
             ) : null}
           </View>
 
-          {/* Veg / Egg / Non-veg filter chips */}
-          <View style={styles.filterRow}>
-            {(
-              [
-                { key: 'all', label: 'All', dotColor: null },
-                { key: 'veg', label: 'Veg', dotColor: '#16A34A' },
-                { key: 'nonveg', label: 'Non-veg', dotColor: '#DC2626' },
-              ] as const
-            ).map(({ key, label, dotColor }) => {
-              const active = vegFilter === key;
-              return (
-                <TouchableOpacity
-                  key={key}
-                  onPress={() => setVegFilter(key)}
-                  activeOpacity={0.75}
-                  style={[
-                    styles.filterChip,
-                    {
-                      backgroundColor: active ? `${colors.primary}15` : colors.card,
-                      borderColor: active ? colors.primary : colors.border,
-                      borderWidth: active ? 1.5 : 1,
-                    },
-                  ]}
-                >
-                  {dotColor && (
-                    <View style={[styles.filterDotBox, { borderColor: dotColor }]}>
-                      <View style={[styles.filterDotInner, { backgroundColor: dotColor }]} />
-                    </View>
-                  )}
-                  <Text
-                    style={[
-                      styles.filterLabel,
-                      {
-                        color: active ? colors.primary : colors.foreground,
-                        fontFamily: active ? 'Poppins_600SemiBold' : 'Poppins_400Regular',
-                      },
-                    ]}
-                  >
-                    {label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+          {/* Filters / Veg / Egg / Non-veg chips — matches reference design */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.filterRow}
+            contentContainerStyle={styles.filterRowContent}
+          >
+            {/* Filters dropdown */}
+            <TouchableOpacity
+              activeOpacity={0.75}
+              style={[styles.filterChip, { backgroundColor: colors.card, borderColor: colors.border }]}
+            >
+              <UtensilsCrossed size={12} color={colors.mutedForeground} />
+              <Text style={[styles.filterLabel, { color: colors.foreground, fontFamily: 'Poppins_400Regular' }]}>
+                Filters
+              </Text>
+              <ChevronDown size={12} color={colors.mutedForeground} />
+            </TouchableOpacity>
+
+            {/* Veg */}
+            <TouchableOpacity
+              onPress={() => setVegFilter(vegFilter === 'veg' ? 'all' : 'veg')}
+              activeOpacity={0.75}
+              style={[
+                styles.filterChip,
+                {
+                  backgroundColor: vegFilter === 'veg' ? '#F0FDF4' : colors.card,
+                  borderColor: vegFilter === 'veg' ? '#16A34A' : colors.border,
+                  borderWidth: vegFilter === 'veg' ? 1.5 : 1,
+                },
+              ]}
+            >
+              <View style={[styles.filterDotBox, { borderColor: '#16A34A' }]}>
+                <View style={[styles.filterDotInner, { backgroundColor: '#16A34A' }]} />
+              </View>
+              <Text style={[styles.filterLabel, { color: vegFilter === 'veg' ? '#16A34A' : colors.foreground, fontFamily: vegFilter === 'veg' ? 'Poppins_600SemiBold' : 'Poppins_400Regular' }]}>
+                Veg
+              </Text>
+            </TouchableOpacity>
+
+            {/* Egg */}
+            <TouchableOpacity
+              onPress={() => setVegFilter(vegFilter === 'egg' ? 'all' : 'egg')}
+              activeOpacity={0.75}
+              style={[
+                styles.filterChip,
+                {
+                  backgroundColor: vegFilter === 'egg' ? '#FFFBEB' : colors.card,
+                  borderColor: vegFilter === 'egg' ? '#F59E0B' : colors.border,
+                  borderWidth: vegFilter === 'egg' ? 1.5 : 1,
+                },
+              ]}
+            >
+              <Text style={styles.filterEggIcon}>🥚</Text>
+              <Text style={[styles.filterLabel, { color: vegFilter === 'egg' ? '#D97706' : colors.foreground, fontFamily: vegFilter === 'egg' ? 'Poppins_600SemiBold' : 'Poppins_400Regular' }]}>
+                Egg
+              </Text>
+            </TouchableOpacity>
+
+            {/* Non-veg */}
+            <TouchableOpacity
+              onPress={() => setVegFilter(vegFilter === 'nonveg' ? 'all' : 'nonveg')}
+              activeOpacity={0.75}
+              style={[
+                styles.filterChip,
+                {
+                  backgroundColor: vegFilter === 'nonveg' ? '#FEF2F2' : colors.card,
+                  borderColor: vegFilter === 'nonveg' ? '#DC2626' : colors.border,
+                  borderWidth: vegFilter === 'nonveg' ? 1.5 : 1,
+                },
+              ]}
+            >
+              <View style={[styles.filterDotBox, { borderColor: '#DC2626' }]}>
+                <View style={[styles.filterDotInner, { backgroundColor: '#DC2626' }]} />
+              </View>
+              <Text style={[styles.filterLabel, { color: vegFilter === 'nonveg' ? '#DC2626' : colors.foreground, fontFamily: vegFilter === 'nonveg' ? 'Poppins_600SemiBold' : 'Poppins_400Regular' }]}>
+                Non-veg
+              </Text>
+            </TouchableOpacity>
+          </ScrollView>
         </View>
 
         <View
@@ -751,6 +842,19 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
               ctaText={query ? 'Clear search' : undefined}
               onCtaPress={query ? () => setQuery('') : undefined}
             />
+          </View>
+        )}
+
+        {/* Coupon unlock banner — shown when cart has items */}
+        {itemCount > 0 && (
+          <View style={styles.couponBanner}>
+            <View style={styles.couponBadge}>
+              <Tag size={12} color="#FFFFFF" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.couponTitle}>You have unlocked a discount!</Text>
+              <Text style={styles.couponSubtitle}>Apply coupon on cart</Text>
+            </View>
           </View>
         )}
 
@@ -814,7 +918,15 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
         </View>
       ) : null}
 
-      <FloatingCartButton
+      {/* Floating Menu pill — bottom right, above cart bar */}
+      <View style={[styles.floatingMenuWrap, { bottom: itemCount > 0 ? insets.bottom + 68 : insets.bottom + 16 }]}>
+        <FloatingMenuButton onPress={() => {
+          scrollRef.current?.scrollTo({ y: COVER_HEIGHT + 200, animated: true });
+        }} />
+      </View>
+
+      {/* Full-width sticky cart bar */}
+      <StickyCartBar
         count={itemCount}
         total={totalAmount}
         onPress={() => router.push('/cart')}
@@ -880,26 +992,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#FFF7ED',
   },
-  offerIcon: {
-    width: 17,
-    height: 17,
-    borderRadius: 9,
-    color: '#FFFFFF',
-    backgroundColor: '#FF6B00',
-    textAlign: 'center',
-    fontSize: 11,
-    fontWeight: '700',
-    lineHeight: 17,
-  },
   searchWrap: { paddingHorizontal: 16, paddingBottom: 14, gap: 10 },
-  filterRow: { flexDirection: 'row', gap: 8, paddingTop: 4 },
+  filterRow: { paddingTop: 4 },
+  filterRowContent: { flexDirection: 'row', gap: 8, paddingHorizontal: 0, paddingRight: 8 },
   filterChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
+    gap: 5,
+    paddingHorizontal: 11,
     paddingVertical: 7,
     borderRadius: 20,
+    borderWidth: 1,
   },
   filterDotBox: {
     width: 13,
@@ -911,6 +1014,123 @@ const styles = StyleSheet.create({
   },
   filterDotInner: { width: 6, height: 6, borderRadius: 3 },
   filterLabel: { fontFamily: 'Poppins_400Regular', fontSize: 13 },
+  filterEggIcon: { fontSize: 12 },
+  // Info badges below info pills
+  infoBadgeRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 11, gap: 4 },
+  infoBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 6,
+    backgroundColor: '#F0FDF4',
+  },
+  // Updated offer banner
+  offerIconWrap: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#FFF7ED',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Coupon unlock banner
+  couponBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginBottom: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 10,
+    backgroundColor: '#EFF6FF',
+    gap: 12,
+  },
+  couponBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#3B82F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  couponTitle: {
+    fontFamily: 'Poppins_600SemiBold',
+    fontSize: 13,
+    color: '#1D4ED8',
+  },
+  couponSubtitle: {
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 11,
+    color: '#6B7280',
+    marginTop: 1,
+  },
+  // Floating Menu pill
+  floatingMenuWrap: { position: 'absolute', right: 16, zIndex: 40 },
+  floatingMenuBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 22,
+    backgroundColor: '#1C1C1E',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.28,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  floatingMenuText: {
+    fontFamily: 'Poppins_600SemiBold',
+    fontSize: 13,
+    color: '#FFFFFF',
+  },
+  // Sticky full-width cart bar
+  stickyCartWrap: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    zIndex: 50,
+  },
+  stickyCartBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    backgroundColor: '#FF6B00',
+    gap: 12,
+  },
+  stickyCartIconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  stickyCartIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stickyCartCenter: { flex: 1, alignItems: 'center' },
+  stickyCartCount: {
+    fontFamily: 'Poppins_600SemiBold',
+    fontSize: 14,
+    color: '#FFFFFF',
+  },
+  stickyCartRight: { flexDirection: 'row', alignItems: 'center' },
+  stickyCartContinue: {
+    fontFamily: 'Poppins_700Bold',
+    fontSize: 15,
+    color: '#FFFFFF',
+  },
+  stickyCartArrow: {
+    fontFamily: 'Poppins_700Bold',
+    fontSize: 18,
+    color: '#FFFFFF',
+    marginTop: -1,
+  },
   searchInput: {
     minHeight: 46,
     borderWidth: 1,
@@ -945,32 +1165,6 @@ const styles = StyleSheet.create({
     paddingTop: 9,
   },
   emptyMenu: { minHeight: 300, alignItems: 'center', justifyContent: 'center' },
-  cartButtonWrap: { position: 'absolute', left: 20, right: 20, zIndex: 50 },
-  cartButton: {
-    overflow: 'hidden',
-    borderRadius: 16,
-    shadowColor: '#FF6B00',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  cartGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-  },
-  cartCount: {
-    minWidth: 28,
-    height: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 6,
-    borderRadius: 14,
-    backgroundColor: '#FFFFFF',
-  },
-  cartLabel: { alignItems: 'center', marginLeft: 12 },
   vegBox: {
     width: 14,
     height: 14,
