@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
-import { Star, Clock3, MapPin, Tag, Truck } from 'lucide-react-native';
+import { Star, Clock3, MapPin, Truck } from 'lucide-react-native';
 import { useColors } from '@/hooks/useColors';
 import { PP } from '@/theme/poppins';
 
@@ -67,8 +67,17 @@ export function RestaurantCard({
           end={{ x: 0, y: 1 }}
         />
 
-        {/* NEW badge — top left */}
-        {isNew === true && (
+        {/* Offer badge — top left (Zomato style: dark bg, compact) */}
+        {offerText != null && (
+          <View style={styles.offerBadge}>
+            <Text style={styles.offerBadgeText} numberOfLines={2}>
+              {offerText}
+            </Text>
+          </View>
+        )}
+
+        {/* NEW badge — top left below offer if no offer */}
+        {isNew === true && offerText == null && (
           <View style={styles.newBadge}>
             <Text style={styles.newBadgeText}>NEW</Text>
           </View>
@@ -87,21 +96,11 @@ export function RestaurantCard({
           </Text>
         </TouchableOpacity>
 
-        {/* Rating pill — bottom left, overlaid on image */}
+        {/* Rating pill — bottom left */}
         <View style={styles.ratingPill}>
           <Star size={11} color="#FFFFFF" fill="#FFFFFF" />
           <Text style={styles.ratingText}>{rating.toFixed(1)}</Text>
         </View>
-
-        {/* Offer banner — bottom, full width */}
-        {offerText != null && (
-          <View style={styles.offerBar}>
-            <Tag size={11} color="#FFFFFF" />
-            <Text style={styles.offerBarText} numberOfLines={1}>
-              {offerText}
-            </Text>
-          </View>
-        )}
       </View>
 
       {/* ── Info area ── */}
@@ -147,7 +146,7 @@ export function RestaurantCard({
           <View style={[styles.metaDot, { backgroundColor: colors.border }]} />
           <Truck size={12} color={colors.mutedForeground} />
           <Text style={[styles.metaText, { color: colors.mutedForeground }]}>
-            {deliveryFee === 0 ? 'Free' : `$${deliveryFee.toFixed(2)}`}
+            {deliveryFee === 0 ? 'Free' : `₹${Math.round(deliveryFee)}`}
           </Text>
         </View>
       </View>
@@ -176,6 +175,23 @@ const styles = StyleSheet.create({
   imagePlaceholder: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  // Offer badge — top left, dark background (Zomato style)
+  offerBadge: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    backgroundColor: 'rgba(0,0,0,0.72)',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderBottomRightRadius: 10,
+    maxWidth: 130,
+  },
+  offerBadgeText: {
+    fontFamily: 'Poppins_600SemiBold',
+    fontSize: 10,
+    color: '#FFFFFF',
+    lineHeight: 14,
   },
   newBadge: {
     position: 'absolute',
@@ -209,7 +225,7 @@ const styles = StyleSheet.create({
   },
   ratingPill: {
     position: 'absolute',
-    bottom: offerPillBottom(true),
+    bottom: 10,
     left: 10,
     flexDirection: 'row',
     alignItems: 'center',
@@ -223,24 +239,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins_700Bold',
     fontSize: 11,
     color: '#FFFFFF',
-  },
-  offerBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    backgroundColor: 'rgba(255,107,0,0.88)',
-  },
-  offerBarText: {
-    fontFamily: 'Poppins_600SemiBold',
-    fontSize: 11,
-    color: '#FFFFFF',
-    flex: 1,
   },
   info: {
     paddingHorizontal: 12,
@@ -289,10 +287,3 @@ const styles = StyleSheet.create({
   },
 });
 
-// Helper: rating pill sits above offer bar if offer bar exists
-function offerPillBottom(_hasOffer: boolean) {
-  // We always position from bottom of image wrapper; offer bar is 0px from bottom.
-  // We offset rating pill above offer bar dynamically. Since we can't know at style
-  // creation time, we use a fixed value; offer bar is ~28px tall.
-  return 32;
-}

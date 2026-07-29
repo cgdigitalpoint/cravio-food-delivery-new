@@ -161,7 +161,7 @@ const hdrStyles = StyleSheet.create({
   },
 });
 
-// ─── Category Strip ───────────────────────────────────────────────────────────
+// ─── Category Strip — Zomato-style stacked layout ─────────────────────────────
 function CategoryStrip({
   activeId,
   onSelect,
@@ -183,27 +183,40 @@ function CategoryStrip({
             key={cat.id}
             onPress={() => onSelect(cat.id)}
             activeOpacity={0.75}
-            style={[
-              catStyles.chip,
-              {
-                backgroundColor: active ? `${colors.primary}18` : colors.card,
-                borderColor: active ? colors.primary : colors.border,
-                borderWidth: active ? 1.5 : 1,
-              },
-            ]}
+            style={catStyles.item}
           >
-            <Text style={catStyles.emoji}>{cat.emoji}</Text>
-            <Text
+            {/* Emoji circle */}
+            <View
               style={[
-                PP.caption,
+                catStyles.emojiCircle,
                 {
-                  color: active ? colors.primary : colors.foreground,
-                  fontFamily: active ? 'Poppins_600SemiBold' : 'Poppins_400Regular',
+                  backgroundColor: active ? `${cat.color}22` : colors.surfaceVariant,
+                  borderColor: active ? cat.color : 'transparent',
+                  borderWidth: active ? 2 : 0,
                 },
               ]}
             >
+              <Text style={catStyles.emoji}>{cat.emoji}</Text>
+            </View>
+
+            {/* Category name */}
+            <Text
+              style={[
+                catStyles.catLabel,
+                {
+                  color: active ? cat.color : colors.foreground,
+                  fontFamily: active ? 'Poppins_600SemiBold' : 'Poppins_400Regular',
+                },
+              ]}
+              numberOfLines={1}
+            >
               {cat.name}
             </Text>
+
+            {/* Active underline */}
+            {active && (
+              <View style={[catStyles.underline, { backgroundColor: cat.color }]} />
+            )}
           </TouchableOpacity>
         );
       })}
@@ -212,21 +225,133 @@ function CategoryStrip({
 }
 
 const catStyles = StyleSheet.create({
-  list: { paddingHorizontal: 16, gap: 8, paddingVertical: 6 },
+  list: { paddingHorizontal: 12, gap: 2, paddingVertical: 10, alignItems: 'flex-start' },
+  item: {
+    alignItems: 'center',
+    paddingHorizontal: 6,
+    minWidth: 64,
+    gap: 5,
+  },
+  emojiCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emoji: { fontSize: 24 },
+  catLabel: {
+    fontSize: 11,
+    textAlign: 'center',
+    maxWidth: 64,
+  },
+  underline: {
+    height: 2.5,
+    width: 24,
+    borderRadius: 2,
+    marginTop: 1,
+  },
+});
+
+// ─── Filter Chips Row — Zomato-style ──────────────────────────────────────────
+function FilterChipsRow({
+  nearFast,
+  under200,
+  onNearFast,
+  onUnder200,
+}: {
+  nearFast: boolean;
+  under200: boolean;
+  onNearFast: () => void;
+  onUnder200: () => void;
+}) {
+  const colors = useColors();
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={chipRowStyles.list}
+    >
+      {/* Filters */}
+      <TouchableOpacity
+        activeOpacity={0.75}
+        style={[chipRowStyles.chip, { backgroundColor: colors.card, borderColor: colors.border }]}
+      >
+        <Ionicons name="options-outline" size={13} color={colors.mutedForeground} />
+        <Text style={[PP.caption, { color: colors.foreground, fontFamily: 'Poppins_500Medium' }]}>
+          Filters
+        </Text>
+        <Ionicons name="chevron-down" size={12} color={colors.mutedForeground} />
+      </TouchableOpacity>
+
+      {/* Near & Fast */}
+      <TouchableOpacity
+        onPress={onNearFast}
+        activeOpacity={0.75}
+        style={[
+          chipRowStyles.chip,
+          nearFast
+            ? { backgroundColor: '#EFF9FF', borderColor: '#0EA5E9', borderWidth: 1.5 }
+            : { backgroundColor: colors.card, borderColor: colors.border },
+        ]}
+      >
+        <Ionicons name="flash" size={13} color={nearFast ? '#0EA5E9' : '#22C55E'} />
+        <Text
+          style={[
+            PP.caption,
+            {
+              color: nearFast ? '#0EA5E9' : colors.foreground,
+              fontFamily: nearFast ? 'Poppins_600SemiBold' : 'Poppins_400Regular',
+            },
+          ]}
+        >
+          Near & Fast
+        </Text>
+      </TouchableOpacity>
+
+      {/* Under ₹200 */}
+      <TouchableOpacity
+        onPress={onUnder200}
+        activeOpacity={0.75}
+        style={[
+          chipRowStyles.chip,
+          under200
+            ? { backgroundColor: '#FFF7ED', borderColor: '#FF6B00', borderWidth: 1.5 }
+            : { backgroundColor: colors.card, borderColor: colors.border },
+        ]}
+      >
+        <Text
+          style={[
+            PP.caption,
+            {
+              color: under200 ? '#FF6B00' : colors.foreground,
+              fontFamily: under200 ? 'Poppins_600SemiBold' : 'Poppins_400Regular',
+            },
+          ]}
+        >
+          Under ₹200
+        </Text>
+      </TouchableOpacity>
+    </ScrollView>
+  );
+}
+
+const chipRowStyles = StyleSheet.create({
+  list: { paddingHorizontal: 16, gap: 8, paddingVertical: 4 },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 5,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 12,
+    borderRadius: 999,
+    borderWidth: 1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.04,
     shadowRadius: 3,
     elevation: 1,
   },
-  emoji: { fontSize: 16 },
 });
 
 // ─── Service switch ────────────────────────────────────────────────────────────
@@ -865,7 +990,7 @@ function FloatingCartButton({
           <View style={cartStyles.right}>
             <ShoppingCart size={18} color="#FFFFFF" strokeWidth={2} />
             <Text style={[PP.bodySM, { color: 'rgba(255,255,255,0.88)', marginLeft: 5 }]}>
-              ${total.toFixed(2)}
+              ₹{Math.round(total)}
             </Text>
           </View>
         </LinearGradient>
@@ -934,6 +1059,8 @@ export function HomeScreen() {
   const [activeTab, setActiveTab] = useState(0);
   const [serviceMode, setServiceMode] = useState<ServiceMode>('food');
   const [vegOnly, setVegOnly] = useState(false);
+  const [nearFast, setNearFast] = useState(false);
+  const [under200, setUnder200] = useState(false);
   const [groceryNotified, setGroceryNotified] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const favorites = storedFavoriteIds;
@@ -1025,7 +1152,9 @@ export function HomeScreen() {
   // Phase 11C-1 ordering and section composition remain unchanged.
   const matchesRestaurantFilter = (restaurant: Restaurant) =>
     (activeCategory === 'all' || restaurant.category === activeCategory) &&
-    (!vegOnly || restaurant.isVeg === true);
+    (!vegOnly || restaurant.isVeg === true) &&
+    (!nearFast || restaurant.deliveryTime <= 25) &&
+    (!under200 || restaurant.deliveryFee === 0);
 
   const filteredPopular =
     activeCategory === 'all'
@@ -1061,7 +1190,7 @@ export function HomeScreen() {
         (r.isVeg ? 3 : 0),
     }));
     return scored.sort((a, b) => b.score - a.score).map((x) => x.r);
-  }, [activeCategory, vegOnly]);
+  }, [activeCategory, vegOnly, nearFast, under200]);
 
   const quickPickFood = FOOD_ITEMS.slice(2).filter((item) => !vegOnly || item.isVeg);
 
@@ -1101,6 +1230,14 @@ export function HomeScreen() {
 
       {/* Category strip */}
       <CategoryStrip activeId={activeCategory} onSelect={setActiveCategory} />
+
+      {/* Filter chips — Filters | Near & Fast | Under ₹200 */}
+      <FilterChipsRow
+        nearFast={nearFast}
+        under200={under200}
+        onNearFast={() => setNearFast((prev) => !prev)}
+        onUnder200={() => setUnder200((prev) => !prev)}
+      />
 
       {/* Offer Banners */}
       <BannerCarousel />

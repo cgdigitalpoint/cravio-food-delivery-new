@@ -103,7 +103,7 @@ export function FoodCard({
                 { color: colors.primary, fontFamily: 'Inter_700Bold', fontSize: 15 },
               ]}
             >
-              ${price.toFixed(2)}
+              ₹{Math.round(price)}
             </Text>
             {/* Rating */}
             {rating != null && (

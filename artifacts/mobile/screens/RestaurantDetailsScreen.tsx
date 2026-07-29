@@ -38,6 +38,7 @@ import {
   Truck,
   UtensilsCrossed,
   X,
+  Zap,
 } from 'lucide-react-native';
 
 import {
@@ -202,101 +203,82 @@ function RestaurantSummary({
 }) {
   const colors = useColors();
   const reviewCount = 1200 + Number(restaurant.id.replace('r', '')) * 143;
+  const ratingColor =
+    restaurant.rating >= 4.0 ? '#16A34A' : restaurant.rating >= 3.0 ? '#F59E0B' : '#EF4444';
 
   return (
     <View style={[styles.summary, { backgroundColor: colors.background }]}>
-      <View className="flex-row items-start">
-        <RestaurantLogo name={restaurant.name} imageUri={restaurant.imageUri} />
-        <View className="flex-1" style={styles.summaryTitle}>
-          <View className="flex-row items-center">
-            <VegIndicator isVeg={restaurant.isVeg ?? false} />
-            <Text
-              numberOfLines={2}
-              style={[PP.h3, { color: colors.foreground, flex: 1, marginLeft: 8 }]}
-            >
-              {restaurant.name}
-            </Text>
-          </View>
-          <Text
-            numberOfLines={2}
-            style={[PP.bodySM, { color: colors.mutedForeground, marginTop: 4 }]}
-          >
+      {/* ── Name + Rating badge row — Zomato reference style ── */}
+      <View style={styles.nameRatingRow}>
+        <View style={{ flex: 1, marginRight: 12 }}>
+          <Text numberOfLines={2} style={[PP.h2, { color: colors.foreground, lineHeight: 30 }]}>
+            {restaurant.name}
+          </Text>
+          <Text numberOfLines={2} style={[PP.bodySM, { color: colors.mutedForeground, marginTop: 3 }]}>
             {restaurant.cuisine}
           </Text>
         </View>
-        <View
-          style={[
-            styles.statusBadge,
-            { backgroundColor: restaurant.isOpen ? '#F0FDF4' : '#FEF2F2' },
-          ]}
-        >
-          <View
-            style={[
-              styles.statusDot,
-              { backgroundColor: restaurant.isOpen ? '#16A34A' : '#DC2626' },
-            ]}
-          />
-          <Text
-            style={[
-              PP.caption,
-              {
-                color: restaurant.isOpen ? '#16A34A' : '#DC2626',
-                fontFamily: 'Poppins_600SemiBold',
-              },
-            ]}
-          >
-            {restaurant.isOpen ? 'Open' : 'Closed'}
+
+        {/* Green/amber rating badge */}
+        <View style={[styles.ratingBadge, { backgroundColor: ratingColor }]}>
+          <Text style={styles.ratingBadgeValue}>
+            {restaurant.rating.toFixed(1)} ★
+          </Text>
+          <Text style={styles.ratingBadgeCount}>
+            {(reviewCount / 1000).toFixed(1)}K ratings
           </Text>
         </View>
       </View>
 
-      <View className="flex-row items-center" style={styles.ratingRow}>
-        <Star size={16} color="#F59E0B" fill="#F59E0B" />
-        <Text style={[PP.label, { color: colors.foreground, marginLeft: 5 }]}>
-          {restaurant.rating.toFixed(1)}
+      {/* ── Distance row ── */}
+      <View style={styles.detailRow}>
+        <MapPin size={13} color={colors.mutedForeground} strokeWidth={1.8} />
+        <Text style={[PP.bodySM, { color: colors.mutedForeground, marginLeft: 4 }]}>
+          {restaurant.distance}
+        </Text>
+      </View>
+
+      {/* ── Delivery time row with lightning bolt ── */}
+      <View style={styles.detailRow}>
+        <Zap size={14} color="#22C55E" fill="#22C55E" />
+        <Text style={[PP.bodySM, { color: '#22C55E', marginLeft: 3, fontFamily: 'Poppins_600SemiBold' }]}>
+          {restaurant.deliveryTime}–{restaurant.deliveryTime + 10} mins
         </Text>
         <Text style={[PP.bodySM, { color: colors.mutedForeground, marginLeft: 4 }]}>
-          ({reviewCount.toLocaleString()} reviews)
+          · Schedule for later ›
         </Text>
       </View>
 
-      <View className="flex-row flex-wrap" style={styles.infoPills}>
-        <View style={[styles.infoPill, { backgroundColor: colors.surfaceVariant }]}>
-          <Clock3 size={13} color={colors.primary} />
-          <Text style={[PP.caption, { color: colors.foreground, marginLeft: 5 }]}>
-            {restaurant.deliveryTime} min
-          </Text>
-        </View>
-        <View style={[styles.infoPill, { backgroundColor: colors.surfaceVariant }]}>
-          <MapPin size={13} color={colors.primary} />
-          <Text style={[PP.caption, { color: colors.foreground, marginLeft: 5 }]}>
-            {restaurant.distance}
-          </Text>
-        </View>
-        <View style={[styles.infoPill, { backgroundColor: colors.surfaceVariant }]}>
-          <Truck size={13} color={colors.primary} />
-          <Text style={[PP.caption, { color: colors.foreground, marginLeft: 5 }]}>
-            {restaurant.deliveryFee === 0 ? 'Free delivery' : `$${restaurant.deliveryFee} delivery`}
-          </Text>
-        </View>
-      </View>
-
-      {/* Info badges — No packaging charges + Frequently reordered */}
-      <View style={styles.infoBadgeRow}>
+      {/* ── Info badges — horizontal scroll ── */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={{ marginTop: 14 }}
+        contentContainerStyle={styles.infoBadgeRow}
+      >
         <View style={styles.infoBadge}>
           <Check size={12} color="#16A34A" strokeWidth={2.5} />
-          <Text style={[PP.caption, { color: colors.foreground, marginLeft: 5 }]}>
+          <Text style={[PP.caption, { color: '#16A34A', marginLeft: 4 }]}>
             No packaging charges
           </Text>
         </View>
-        <View style={[styles.infoBadge, { marginLeft: 10 }]}>
+        <View style={styles.infoBadge}>
           <Check size={12} color="#16A34A" strokeWidth={2.5} />
-          <Text style={[PP.caption, { color: colors.foreground, marginLeft: 5 }]}>
+          <Text style={[PP.caption, { color: '#16A34A', marginLeft: 4 }]}>
             Frequently reordered
           </Text>
         </View>
-      </View>
+        {restaurant.deliveryFee === 0 && (
+          <View style={styles.infoBadge}>
+            <Check size={12} color="#16A34A" strokeWidth={2.5} />
+            <Text style={[PP.caption, { color: '#16A34A', marginLeft: 4 }]}>
+              Free delivery
+            </Text>
+          </View>
+        )}
+      </ScrollView>
 
+      {/* ── Offer banner ── */}
       {restaurant.offerText ? (
         <TouchableOpacity activeOpacity={0.8} style={styles.offerBanner}>
           <View style={styles.offerIconWrap}>
@@ -569,7 +551,7 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
   const shareFood = useCallback(async (item: RestaurantMenuItem) => {
     await Share.share({
       title: item.name,
-      message: `Try ${item.name} from ${restaurant?.name ?? 'this restaurant'} on Cravio — $${item.price.toFixed(2)}.`,
+      message: `Try ${item.name} from ${restaurant?.name ?? 'this restaurant'} on Cravio — ₹${Math.round(item.price)}.`,
       url: `https://cravio.app/food/${item.id}`,
     });
   }, [restaurant]);
@@ -963,24 +945,44 @@ const styles = StyleSheet.create({
   },
   headerButtonGap: { marginLeft: 8 },
   summary: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 16 },
-  summaryTitle: { marginLeft: 15, marginRight: 8 },
-  statusBadge: {
+  // Zomato-style name + rating badge row
+  nameRatingRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 9,
-    paddingVertical: 6,
-    borderRadius: 20,
+    alignItems: 'flex-start',
   },
-  statusDot: { width: 7, height: 7, borderRadius: 4 },
-  ratingRow: { marginTop: 14 },
-  infoPills: { gap: 8, marginTop: 14 },
-  infoPill: {
+  ratingBadge: {
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    alignItems: 'center',
+    minWidth: 70,
+  },
+  ratingBadgeValue: {
+    fontFamily: 'Poppins_700Bold',
+    fontSize: 16,
+    color: '#FFFFFF',
+    lineHeight: 22,
+  },
+  ratingBadgeCount: {
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 9.5,
+    color: 'rgba(255,255,255,0.88)',
+    marginTop: 1,
+  },
+  detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    borderRadius: 20,
+    marginTop: 6,
+  },
+  // Info badges horizontal
+  infoBadgeRow: { flexDirection: 'row', gap: 8, paddingHorizontal: 0 },
+  infoBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 6,
+    backgroundColor: '#F0FDF4',
   },
   offerBanner: {
     flexDirection: 'row',
@@ -1015,16 +1017,6 @@ const styles = StyleSheet.create({
   filterDotInner: { width: 6, height: 6, borderRadius: 3 },
   filterLabel: { fontFamily: 'Poppins_400Regular', fontSize: 13 },
   filterEggIcon: { fontSize: 12 },
-  // Info badges below info pills
-  infoBadgeRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 11, gap: 4 },
-  infoBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: 6,
-    backgroundColor: '#F0FDF4',
-  },
   // Updated offer banner
   offerIconWrap: {
     width: 22,

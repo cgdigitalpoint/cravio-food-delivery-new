@@ -170,11 +170,11 @@ export function RestaurantMenuItemCard({
         {/* Price row */}
         <View style={styles.priceRow}>
           <Text style={[styles.price, { color: colors.foreground }]}>
-            ${discountedPrice.toFixed(2)}
+            ₹{Math.round(discountedPrice)}
           </Text>
           {item.discount ? (
             <Text style={[styles.strikePrice, { color: colors.mutedForeground }]}>
-              ${item.price.toFixed(2)}
+              ₹{Math.round(item.price)}
             </Text>
           ) : null}
           {item.discount ? (

@@ -214,15 +214,15 @@ export function InvoiceScreen({ orderId, onBack }: InvoiceScreenProps) {
             <Text style={[PP.overline, { color: colors.mutedForeground, marginBottom: spacing.sm }]}>
               PRICE BREAKDOWN
             </Text>
-            <BillRow label="Subtotal" value={`$${subtotal.toFixed(2)}`} />
+            <BillRow label="Subtotal" value={`₹${Math.round(subtotal)}`} />
             {couponDiscount > 0 && (
-              <BillRow label="Coupon Discount" value={`-$${couponDiscount.toFixed(2)}`} isSaving />
+              <BillRow label="Coupon Discount" value={`-₹${Math.round(couponDiscount)}`} isSaving />
             )}
-            <BillRow label="Delivery Fee" value={`$${DEFAULT_DELIVERY_FEE.toFixed(2)}`} dimmed />
-            <BillRow label="Platform Fee" value={`$${PLATFORM_FEE.toFixed(2)}`} dimmed />
-            <BillRow label="GST (5%)" value={`$${gst.toFixed(2)}`} dimmed />
+            <BillRow label="Delivery Fee" value={`₹${Math.round(DEFAULT_DELIVERY_FEE)}`} dimmed />
+            <BillRow label="Platform Fee" value={`₹${Math.round(PLATFORM_FEE)}`} dimmed />
+            <BillRow label="GST (5%)" value={`₹${Math.round(gst)}`} dimmed />
             <View style={[styles.billDivider, { backgroundColor: colors.border }]} />
-            <BillRow label="Grand Total" value={`$${grandTotal.toFixed(2)}`} isTotal />
+            <BillRow label="Grand Total" value={`₹${Math.round(grandTotal)}`} isTotal />
           </View>
 
           {/* ── Payment ── */}
