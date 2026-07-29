@@ -346,6 +346,7 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
   );
   const [isLoading, setIsLoading] = useState(true);
   const [query, setQuery] = useState('');
+  const [vegFilter, setVegFilter] = useState<'all' | 'veg' | 'nonveg'>('all');
   const [activeCategory, setActiveCategory] = useState('popular');
   const [showStickyTabs, setShowStickyTabs] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
@@ -396,15 +397,22 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
         .map((section) => ({
           ...section,
           items: section.items.filter((item) => {
-            if (!menuQuery) return true;
-            return [item.name, item.description, ...item.tags]
-              .join(' ')
-              .toLowerCase()
-              .includes(menuQuery);
+            // text search
+            if (menuQuery) {
+              const match = [item.name, item.description, ...item.tags]
+                .join(' ')
+                .toLowerCase()
+                .includes(menuQuery);
+              if (!match) return false;
+            }
+            // veg / non-veg filter
+            if (vegFilter === 'veg') return item.isVeg === true;
+            if (vegFilter === 'nonveg') return item.isVeg === false;
+            return true;
           }),
         }))
         .filter((section) => section.items.length > 0),
-    [allSections, menuQuery],
+    [allSections, menuQuery, vegFilter],
   );
   const categories = useMemo(
     () =>
@@ -655,6 +663,51 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
               </TouchableOpacity>
             ) : null}
           </View>
+
+          {/* Veg / Egg / Non-veg filter chips */}
+          <View style={styles.filterRow}>
+            {(
+              [
+                { key: 'all', label: 'All', dotColor: null },
+                { key: 'veg', label: 'Veg', dotColor: '#16A34A' },
+                { key: 'nonveg', label: 'Non-veg', dotColor: '#DC2626' },
+              ] as const
+            ).map(({ key, label, dotColor }) => {
+              const active = vegFilter === key;
+              return (
+                <TouchableOpacity
+                  key={key}
+                  onPress={() => setVegFilter(key)}
+                  activeOpacity={0.75}
+                  style={[
+                    styles.filterChip,
+                    {
+                      backgroundColor: active ? `${colors.primary}15` : colors.card,
+                      borderColor: active ? colors.primary : colors.border,
+                      borderWidth: active ? 1.5 : 1,
+                    },
+                  ]}
+                >
+                  {dotColor && (
+                    <View style={[styles.filterDotBox, { borderColor: dotColor }]}>
+                      <View style={[styles.filterDotInner, { backgroundColor: dotColor }]} />
+                    </View>
+                  )}
+                  <Text
+                    style={[
+                      styles.filterLabel,
+                      {
+                        color: active ? colors.primary : colors.foreground,
+                        fontFamily: active ? 'Poppins_600SemiBold' : 'Poppins_400Regular',
+                      },
+                    ]}
+                  >
+                    {label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         </View>
 
         <View
@@ -838,7 +891,26 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     lineHeight: 17,
   },
-  searchWrap: { paddingHorizontal: 16, paddingBottom: 14 },
+  searchWrap: { paddingHorizontal: 16, paddingBottom: 14, gap: 10 },
+  filterRow: { flexDirection: 'row', gap: 8, paddingTop: 4 },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 20,
+  },
+  filterDotBox: {
+    width: 13,
+    height: 13,
+    borderRadius: 3,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterDotInner: { width: 6, height: 6, borderRadius: 3 },
+  filterLabel: { fontFamily: 'Poppins_400Regular', fontSize: 13 },
   searchInput: {
     minHeight: 46,
     borderWidth: 1,
