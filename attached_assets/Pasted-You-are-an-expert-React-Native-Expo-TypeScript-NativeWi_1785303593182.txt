@@ -1,0 +1,526 @@
+You are an expert React Native (Expo), TypeScript, NativeWind, Zustand and Firebase developer.
+
+I am attaching multiple UI reference screenshots of Zomato/Swiggy.
+
+Your job is to carefully analyse EVERY attached screenshot and redesign the Cravio Food Delivery App to match the same premium UI and UX while keeping Cravio branding.
+
+=========================
+VERY IMPORTANT
+=========================
+
+The attached screenshots are the PRIMARY DESIGN REFERENCE.
+
+Study every screenshot carefully before writing or modifying any code.
+
+Match the following as closely as possible:
+
+• Layout
+• Screen Structure
+• Component Position
+• Typography
+• Font Sizes
+• Colors
+• Padding
+• Margins
+• Card Design
+• Border Radius
+• Shadows
+• Icons
+• Image Sizes
+• Food Card Layout
+• Restaurant Cards
+• Search Bar
+• Filter Chips
+• Category Section
+• Settings Screen
+• Profile Screen
+• Sticky Cart
+• Floating Buttons
+• Animations
+• Overall User Experience
+
+Do NOT copy Zomato branding, logos or name.
+
+Replace everything with Cravio branding.
+
+=========================
+HOME SCREEN
+=========================
+
+Build a premium Home Screen exactly like the attached screenshots.
+
+Include
+
+• Current Location
+• Search Bar
+• Voice Search
+• Veg Mode Toggle
+• Banner Carousel
+• Horizontal Food Categories
+• Filter Chips
+• Recommended Restaurants
+• Restaurant Cards
+• Sticky Bottom Navigation
+
+=========================
+HORIZONTAL CATEGORY SECTION
+=========================
+
+Create horizontal scrolling categories exactly like the screenshots.
+
+Requirements
+
+• Circular HD PNG food images
+• Transparent background PNGs
+• Local assets
+• Smooth scrolling
+• Premium spacing
+• Active category underline
+• Selected category highlight
+• Category filtering
+
+Categories
+
+All
+
+Biryani
+
+Pizza
+
+Burger
+
+Chinese
+
+Rolls
+
+Shawarma
+
+North Indian
+
+South Indian
+
+Ice Cream
+
+Coffee
+
+Tea
+
+Juices
+
+Sandwich
+
+Cake
+
+Pasta
+
+Momos
+
+Dosa
+
+Idli
+
+Thali
+
+Drinks
+
+Do NOT use emojis.
+
+Use realistic HD food PNG images.
+
+=========================
+RESTAURANT LIST
+=========================
+
+Restaurant listing should match the screenshots.
+
+Every card must include
+
+Restaurant Image
+
+Restaurant Name
+
+Rating
+
+Distance
+
+Delivery Time
+
+Cuisine
+
+Veg Available
+
+Offer Badge
+
+Favourite Button
+
+Click opens Restaurant Details.
+
+=========================
+RESTAURANT DETAILS
+=========================
+
+Design exactly like the attached screenshots.
+
+Include
+
+Restaurant Name
+
+Rating
+
+Reviews
+
+Distance
+
+Delivery Time
+
+Schedule Order
+
+Packaging Information
+
+Offer Section
+
+Search Inside Restaurant
+
+Veg Filter
+
+Egg Filter
+
+Non Veg Filter
+
+Sticky Header
+
+=========================
+FOOD MENU
+=========================
+
+Every food item should be horizontal exactly like the screenshots.
+
+LEFT SIDE
+
+Veg/Non Veg Icon
+
+Food Name
+
+Rating
+
+Highly Reordered Badge
+
+Best Seller Badge
+
+Price
+
+Description
+
+Bookmark Button
+
+Share Button
+
+RIGHT SIDE
+
+Large Food Image
+
+Rounded Corners
+
+ADD Button
+
+When clicked
+
+Replace ADD with
+
+[-] Quantity [+]
+
+Exactly like the screenshots.
+
+=========================
+BOTTOM CART
+=========================
+
+Create sticky animated cart.
+
+Show
+
+Food Thumbnails
+
+Item Count
+
+Total Price
+
+Continue Button
+
+Animated Appearance
+
+=========================
+SEARCH
+=========================
+
+Restaurant Search
+
+Food Search
+
+Search Inside Restaurant
+
+Recent Searches
+
+Trending Searches
+
+Live Search
+
+=========================
+SETTINGS / PROFILE
+=========================
+
+Design the Settings screen exactly like the screenshots.
+
+Include
+
+Profile Card
+
+Profile Photo
+
+User Name
+
+Edit Profile
+
+Membership Card
+
+Wallet
+
+Coupons
+
+Preferences
+
+Veg Mode
+
+Appearance
+
+Dark Mode
+
+Language
+
+Notification Settings
+
+Payment Methods
+
+Saved Cards
+
+Saved UPI
+
+Wallet
+
+Food Delivery
+
+Orders
+
+Track Order
+
+Scheduled Orders
+
+Order History
+
+Invoices
+
+Support
+
+Address Book
+
+Favourite Restaurants
+
+Favourite Foods
+
+Hidden Restaurants
+
+Manage Recommendations
+
+Payments
+
+Wallet
+
+Gift Cards
+
+Credits
+
+Coupons
+
+Promo Codes
+
+Transaction History
+
+Help
+
+Help Centre
+
+FAQs
+
+Contact Support
+
+Live Chat
+
+Privacy Policy
+
+Terms
+
+About App
+
+Logout
+
+=========================
+UI
+=========================
+
+Use
+
+NativeWind
+
+Rounded Cards
+
+Premium Shadows
+
+Glass Effect where needed
+
+Smooth Animations
+
+Modern Typography
+
+Professional Spacing
+
+Beautiful Empty States
+
+Loading Skeletons
+
+Lottie Animations
+
+Responsive Design
+
+Android
+
+iOS
+
+Tablet
+
+=========================
+COMPONENTS
+=========================
+
+Use reusable components only.
+
+SearchBar
+
+BannerCarousel
+
+CategoryItem
+
+RestaurantCard
+
+FoodHorizontalCard
+
+StickyCart
+
+FloatingMenuButton
+
+ProfileCard
+
+SettingsTile
+
+OfferCard
+
+FilterChip
+
+BottomNavigation
+
+=========================
+PERFORMANCE
+=========================
+
+FlatList
+
+Memoization
+
+Image Optimization
+
+Image Caching
+
+Lazy Loading
+
+Virtualized Lists
+
+Fast Rendering
+
+=========================
+CODE QUALITY
+=========================
+
+Clean Folder Structure
+
+Reusable Code
+
+Best Practices
+
+No Duplicate Code
+
+Maintainable Architecture
+
+=========================
+DO NOT BREAK
+=========================
+
+Do NOT break
+
+Google Login
+
+Email Login
+
+Signup
+
+Forgot Password
+
+OTP Verification
+
+Firebase
+
+Backend
+
+Database
+
+Navigation
+
+API Calls
+
+Cart
+
+Checkout
+
+Payment
+
+Address
+
+Order Flow
+
+Notifications
+
+User Profile
+
+Existing Features
+
+=========================
+FINAL REQUIREMENTS
+=========================
+
+Analyse every attached screenshot first.
+
+Implement every visible section.
+
+Match the screenshots as closely as possible.
+
+Keep Cravio branding.
+
+Fix all TypeScript errors.
+
+Fix all ESLint errors.
+
+Fix all runtime errors.
+
+Test every screen.
+
+Ensure the application builds successfully.
+
+Do not stop until the UI closely matches all attached reference screenshots and the application is fully functional without any errors.

@@ -1,12 +1,31 @@
-import React from 'react';
+// ─── Restaurant Menu Item Card — Redesigned ──────────────────────────────────
+// Layout reference: Zomato food menu horizontal card (screenshots provided).
+// Branding: Cravio (#FF6B00 primary, #16A34A green).
+//
+// Structure
+//   LEFT (flex 1): veg indicator → name → reorder/bestseller badge →
+//                  price → description → bookmark + share row
+//   RIGHT (110 px): square image with overlaid ADD pill;
+//                   ADD animates into −qty+ when qty > 0
+
+import React, { useEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Image } from 'expo-image';
-import { Plus, Share2, Star } from 'lucide-react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  interpolate,
+  Extrapolation,
+} from 'react-native-reanimated';
+import { Bookmark, BookmarkCheck, Minus, Plus, Share2 } from 'lucide-react-native';
+import * as Haptics from 'expo-haptics';
 
-import { FavoriteButton, QuantitySelector } from '@/components/ui';
 import { useColors } from '@/hooks/useColors';
 import { PP } from '@/theme/poppins';
 import type { RestaurantMenuItem } from '@/data/restaurantData';
+
+// ─── Props ────────────────────────────────────────────────────────────────────
 
 interface RestaurantMenuItemCardProps {
   item: RestaurantMenuItem;
@@ -19,6 +38,8 @@ interface RestaurantMenuItemCardProps {
   onShare?: () => void;
 }
 
+// ─── Veg / Non-veg dot ───────────────────────────────────────────────────────
+
 function VegIndicator({ isVeg }: { isVeg: boolean }) {
   const color = isVeg ? '#16A34A' : '#DC2626';
   return (
@@ -27,6 +48,31 @@ function VegIndicator({ isVeg }: { isVeg: boolean }) {
     </View>
   );
 }
+
+// ─── "Highly reordered" bar badge ────────────────────────────────────────────
+
+function ReorderBadge() {
+  return (
+    <View style={styles.reorderRow}>
+      <View style={styles.reorderTrack}>
+        <View style={styles.reorderFill} />
+      </View>
+      <Text style={styles.reorderText}>Highly reordered</Text>
+    </View>
+  );
+}
+
+// ─── "Best Seller" pill badge ────────────────────────────────────────────────
+
+function BestSellerBadge() {
+  return (
+    <View style={styles.bestSellerPill}>
+      <Text style={styles.bestSellerText}>Best Seller</Text>
+    </View>
+  );
+}
+
+// ─── Main card ───────────────────────────────────────────────────────────────
 
 export function RestaurantMenuItemCard({
   item,
@@ -39,173 +85,408 @@ export function RestaurantMenuItemCard({
   onShare,
 }: RestaurantMenuItemCardProps) {
   const colors = useColors();
+
+  // 0 = ADD visible, 1 = qty selector visible
+  const progress = useSharedValue(quantity > 0 ? 1 : 0);
+
+  useEffect(() => {
+    progress.value = withTiming(quantity > 0 ? 1 : 0, { duration: 220 });
+  }, [quantity, progress]);
+
+  const addStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(progress.value, [0, 0.5], [1, 0], Extrapolation.CLAMP),
+    transform: [
+      {
+        scale: interpolate(
+          progress.value,
+          [0, 0.4],
+          [1, 0.82],
+          Extrapolation.CLAMP,
+        ),
+      },
+    ],
+  }));
+
+  const qtyStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(progress.value, [0.5, 1], [0, 1], Extrapolation.CLAMP),
+    transform: [
+      {
+        scale: interpolate(
+          progress.value,
+          [0.6, 1],
+          [0.82, 1],
+          Extrapolation.CLAMP,
+        ),
+      },
+    ],
+  }));
+
   const discountedPrice = item.discount
     ? item.price * (1 - item.discount / 100)
     : item.price;
 
+  const handleAdd = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    onAdd();
+  };
+
+  const handleIncrease = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onIncrease();
+  };
+
+  const handleDecrease = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onDecrease();
+  };
+
   return (
     <View
-      className="flex-row"
       style={[
         styles.card,
-        { backgroundColor: colors.card, borderColor: colors.border },
+        { backgroundColor: colors.card, borderBottomColor: colors.border },
       ]}
     >
-      <View className="flex-1">
-        <View className="flex-row items-center">
-          <VegIndicator isVeg={item.isVeg} />
-          <Text
-            numberOfLines={2}
-            style={[PP.label, { color: colors.foreground, marginLeft: 8, flex: 1, fontFamily: 'Poppins_600SemiBold', fontSize: 14 }]}
-          >
-            {item.name}
+      {/* ── Left content ───────────────────────────────────────────────── */}
+      <View style={styles.leftCol}>
+        {/* Veg indicator */}
+        <VegIndicator isVeg={item.isVeg} />
+
+        {/* Name */}
+        <Text
+          numberOfLines={2}
+          style={[styles.name, { color: colors.foreground }]}
+        >
+          {item.name}
+        </Text>
+
+        {/* Badge row */}
+        {item.isBestSeller ? (
+          <BestSellerBadge />
+        ) : item.isPopular ? (
+          <ReorderBadge />
+        ) : null}
+
+        {/* Price row */}
+        <View style={styles.priceRow}>
+          <Text style={[styles.price, { color: colors.foreground }]}>
+            ${discountedPrice.toFixed(2)}
           </Text>
-          {onFavorite ? (
-            <FavoriteButton
-              isFavorite={isFavorite}
-              onToggle={onFavorite}
-              size="sm"
-              backgroundColor="transparent"
-            />
+          {item.discount ? (
+            <Text style={[styles.strikePrice, { color: colors.mutedForeground }]}>
+              ${item.price.toFixed(2)}
+            </Text>
           ) : null}
-          {onShare ? (
-            <TouchableOpacity
-              accessibilityRole="button"
-              accessibilityLabel={`Share ${item.name}`}
-              onPress={onShare}
-              style={styles.shareButton}
-            >
-              <Share2 size={16} color={colors.mutedForeground} />
-            </TouchableOpacity>
+          {item.discount ? (
+            <View style={[styles.discountPill, { backgroundColor: colors.accent }]}>
+              <Text style={[styles.discountPillText, { color: colors.primary }]}>
+                {item.discount}% off
+              </Text>
+            </View>
           ) : null}
         </View>
 
-        {item.isBestSeller ? (
-          <Text style={[PP.caption, styles.badgeText, { color: colors.primary }]}>
-            Best seller
-          </Text>
-        ) : null}
-
+        {/* Description */}
         <Text
           numberOfLines={2}
-          style={[PP.bodySM, { color: colors.mutedForeground, marginTop: 4, fontSize: 12, lineHeight: 16 }]}
+          style={[styles.description, { color: colors.mutedForeground }]}
         >
           {item.description}
         </Text>
 
-        <View className="flex-row items-center" style={styles.metaRow}>
-          <Star size={12} color="#F59E0B" fill="#F59E0B" />
-          <Text style={[PP.caption, { color: colors.mutedForeground, marginLeft: 4 }]}>
-            {item.rating.toFixed(1)}
-          </Text>
-          {item.calories ? (
-            <Text style={[PP.caption, { color: colors.mutedForeground, marginLeft: 8 }]}>
-              {item.calories} cal
-            </Text>
-          ) : null}
-        </View>
-
-        <View className="flex-row items-center" style={styles.priceRow}>
-          <Text style={[PP.subtitle, { color: colors.primary, fontFamily: 'Poppins_700Bold', fontSize: 15 }]}>
-            ${discountedPrice.toFixed(2)}
-          </Text>
-          {item.discount ? (
-            <Text
-              style={[
-                PP.caption,
-                { color: colors.mutedForeground, textDecorationLine: 'line-through', marginLeft: 7 },
-              ]}
+        {/* Action buttons */}
+        <View style={styles.actionRow}>
+          {onFavorite ? (
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                onFavorite();
+              }}
+              style={[styles.iconBtn, { borderColor: colors.border }]}
+              accessibilityRole="button"
+              accessibilityLabel={
+                isFavorite
+                  ? `Remove ${item.name} from saved`
+                  : `Save ${item.name}`
+              }
             >
-              ${item.price.toFixed(2)}
-            </Text>
+              {isFavorite ? (
+                <BookmarkCheck size={15} color={colors.primary} strokeWidth={2} />
+              ) : (
+                <Bookmark size={15} color={colors.mutedForeground} strokeWidth={1.8} />
+              )}
+            </TouchableOpacity>
+          ) : null}
+
+          {onShare ? (
+            <TouchableOpacity
+              onPress={() => onShare()}
+              style={[styles.iconBtn, { borderColor: colors.border, marginLeft: 8 }]}
+              accessibilityRole="button"
+              accessibilityLabel={`Share ${item.name}`}
+            >
+              <Share2 size={15} color={colors.mutedForeground} strokeWidth={1.8} />
+            </TouchableOpacity>
           ) : null}
         </View>
       </View>
 
-      <View style={styles.imageColumn}>
-        <Image source={{ uri: item.imageUrl }} contentFit="cover" style={styles.image} />
-        {quantity === 0 ? (
+      {/* ── Right: image + ADD/qty ──────────────────────────────────────── */}
+      <View style={styles.rightCol}>
+        <Image
+          source={{ uri: item.imageUrl }}
+          contentFit="cover"
+          style={styles.image}
+          transition={200}
+        />
+
+        {/* ADD button — fades out when qty > 0 */}
+        <Animated.View
+          style={[styles.ctaOverlay, addStyle]}
+          pointerEvents={quantity === 0 ? 'auto' : 'none'}
+        >
           <TouchableOpacity
+            onPress={handleAdd}
+            activeOpacity={0.85}
+            style={[styles.addBtn, { backgroundColor: colors.card }]}
             accessibilityRole="button"
             accessibilityLabel={`Add ${item.name} to cart`}
-            onPress={onAdd}
-            activeOpacity={0.8}
-            style={[styles.addButton, { backgroundColor: colors.primary }]}
           >
-            <Plus size={16} color="#FFFFFF" strokeWidth={3} />
+            <Text style={[styles.addBtnText, { color: colors.primary }]}>
+              ADD
+            </Text>
+            <Plus size={13} color={colors.primary} strokeWidth={3} style={styles.addIcon} />
           </TouchableOpacity>
-        ) : (
-          <View style={styles.qtyWrap}>
-            <QuantitySelector
-              value={quantity}
-              onIncrement={onIncrease}
-              onDecrement={onDecrease}
-              min={0}
-              size="sm"
-            />
+        </Animated.View>
+
+        {/* Quantity selector — fades in when qty > 0 */}
+        <Animated.View
+          style={[styles.ctaOverlay, qtyStyle]}
+          pointerEvents={quantity > 0 ? 'auto' : 'none'}
+        >
+          <View style={[styles.qtyPill, { backgroundColor: colors.primary }]}>
+            <TouchableOpacity
+              onPress={handleDecrease}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 4 }}
+              accessibilityRole="button"
+              accessibilityLabel="Decrease quantity"
+            >
+              <Minus size={14} color="#FFFFFF" strokeWidth={3} />
+            </TouchableOpacity>
+
+            <Text style={styles.qtyText}>{quantity}</Text>
+
+            <TouchableOpacity
+              onPress={handleIncrease}
+              hitSlop={{ top: 8, bottom: 8, left: 4, right: 8 }}
+              accessibilityRole="button"
+              accessibilityLabel="Increase quantity"
+            >
+              <Plus size={14} color="#FFFFFF" strokeWidth={3} />
+            </TouchableOpacity>
           </View>
-        )}
+        </Animated.View>
       </View>
     </View>
   );
 }
 
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
+const IMAGE_SIZE = 108;
+
 const styles = StyleSheet.create({
+  // Card
   card: {
-    marginHorizontal: 16,
-    marginBottom: 12,
-    padding: 12,
-    borderRadius: 16,
-    borderWidth: 1,
-    gap: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingHorizontal: 16,
+    paddingVertical: 18,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: 14,
   },
+
+  // Left column
+  leftCol: {
+    flex: 1,
+    paddingRight: 4,
+  },
+
+  // Veg indicator
   vegBox: {
-    width: 12,
-    height: 12,
+    width: 14,
+    height: 14,
     borderWidth: 1.5,
-    borderRadius: 2,
+    borderRadius: 3,
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 7,
   },
-  vegDot: { width: 6, height: 6, borderRadius: 3 },
-  badgeText: {
-    marginTop: 6,
+  vegDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+  },
+
+  // Name
+  name: {
+    fontFamily: 'Poppins_600SemiBold',
+    fontSize: 15,
+    lineHeight: 21,
+    marginBottom: 6,
+  },
+
+  // Reorder badge
+  reorderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 7,
+    gap: 6,
+  },
+  reorderTrack: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#E5E7EB',
+    overflow: 'hidden',
+  },
+  reorderFill: {
+    width: '75%',
+    height: '100%',
+    borderRadius: 2,
+    backgroundColor: '#16A34A',
+  },
+  reorderText: {
+    fontFamily: 'Poppins_500Medium',
+    fontSize: 11,
+    color: '#16A34A',
+  },
+
+  // Best Seller badge
+  bestSellerPill: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#FFF7ED',
+    borderRadius: 4,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    marginBottom: 7,
+  },
+  bestSellerText: {
+    fontFamily: 'Poppins_600SemiBold',
+    fontSize: 10,
+    color: '#FF6B00',
+    letterSpacing: 0.2,
+  },
+
+  // Price row
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 6,
+  },
+  price: {
+    fontFamily: 'Poppins_700Bold',
+    fontSize: 15,
+    lineHeight: 20,
+  },
+  strikePrice: {
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 12,
+    textDecorationLine: 'line-through',
+  },
+  discountPill: {
+    borderRadius: 4,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+  },
+  discountPillText: {
     fontFamily: 'Poppins_600SemiBold',
     fontSize: 10,
   },
-  metaRow: { marginTop: 6 },
-  priceRow: { marginTop: 8 },
-  imageColumn: { width: 88, alignItems: 'center' },
-  image: { width: 88, height: 88, borderRadius: 10 },
-  shareButton: { padding: 5 },
-  addButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+
+  // Description
+  description: {
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 12,
+    lineHeight: 17,
+    marginBottom: 12,
+  },
+
+  // Bookmark / share icon buttons
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -14,
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-    shadowColor: '#FF6B00',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 3,
   },
-  qtyWrap: {
-    marginTop: -16,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
+
+  // Right column
+  rightCol: {
+    width: IMAGE_SIZE,
+    alignItems: 'center',
+  },
+  image: {
+    width: IMAGE_SIZE,
+    height: IMAGE_SIZE,
+    borderRadius: 12,
+  },
+
+  // ADD / qty overlay (positioned just below image, centred)
+  ctaOverlay: {
+    position: 'absolute',
+    bottom: -14,
+    alignSelf: 'center',
+  },
+
+  // ADD button pill
+  addBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 18,
+    paddingVertical: 7,
+    borderRadius: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  }
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 4,
+    gap: 3,
+  },
+  addBtnText: {
+    fontFamily: 'Poppins_700Bold',
+    fontSize: 13,
+    letterSpacing: 0.5,
+  },
+  addIcon: {
+    marginTop: 1,
+  },
+
+  // Qty selector pill
+  qtyPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 8,
+    gap: 14,
+    shadowColor: '#FF6B00',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  qtyText: {
+    fontFamily: 'Poppins_700Bold',
+    fontSize: 14,
+    color: '#FFFFFF',
+    minWidth: 16,
+    textAlign: 'center',
+  },
 });
