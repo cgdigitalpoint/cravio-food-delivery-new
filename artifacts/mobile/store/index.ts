@@ -9,3 +9,9 @@ export { useAddressStore } from './useAddressStore';
 export { useDonationStore } from './useDonationStore';
 export { usePreferencesStore } from './usePreferencesStore';
 export type { AppTheme, NotificationPrefs } from './usePreferencesStore';
+export { useNotificationStore } from './useNotificationStore';
+export type {
+  CravioNotification,
+  NotificationCategory,
+  NotificationType,
+} from './useNotificationStore';

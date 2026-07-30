@@ -376,10 +376,14 @@ export function CheckoutScreen() {
 
       addNotification({
         type: 'order_placed',
-        orderId: order.id,
-        orderNumber: order.id.slice(0, 8).toUpperCase(),
-        restaurantName: restaurantName ?? 'Restaurant',
+        title: 'Order Placed',
         message: `Your order from ${restaurantName ?? 'Restaurant'} has been placed!`,
+        deepLink: `/orders/${order.id}`,
+        payload: {
+          orderId: order.id,
+          orderNumber: order.id.slice(0, 8).toUpperCase(),
+          restaurantName: restaurantName ?? 'Restaurant',
+        },
       });
 
       clearCart();

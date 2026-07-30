@@ -27,6 +27,7 @@ import { authService } from '@/services/authService';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCartStore } from '@/store/useCartStore';
 import { usePreferencesStore } from '@/store/usePreferencesStore';
+import { useNotificationStore } from '@/store/useNotificationStore';
 
 // Prevent the native splash screen from auto-hiding before assets load.
 SplashScreen.preventAutoHideAsync();
@@ -44,7 +45,7 @@ const queryClient = new QueryClient({
 });
 
 // Protected route segments — redirect to /welcome if unauthenticated
-const PROTECTED = new Set(['home', 'search', 'profile', 'profile-edit', 'change-password', 'notification-preferences', 'app-preferences', 'orders', 'favorites', 'recently-viewed', 'address', 'restaurant', 'cart', 'checkout', 'order-success', 'order-failure', 'invoice', 'donations', 'donation-management', 'legal', 'about', 'delete-account']);
+const PROTECTED = new Set(['home', 'search', 'profile', 'profile-edit', 'change-password', 'notification-preferences', 'notifications', 'app-preferences', 'orders', 'favorites', 'recently-viewed', 'address', 'restaurant', 'cart', 'checkout', 'order-success', 'order-failure', 'invoice', 'donations', 'donation-management', 'legal', 'about', 'delete-account']);
 // Auth-only segments — redirect to /home if already authenticated
 const AUTH_ONLY = new Set(['auth']);
 
@@ -199,6 +200,9 @@ function RootLayoutNav() {
         <Stack.Screen name="notification-preferences" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="app-preferences" options={{ animation: 'slide_from_right' }} />
 
+        {/* ── Phase 15A: Notification Center ── */}
+        <Stack.Screen name="notifications" options={{ animation: 'slide_from_right' }} />
+
         {/* ── About & Account ── */}
         <Stack.Screen name="about" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="delete-account" options={{ animation: 'slide_from_right' }} />
@@ -214,7 +218,11 @@ export default function RootLayout() {
   // Load persisted user preferences (theme, notification prefs) from AsyncStorage.
   // Run once on mount — before rendering any screen that depends on these values.
   const loadPreferences = usePreferencesStore((s) => s.load);
-  useEffect(() => { loadPreferences(); }, []);
+  const loadNotifications = useNotificationStore((s) => s.load);
+  useEffect(() => {
+    loadPreferences();
+    loadNotifications();
+  }, []);
 
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,

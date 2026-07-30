@@ -14,6 +14,11 @@ export interface NotificationPrefs {
   offers: boolean;
   promotions: boolean;
   donations: boolean;
+  // Phase 15A additions
+  marketing: boolean;
+  systemAlerts: boolean;
+  sound: boolean;
+  vibration: boolean;
 }
 
 interface PreferencesState {
@@ -38,6 +43,10 @@ const DEFAULT_NOTIFICATIONS: NotificationPrefs = {
   offers: true,
   promotions: false,
   donations: true,
+  marketing: false,
+  systemAlerts: true,
+  sound: true,
+  vibration: true,
 };
 
 function persist(state: Pick<PreferencesState, 'notifications' | 'theme' | 'language'>) {

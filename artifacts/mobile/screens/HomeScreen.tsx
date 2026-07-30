@@ -1413,7 +1413,7 @@ export function HomeScreen() {
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       {/* Fixed header + safe area top */}
       <View style={{ paddingTop }}>
-        <HomeHeader onNotificationsPress={() => router.push('/profile')} />
+        <HomeHeader onNotificationsPress={() => router.push('/notifications')} />
       </View>
 
       {/* Main content area */}

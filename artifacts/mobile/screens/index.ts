@@ -40,6 +40,10 @@ export { OTPScreen } from './auth/OTPScreen';
 export { ForgotPasswordScreen } from './auth/ForgotPasswordScreen';
 export { ResetPasswordScreen } from './auth/ResetPasswordScreen';
 
+// Phase 15A — Notification Center
+export { NotificationCenterScreen } from './NotificationCenterScreen';
+export type { NotificationCenterScreenProps } from './NotificationCenterScreen';
+
 // Legal Center, About, Delete Account
 export { LegalCenterScreen, LegalDocScreen } from './legal';
 export { AboutScreen } from './AboutScreen';
