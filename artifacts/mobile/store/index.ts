@@ -10,6 +10,7 @@ export { useDonationStore } from './useDonationStore';
 export { usePreferencesStore } from './usePreferencesStore';
 export type { AppTheme, NotificationPrefs } from './usePreferencesStore';
 export { useNotificationStore } from './useNotificationStore';
+export { useTrackingStore } from './useTrackingStore';
 export type {
   CravioNotification,
   NotificationCategory,

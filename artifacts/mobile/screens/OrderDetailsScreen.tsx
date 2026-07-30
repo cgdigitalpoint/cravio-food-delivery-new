@@ -467,21 +467,26 @@ export function OrderDetailsScreen({ orderId, onBack }: OrderDetailsScreenProps)
                 })}
               </View>
 
-              {/* Map placeholder */}
-              <View style={[styles.mapPlaceholder, { backgroundColor: colors.surfaceVariant, borderColor: colors.border }]}>
-                <Navigation size={24} color={colors.mutedForeground} />
-                <View style={{ flex: 1, marginLeft: 12 }}>
-                  <Text style={[PP.label, { color: colors.foreground }]}>Live Order Tracking</Text>
-                  <Text style={[PP.caption, { color: colors.mutedForeground, marginTop: 2 }]}>
-                    Map view coming soon
-                  </Text>
-                </View>
-                <View style={[styles.soonBadge, { backgroundColor: colors.muted }]}>
-                  <Text style={[PP.caption, { color: colors.mutedForeground, fontSize: 10 }]}>
-                    Soon
-                  </Text>
-                </View>
-              </View>
+              {/* Track Order button — visible for active orders */}
+              {!isDelivered && !isCancelled && (
+                <TouchableOpacity
+                  onPress={() => router.push(`/tracking/${order.id}` as any)}
+                  activeOpacity={0.85}
+                  style={[styles.trackBtn, { backgroundColor: `${colors.primary}12`, borderColor: `${colors.primary}40` }]}
+                  accessibilityLabel="Track your order on the map"
+                >
+                  <Navigation size={18} color={colors.primary} />
+                  <View style={{ flex: 1, marginLeft: 12 }}>
+                    <Text style={[PP.label, { color: colors.primary }]}>Track Order</Text>
+                    <Text style={[PP.caption, { color: colors.mutedForeground, marginTop: 1 }]}>
+                      See live map &amp; driver location
+                    </Text>
+                  </View>
+                  <View style={[styles.trackChevron, { backgroundColor: colors.primary }]}>
+                    <Navigation size={13} color="#fff" />
+                  </View>
+                </TouchableOpacity>
+              )}
             </View>
           )}
         </Animated.View>
@@ -722,15 +727,22 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 
-  // Map placeholder
-  mapPlaceholder: {
+  // Track order button
+  trackBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: borderRadius.md,
     borderWidth: 1,
     padding: spacing.md12,
   },
-  soonBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  trackChevron: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
 
   // Items
   itemRow: {

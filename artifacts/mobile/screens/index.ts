@@ -33,6 +33,10 @@ export { ChangePasswordScreen } from './ChangePasswordScreen';
 export { NotificationPreferencesScreen } from './NotificationPreferencesScreen';
 export { AppPreferencesScreen } from './AppPreferencesScreen';
 
+// Phase 16 screens
+export { OrderTrackingScreen } from './OrderTrackingScreen';
+export type { OrderTrackingScreenProps } from './OrderTrackingScreen';
+
 // Auth screens
 export { LoginScreen } from './auth/LoginScreen';
 export { SignupScreen } from './auth/SignupScreen';
