@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowLeft, Search, X } from 'lucide-react-native';
+import { ArrowLeft, ChevronRight, Clock3, Package, Search, X } from 'lucide-react-native';
 import { useColors } from '@/hooks/useColors';
 import { PP } from '@/theme/poppins';
 import { borderRadius, spacing } from '@/theme';
@@ -55,6 +55,13 @@ function OrderCard({ order, onPress }: OrderCardProps) {
   const colors = useColors();
   const statusColor = STATUS_COLORS[order.status] ?? '#6B7280';
   const itemCount = order.order_items?.length ?? 0;
+  const orderNum = `#${order.id.slice(0, 8).toUpperCase()}`;
+
+  const itemNames = order.order_items
+    ?.slice(0, 2)
+    .map((i: any) => i.item_name ?? i.name ?? '')
+    .filter(Boolean)
+    .join(', ');
 
   return (
     <TouchableOpacity
@@ -62,18 +69,23 @@ function OrderCard({ order, onPress }: OrderCardProps) {
       style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
       activeOpacity={0.8}
     >
+      {/* Header row: restaurant name + status badge */}
       <View style={styles.cardHeader}>
-        <View>
-          <Text style={[PP.label, { color: colors.foreground }]}>{order.restaurant_name}</Text>
-          <Text style={[PP.caption, { color: colors.mutedForeground, marginTop: 2 }]}>
-            {new Date(order.created_at).toLocaleDateString('en-US', {
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric',
-            })}
-          </Text>
+        <View style={styles.cardRestaurantRow}>
+          <View style={[styles.cardIconWrap, { backgroundColor: '#FFF7ED' }]}>
+            <Package size={16} color="#FF6B00" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={[PP.label, { color: colors.foreground }]} numberOfLines={1}>
+              {order.restaurant_name}
+            </Text>
+            <Text style={[PP.caption, { color: colors.mutedForeground }]}>
+              {orderNum}
+            </Text>
+          </View>
         </View>
-        <View style={[styles.statusBadge, { backgroundColor: statusColor + '20' }]}>
+        <View style={[styles.statusBadge, { backgroundColor: statusColor + '18' }]}>
+          <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
           <Text style={[PP.caption, { color: statusColor, fontFamily: 'Poppins_600SemiBold' }]}>
             {STATUS_LABELS[order.status]}
           </Text>
@@ -82,13 +94,34 @@ function OrderCard({ order, onPress }: OrderCardProps) {
 
       <View style={[styles.cardDivider, { backgroundColor: colors.border }]} />
 
+      {/* Items summary */}
+      {itemNames ? (
+        <Text style={[PP.caption, { color: colors.mutedForeground, marginBottom: 10 }]} numberOfLines={1}>
+          {itemNames}{itemCount > 2 ? ` +${itemCount - 2} more` : ''}
+        </Text>
+      ) : null}
+
+      {/* Footer row: date · items count · total */}
       <View style={styles.cardFooter}>
-        <Text style={[PP.caption, { color: colors.mutedForeground }]}>
-          {itemCount} {itemCount === 1 ? 'item' : 'items'}
-        </Text>
-        <Text style={[PP.label, { color: colors.foreground }]}>
-          ${order.total.toFixed(2)}
-        </Text>
+        <View style={styles.cardDateRow}>
+          <Clock3 size={12} color={colors.mutedForeground} strokeWidth={1.8} />
+          <Text style={[PP.caption, { color: colors.mutedForeground, marginLeft: 4 }]}>
+            {new Date(order.created_at).toLocaleDateString('en-IN', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+            })}
+          </Text>
+          <Text style={[PP.caption, { color: colors.mutedForeground }]}>
+            · {itemCount} {itemCount === 1 ? 'item' : 'items'}
+          </Text>
+        </View>
+        <View style={styles.cardTotalRow}>
+          <Text style={[PP.label, { color: colors.foreground, fontFamily: 'Poppins_700Bold' }]}>
+            ₹{order.total.toFixed(2)}
+          </Text>
+          <ChevronRight size={14} color={colors.mutedForeground} strokeWidth={2} />
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -277,22 +310,61 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
+    marginBottom: 12,
+    gap: 8,
+  },
+  cardRestaurantRow: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  cardIconWrap: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
   },
   statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
     paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
+    paddingVertical: 5,
+    borderRadius: 20,
+    flexShrink: 0,
   },
-  cardDivider: { height: StyleSheet.hairlineWidth, marginVertical: 12 },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  cardDivider: { height: StyleSheet.hairlineWidth, marginBottom: 10 },
   cardFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  cardDateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cardTotalRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
   },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 60 },
 });

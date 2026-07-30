@@ -4,7 +4,6 @@
 import React, { useState } from 'react';
 import {
   Alert,
-  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -14,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Image } from 'expo-image';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -74,43 +74,57 @@ function CartItemRow({
   return (
     <View style={[cirStyles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
       <View style={cirStyles.row}>
-        {/* Veg dot */}
-        <View style={[cirStyles.vegBox, { borderColor: isVeg ? '#16A34A' : '#DC2626' }]}>
-          <View style={[cirStyles.vegDot, { backgroundColor: isVeg ? '#16A34A' : '#DC2626' }]} />
+        {/* Image */}
+        <View style={cirStyles.imgWrap}>
+          <Image
+            source={{ uri: imageUrl }}
+            style={cirStyles.img}
+            contentFit="cover"
+            transition={200}
+          />
+          {/* Veg indicator overlaid bottom-left */}
+          <View style={[cirStyles.vegBadge, { borderColor: isVeg ? '#16A34A' : '#DC2626', backgroundColor: '#fff' }]}>
+            <View style={[cirStyles.vegDot, { backgroundColor: isVeg ? '#16A34A' : '#DC2626' }]} />
+          </View>
         </View>
 
-        <Image source={{ uri: imageUrl }} style={cirStyles.img} resizeMode="cover" />
-
+        {/* Info */}
         <View style={cirStyles.info}>
-          <Text style={[PP.label, { color: colors.foreground }]} numberOfLines={2}>
+          <Text style={[PP.label, { color: colors.foreground, lineHeight: 20 }]} numberOfLines={2}>
             {name}
           </Text>
-          <Text style={[PP.subtitle, { color: colors.primary, fontFamily: 'Poppins_700Bold', marginTop: 4 }]}>
-            ₹{(price * quantity).toFixed(2)}
+          <Text style={[PP.caption, { color: colors.mutedForeground, marginTop: 2 }]}>
+            ₹{price.toFixed(0)} × {quantity}
           </Text>
-          <Text style={[PP.caption, { color: colors.mutedForeground }]}>
-            ₹{price.toFixed(2)} each
+          <Text style={[PP.subtitle, { color: colors.foreground, fontFamily: 'Poppins_700Bold', marginTop: 3 }]}>
+            ₹{(price * quantity).toFixed(0)}
           </Text>
         </View>
 
-        {/* Qty controls */}
+        {/* Qty controls — orange pill matching restaurant card style */}
         <View style={cirStyles.qtyCol}>
           <TouchableOpacity
             onPress={onRemove}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             style={cirStyles.removeBtn}
           >
             <Trash2 size={14} color={colors.mutedForeground} />
           </TouchableOpacity>
-          <View style={[cirStyles.qtyRow, { borderColor: colors.border }]}>
-            <TouchableOpacity onPress={onDecrease} style={cirStyles.qtyBtn} hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}>
-              <Minus size={14} color={colors.primary} strokeWidth={2.5} />
+          <View style={[cirStyles.qtyPill, { backgroundColor: colors.primary }]}>
+            <TouchableOpacity
+              onPress={onDecrease}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 4 }}
+              accessibilityLabel="Decrease quantity"
+            >
+              <Minus size={14} color="#FFFFFF" strokeWidth={3} />
             </TouchableOpacity>
-            <Text style={[PP.label, { color: colors.foreground, minWidth: 22, textAlign: 'center' }]}>
-              {quantity}
-            </Text>
-            <TouchableOpacity onPress={onIncrease} style={cirStyles.qtyBtn} hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}>
-              <Plus size={14} color={colors.primary} strokeWidth={2.5} />
+            <Text style={cirStyles.qtyText}>{quantity}</Text>
+            <TouchableOpacity
+              onPress={onIncrease}
+              hitSlop={{ top: 8, bottom: 8, left: 4, right: 8 }}
+              accessibilityLabel="Increase quantity"
+            >
+              <Plus size={14} color="#FFFFFF" strokeWidth={3} />
             </TouchableOpacity>
           </View>
         </View>
@@ -122,8 +136,8 @@ function CartItemRow({
         style={cirStyles.noteToggle}
         activeOpacity={0.7}
       >
-        <Text style={[PP.caption, { color: colors.primary }]}>
-          {showNote ? 'Hide instructions' : '+ Add special instructions'}
+        <Text style={[PP.caption, { color: colors.primary, fontFamily: 'Poppins_500Medium' }]}>
+          {showNote ? '− Hide instructions' : '+ Add special instructions'}
         </Text>
       </TouchableOpacity>
 
@@ -148,28 +162,55 @@ function CartItemRow({
 const cirStyles = StyleSheet.create({
   card: {
     marginHorizontal: 16,
-    marginBottom: 12,
+    marginBottom: 10,
     borderRadius: 16,
     borderWidth: 1,
-    padding: 12,
+    padding: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  row: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
-  vegBox: { width: 14, height: 14, borderWidth: 1.5, borderRadius: 2, alignItems: 'center', justifyContent: 'center', marginTop: 3 },
-  vegDot: { width: 7, height: 7, borderRadius: 4 },
-  img: { width: 72, height: 72, borderRadius: 12 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  imgWrap: { position: 'relative' },
+  img: { width: 80, height: 80, borderRadius: 12 },
+  vegBadge: {
+    position: 'absolute',
+    bottom: 5,
+    left: 5,
+    width: 14,
+    height: 14,
+    borderWidth: 1.5,
+    borderRadius: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  vegDot: { width: 7, height: 7, borderRadius: 3.5 },
   info: { flex: 1 },
-  qtyCol: { alignItems: 'center', gap: 6 },
+  qtyCol: { alignItems: 'center', gap: 8, flexShrink: 0 },
   removeBtn: { padding: 2 },
-  qtyRow: {
+  qtyPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: 20,
-    overflow: 'hidden',
-    backgroundColor: '#fff',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    gap: 10,
+    shadowColor: '#FF6B00',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  qtyBtn: { paddingHorizontal: 8, paddingVertical: 6 },
-  noteToggle: { marginTop: 10 },
+  qtyText: {
+    fontFamily: 'Poppins_700Bold',
+    fontSize: 13,
+    color: '#FFFFFF',
+    minWidth: 16,
+    textAlign: 'center',
+  },
+  noteToggle: { marginTop: 12 },
   noteInput: {
     marginTop: 8,
     borderWidth: 1,

@@ -1,12 +1,14 @@
-// ─── Food Card ────────────────────────────────────────────────────────────────
+// ─── Food Card — Zomato-style ─────────────────────────────────────────────────
+// Layout: text content left (flex 1) | image right (96×96) with ADD pill overlay
+// Matches the restaurant menu item card style from the reference screenshots.
+
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
+import { Bookmark, BookmarkCheck, Plus, Share2 } from 'lucide-react-native';
 import { useColors } from '@/hooks/useColors';
-import { typography, borderRadius, spacing } from '@/theme';
-import { Chip } from './Chip';
+import { PP } from '@/theme/poppins';
 
 export interface FoodCardProps {
   name: string;
@@ -24,6 +26,29 @@ export interface FoodCardProps {
   onFavoritePress?: () => void;
 }
 
+// ─── Veg / Non-veg indicator ─────────────────────────────────────────────────
+function VegIndicator({ isVeg }: { isVeg: boolean }) {
+  const color = isVeg ? '#16A34A' : '#DC2626';
+  return (
+    <View style={[styles.vegBox, { borderColor: color }]}>
+      <View style={[styles.vegDot, { backgroundColor: color }]} />
+    </View>
+  );
+}
+
+// ─── "Highly reordered" badge ────────────────────────────────────────────────
+function ReorderBadge() {
+  return (
+    <View style={styles.reorderRow}>
+      <View style={styles.reorderTrack}>
+        <View style={styles.reorderFill} />
+      </View>
+      <Text style={styles.reorderText}>Highly reordered</Text>
+    </View>
+  );
+}
+
+// ─── Main FoodCard ────────────────────────────────────────────────────────────
 export function FoodCard({
   name,
   description,
@@ -45,127 +70,121 @@ export function FoodCard({
     <TouchableOpacity
       activeOpacity={0.88}
       onPress={onPress}
-      style={[
-        styles.card,
-        {
-          backgroundColor: colors.card,
-          borderRadius: borderRadius.lg,
-          borderColor: colors.border,
-        },
-      ]}
+      style={[styles.card, { backgroundColor: colors.card, borderBottomColor: colors.border }]}
     >
-      {/* Left content */}
-      <View style={styles.content}>
-        {/* Veg / Non-veg + badges */}
-        <View style={styles.chips}>
-          <Chip variant={isVeg ? 'veg' : 'nonVeg'} />
-          {isPopular === true && <Chip variant="popular" />}
-          {isNew === true && <Chip variant="new" />}
-        </View>
+      {/* ── Left content ─────────────────────────────────────────────────── */}
+      <View style={styles.leftCol}>
+        {/* Veg indicator */}
+        <VegIndicator isVeg={isVeg} />
 
+        {/* Name */}
         <Text
-          style={[typography.subtitle, { color: colors.foreground, marginTop: 6, fontFamily: 'Inter_600SemiBold', fontSize: 14 }]}
+          style={[styles.name, { color: colors.foreground }]}
           numberOfLines={2}
         >
           {name}
         </Text>
 
+        {/* Popular / new badge */}
+        {isPopular ? <ReorderBadge /> : isNew ? (
+          <View style={styles.newBadge}>
+            <Text style={styles.newBadgeText}>New</Text>
+          </View>
+        ) : null}
+
+        {/* Price row */}
+        <View style={styles.priceRow}>
+          <Text style={[styles.price, { color: colors.foreground }]}>
+            ₹{Math.round(price)}
+          </Text>
+          {rating != null && (
+            <View style={styles.ratingPill}>
+              <Text style={styles.ratingText}>★ {rating.toFixed(1)}</Text>
+            </View>
+          )}
+        </View>
+
         {/* Restaurant name */}
         {restaurantName != null && (
-          <View style={styles.restaurantRow}>
-            <Ionicons name="storefront-outline" size={11} color={colors.mutedForeground} />
-            <Text
-              style={[typography.caption, { color: colors.mutedForeground, marginLeft: 3, fontSize: 11 }]}
-              numberOfLines={1}
-            >
-              {restaurantName}
-            </Text>
-          </View>
+          <Text
+            style={[styles.restaurantName, { color: colors.mutedForeground }]}
+            numberOfLines={1}
+          >
+            {restaurantName}
+          </Text>
         )}
 
+        {/* Description */}
         {description != null && (
           <Text
-            style={[
-              typography.caption,
-              { color: colors.mutedForeground, marginTop: 4, fontSize: 11, lineHeight: 15 },
-            ]}
+            style={[styles.description, { color: colors.mutedForeground }]}
             numberOfLines={2}
           >
             {description}
           </Text>
         )}
 
-        <View style={styles.priceRow}>
-          <View style={styles.priceBlock}>
-            <Text
-              style={[
-                typography.title,
-                { color: colors.primary, fontFamily: 'Inter_700Bold', fontSize: 15 },
-              ]}
+        {/* Bookmark / share buttons */}
+        <View style={styles.actionRow}>
+          {onFavoritePress != null && (
+            <TouchableOpacity
+              onPress={onFavoritePress}
+              style={[styles.iconBtn, { borderColor: colors.border }]}
+              accessibilityRole="button"
+              accessibilityLabel={isFavorite ? `Remove ${name} from saved` : `Save ${name}`}
             >
-              ₹{Math.round(price)}
-            </Text>
-            {/* Rating */}
-            {rating != null && (
-              <View style={[styles.ratingPill, { backgroundColor: '#22C55E' }]}>
-                <Ionicons name="star" size={9} color="#FFFFFF" />
-                <Text
-                  style={[
-                    typography.caption,
-                    { color: '#FFFFFF', fontFamily: 'Inter_600SemiBold', marginLeft: 2, fontSize: 10 },
-                  ]}
-                >
-                  {rating.toFixed(1)}
-                </Text>
-              </View>
-            )}
-          </View>
-
-          <TouchableOpacity
-            onPress={onAddPress}
-            style={[
-              styles.addBtn,
-              {
-                backgroundColor: colors.primary,
-                borderRadius: borderRadius.pill,
-              },
-            ]}
-          >
-            <Ionicons name="add" size={18} color="#FFFFFF" />
-          </TouchableOpacity>
+              {isFavorite ? (
+                <BookmarkCheck size={14} color={colors.primary} strokeWidth={2} />
+              ) : (
+                <Bookmark size={14} color={colors.mutedForeground} strokeWidth={1.8} />
+              )}
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
-      {/* Right image */}
-      <View style={[styles.imageWrapper, { borderRadius: 12 }]}>
+      {/* ── Right: image + ADD overlay ────────────────────────────────────── */}
+      <View style={styles.rightCol}>
         {imageUri ? (
           <Image
             source={{ uri: imageUri }}
             style={styles.image}
             contentFit="cover"
+            transition={200}
           />
         ) : (
           <LinearGradient
-            colors={['#16A34A', '#4ADE80']}
+            colors={['#FF8C38', '#FF6B00']}
             style={styles.image}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-          >
-            <Ionicons name="fast-food" size={24} color="rgba(255,255,255,0.7)" />
-          </LinearGradient>
+          />
         )}
-        {/* Favorite button overlay */}
+
+        {/* Favorite heart overlay — top right of image */}
         {onFavoritePress != null && (
           <TouchableOpacity
             onPress={onFavoritePress}
-            style={[styles.favBtn, { backgroundColor: 'rgba(255,255,255,0.2)' }]}
+            style={styles.favOverlay}
             hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
           >
-            <Ionicons
-              name={isFavorite ? 'heart' : 'heart-outline'}
-              size={14}
-              color={isFavorite ? '#EF4444' : '#FFFFFF'}
-            />
+            <Text style={{ fontSize: 16, color: isFavorite ? '#EF4444' : '#FFFFFF' }}>
+              {isFavorite ? '♥' : '♡'}
+            </Text>
+          </TouchableOpacity>
+        )}
+
+        {/* ADD button — overlaid at bottom of image */}
+        {onAddPress != null && (
+          <TouchableOpacity
+            onPress={onAddPress}
+            activeOpacity={0.85}
+            style={[styles.addBtn, { backgroundColor: colors.card }]}
+            accessibilityRole="button"
+            accessibilityLabel={`Add ${name} to cart`}
+          >
+            <Text style={[styles.addBtnText, { color: colors.primary }]}>ADD</Text>
+            <Plus size={12} color={colors.primary} strokeWidth={3} />
           </TouchableOpacity>
         )}
       </View>
@@ -173,70 +192,178 @@ export function FoodCard({
   );
 }
 
+// ─── Styles ──────────────────────────────────────────────────────────────────
+
+const IMAGE_SIZE = 96;
+
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderWidth: 1,
-    gap: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    alignItems: 'flex-start',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: 14,
+    backgroundColor: '#FFFFFF',
   },
-  content: { flex: 1, gap: 1 },
-  chips: { flexDirection: 'row', gap: 6 },
-  restaurantRow: {
+
+  // Left column
+  leftCol: { flex: 1, paddingRight: 4 },
+
+  // Veg indicator
+  vegBox: {
+    width: 14,
+    height: 14,
+    borderWidth: 1.5,
+    borderRadius: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 7,
+  },
+  vegDot: { width: 7, height: 7, borderRadius: 3.5 },
+
+  // Name
+  name: {
+    fontFamily: 'Poppins_600SemiBold',
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 6,
+  },
+
+  // Highly reordered
+  reorderRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 2,
+    marginBottom: 7,
+    gap: 6,
   },
+  reorderTrack: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#E5E7EB',
+    overflow: 'hidden',
+  },
+  reorderFill: {
+    width: '75%',
+    height: '100%',
+    borderRadius: 2,
+    backgroundColor: '#16A34A',
+  },
+  reorderText: {
+    fontFamily: 'Poppins_500Medium',
+    fontSize: 11,
+    color: '#16A34A',
+  },
+
+  // New badge
+  newBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#EFF9FF',
+    borderRadius: 4,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    marginBottom: 7,
+  },
+  newBadgeText: {
+    fontFamily: 'Poppins_600SemiBold',
+    fontSize: 10,
+    color: '#0EA5E9',
+  },
+
+  // Price row
   priceRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 8,
+    gap: 8,
+    marginBottom: 4,
   },
-  priceBlock: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
+  price: {
+    fontFamily: 'Poppins_700Bold',
+    fontSize: 15,
+    lineHeight: 20,
   },
   ratingPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 5,
+    backgroundColor: '#22C55E',
+    borderRadius: 6,
+    paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 8,
   },
-  addBtn: {
-    width: 28,
-    height: 28,
+  ratingText: {
+    fontFamily: 'Poppins_600SemiBold',
+    fontSize: 10,
+    color: '#FFFFFF',
+  },
+
+  // Restaurant name
+  restaurantName: {
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 11,
+    marginBottom: 2,
+  },
+
+  // Description
+  description: {
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 12,
+    lineHeight: 17,
+    marginBottom: 10,
+  },
+
+  // Action row
+  actionRow: { flexDirection: 'row', alignItems: 'center' },
+  iconBtn: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  imageWrapper: {
-    width: 80,
-    height: 80,
-    overflow: 'hidden',
-    flexShrink: 0,
+
+  // Right column
+  rightCol: {
+    width: IMAGE_SIZE,
+    alignItems: 'center',
   },
-  favBtn: {
+  image: {
+    width: IMAGE_SIZE,
+    height: IMAGE_SIZE,
+    borderRadius: 12,
+  },
+
+  // Favorite overlay
+  favOverlay: {
     position: 'absolute',
     top: 4,
     right: 4,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(0,0,0,0.28)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  image: {
-    width: '100%',
-    height: '100%',
+
+  // ADD button — overlaid at image bottom
+  addBtn: {
+    position: 'absolute',
+    bottom: -14,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 7,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 4,
+    gap: 3,
+  },
+  addBtnText: {
+    fontFamily: 'Poppins_700Bold',
+    fontSize: 12,
+    letterSpacing: 0.5,
   },
 });

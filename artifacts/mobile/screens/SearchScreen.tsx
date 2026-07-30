@@ -549,7 +549,7 @@ function IdleContent({
               </View>
             ))
           : POPULAR_DISHES.map((f) => (
-              <View key={f.id} style={{ marginBottom: spacing.md12 }}>
+              <View key={f.id} style={{ marginBottom: 28 }}>
                 <FoodCard
                   name={f.name}
                   description={f.description}

@@ -1,0 +1,126 @@
+Continue development from the current project state.
+
+Repository:
+https://github.com/cgdigitalpoint/cravio-food-delivery-new
+
+Branch:
+main
+
+IMPORTANT
+
+The project is already imported.
+
+The app is already running.
+
+Dependencies are installed.
+
+Environment is configured.
+
+The uploaded screenshots are the PRIMARY UI/UX reference.
+
+==================================================
+
+DO NOT
+
+- Restart the project.
+- Re-analyse the entire codebase.
+- Read every file.
+- Rebuild completed screens.
+- Change Authentication.
+- Change Firebase.
+- Change Backend.
+- Change Database.
+- Change Navigation.
+- Change Business Logic.
+
+Read only the files required for the screen you are editing.
+
+Spend at least 95% of the session implementing code.
+
+==================================================
+
+GOAL
+
+Transform the entire Cravio UI to match the uploaded screenshots as closely as possible while keeping 100% Cravio branding.
+
+Use the screenshots as the design reference for every remaining screen.
+
+==================================================
+
+IMPLEMENT CONTINUOUSLY
+
+Do NOT stop after completing one screen.
+
+Do NOT wait for confirmation.
+
+Automatically continue from one module to the next until the session quota ends.
+
+Work in this order:
+
+1. Home Screen
+2. Restaurant Listing
+3. Restaurant Details
+4. Search
+5. Profile
+6. Settings
+7. Cart
+8. Checkout
+9. Orders
+10. Global UI polish
+
+==================================================
+
+FOR EVERY SCREEN
+
+Improve:
+
+- Layout
+- Typography
+- Cards
+- Icons
+- Chips
+- Filters
+- Search
+- Buttons
+- Banners
+- Offers
+- Animations
+- Shadows
+- Spacing
+- Responsive behaviour
+- Empty states
+- Loading states
+
+Use reusable components wherever possible.
+
+==================================================
+
+QUALITY
+
+After every major module:
+
+- Run TypeScript
+- Fix all errors
+- Verify build
+- Commit changes
+- Push to GitHub
+
+Immediately continue with the next module.
+
+==================================================
+
+SESSION END
+
+Only stop when:
+
+- Every possible improvement from the uploaded screenshots has been implemented, OR
+- The session quota is exhausted.
+
+Before stopping, provide:
+
+- Completed modules
+- Remaining modules
+- Files modified
+- TypeScript status
+- Build status
+- Latest Git commit hash

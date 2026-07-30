@@ -25,7 +25,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Bell, Check, ChevronDown, Clock3, Leaf, MapPin, Mic, ShoppingBasket, ShoppingCart } from 'lucide-react-native';
+import { Bell, Check, ChevronDown, Clock3, Leaf, MapPin, ShoppingBasket, ShoppingCart } from 'lucide-react-native';
 
 import {
   Avatar,
@@ -818,7 +818,7 @@ function FoodRecommendationScroll({
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={{ paddingHorizontal: 16, gap: H_GAP, paddingVertical: 4 }}
+      contentContainerStyle={{ paddingHorizontal: 16, gap: H_GAP, paddingTop: 4, paddingBottom: 24 }}
       decelerationRate="fast"
       snapToInterval={FOOD_W + H_GAP}
     >
@@ -1219,14 +1219,6 @@ export function HomeScreen() {
           onFilterPress={() => router.push('/search')}
         />
       </View>
-
-      {/* Voice hint */}
-      <TouchableOpacity style={styles.voiceHint} activeOpacity={0.7}>
-        <Mic size={15} color={colors.primary} strokeWidth={2} />
-        <Text style={[PP.caption, { color: colors.mutedForeground }]}>
-          Try "Pizza near me" or "Best burgers"
-        </Text>
-      </TouchableOpacity>
 
       {/* Category strip */}
       <CategoryStrip activeId={activeCategory} onSelect={setActiveCategory} />
