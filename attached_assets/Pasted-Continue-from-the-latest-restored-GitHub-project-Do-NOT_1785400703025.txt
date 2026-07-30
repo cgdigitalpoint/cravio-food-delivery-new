@@ -1,0 +1,140 @@
+Continue from the latest restored GitHub project.
+
+Do NOT redesign any UI.
+
+Do NOT modify completed screens unless required for backend integration.
+
+Do NOT create duplicate components.
+
+Preserve the current architecture.
+
+==========================================================
+CURRENT GOAL
+==========================================================
+
+Begin Phase: Backend Foundation
+
+This phase is ONLY for backend integration.
+
+No new UI redesign.
+
+==========================================================
+TASKS
+==========================================================
+
+1. Review the existing authentication implementation.
+
+2. Verify whether the project is using:
+   • Supabase
+   • Firebase
+   • Both
+   • Neither
+
+3. Audit the following flows:
+
+• Email Signup
+• Email Login
+• Google Sign In
+• Forgot Password
+• Logout
+• Session Persistence
+
+4. Verify that authentication works on:
+
+• Android
+• iOS
+• Web (where applicable)
+
+5. Check whether user data is actually stored in the backend.
+
+6. Review environment variables.
+
+7. Check backend configuration.
+
+8. Verify navigation guards.
+
+9. Check protected routes.
+
+10. Review error handling.
+
+11. Review loading states.
+
+12. Review authentication security.
+
+==========================================================
+IF PROBLEMS EXIST
+==========================================================
+
+Fix ONLY authentication-related issues.
+
+Do not touch unrelated modules.
+
+Do not redesign screens.
+
+Keep UI identical.
+
+==========================================================
+QUALITY CHECK
+==========================================================
+
+Run:
+
+• npm install (if required)
+
+• TypeScript
+
+• Build
+
+• Expo
+
+Verify:
+
+• Login
+
+• Signup
+
+• Forgot Password
+
+• Logout
+
+• Google Sign In
+
+• Session Restore
+
+Fix every authentication issue found.
+
+==========================================================
+GIT
+==========================================================
+
+Commit the authentication improvements.
+
+Push to GitHub.
+
+==========================================================
+FINAL REPORT
+==========================================================
+
+Provide:
+
+• Authentication Audit Summary
+
+• Backend Technology Used
+
+• Issues Found
+
+• Issues Fixed
+
+• Modified Files
+
+• Build Status
+
+• TypeScript Status
+
+• Git Commit Hash
+
+• GitHub Push Confirmation
+
+Stop after completing the authentication audit and fixes.
+
+Do NOT begin the next phase until instructed.
