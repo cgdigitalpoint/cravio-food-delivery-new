@@ -257,6 +257,18 @@ alter table public.favorites
 alter table public.cart
   alter column food_id type text using food_id::text;
 
+-- ── Phase 12 — Cart persistence metadata ─────────────────────────────────────
+-- Extend the cart table so CartItems can be fully reconstructed on login
+-- without a separate catalog lookup.  All new columns are nullable / defaulted
+-- so existing rows and a fresh schema run are both safe.
+alter table public.cart
+  add column if not exists restaurant_id   text,
+  add column if not exists restaurant_name text,
+  add column if not exists food_name       text    not null default '',
+  add column if not exists food_price      float4  not null default 0,
+  add column if not exists food_image      text,
+  add column if not exists notes           text;
+
 -- ── Phase 11C-4 — Hunger Relief donation wallet ───────────────────────────────
 -- Donations are a separate financial ledger. They must never be mixed with
 -- restaurant settlements, delivery partner earnings, or platform commission.

@@ -5,3 +5,4 @@ export { userService } from './userService';
 export { orderService } from './orderService';
 export { favoriteService } from './favoriteService';
 export { addressService } from './addressService';
+export { cartService } from './cartService';

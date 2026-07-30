@@ -25,6 +25,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { supabase } from '@/services/supabase';
 import { authService } from '@/services/authService';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useCartStore } from '@/store/useCartStore';
 
 // Prevent the native splash screen from auto-hiding before assets load.
 SplashScreen.preventAutoHideAsync();
@@ -60,6 +61,7 @@ function AuthGuard() {
   const router = useRouter();
   const segments = useSegments();
   const { isAuthenticated, setAuthenticatedUser, setUnauthenticated, loadProfile } = useAuthStore();
+  const { setUserId: setCartUserId, loadFromRemote: loadCartFromRemote, clearLocalOnly: clearLocalCart } = useCartStore();
   const [authReady, setAuthReady] = useState(false);
   // Tracks whether we entered a PASSWORD_RECOVERY flow so we can navigate to
   // /home automatically once the USER_UPDATED event confirms the new password
@@ -95,8 +97,13 @@ function AuthGuard() {
       }
 
       if (session?.user) {
-        setAuthenticatedUser(session.user.id);
-        loadProfile(session.user.id);
+        const uid = session.user.id;
+        setAuthenticatedUser(uid);
+        loadProfile(uid);
+        // Set userId in cart store so background mutations sync to the right user,
+        // then restore any persisted cart rows from Supabase.
+        setCartUserId(uid);
+        loadCartFromRemote(uid);
 
         // USER_UPDATED fires after a successful resetPassword() call. If we
         // entered via PASSWORD_RECOVERY, navigate to /home here — doing it
@@ -108,6 +115,10 @@ function AuthGuard() {
         }
       } else {
         setUnauthenticated();
+        // Keep Supabase rows intact so the cart is still there on next login.
+        // Only clear local in-memory state.
+        setCartUserId(null);
+        clearLocalCart();
       }
       setAuthReady(true);
     });

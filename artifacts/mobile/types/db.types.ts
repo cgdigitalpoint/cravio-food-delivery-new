@@ -87,4 +87,12 @@ export interface DbCart {
   user_id: string;
   food_id: string;
   quantity: number;
+  // Extended columns — stored so CartItems can be fully reconstructed on restore
+  // without requiring a catalog lookup.
+  restaurant_id: string | null;
+  restaurant_name: string | null;
+  food_name: string;
+  food_price: number;
+  food_image: string | null;
+  notes: string | null;
 }
