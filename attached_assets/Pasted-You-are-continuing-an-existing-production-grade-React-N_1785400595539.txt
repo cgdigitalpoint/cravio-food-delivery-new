@@ -1,0 +1,129 @@
+You are continuing an existing production-grade React Native Expo project.
+
+==========================================================
+PROJECT
+==========================================================
+
+Project Name:
+Cravio Food Delivery
+
+GitHub Repository:
+https://github.com/cgdigitalpoint/cravio-food-delivery-new
+
+Branch:
+main
+
+Latest Stable Commit:
+938610c
+
+First clone/import this repository from GitHub.
+
+After importing, continue ONLY from the latest commit.
+
+==========================================================
+IMPORTANT
+==========================================================
+
+This is NOT a new project.
+
+DO NOT create a new Expo project.
+
+DO NOT replace existing code.
+
+DO NOT redesign completed UI.
+
+DO NOT restart development.
+
+DO NOT regenerate completed screens.
+
+DO NOT change folder structure unless absolutely necessary.
+
+Read only the files required for the current task.
+
+Preserve the existing architecture, theme, navigation, animations, typography and reusable components.
+
+==========================================================
+CURRENT PROJECT STATUS
+==========================================================
+
+✅ Customer App UI/UX completed.
+
+✅ Home Screen completed.
+
+✅ Search completed.
+
+✅ Restaurant Details completed.
+
+✅ Cart completed.
+
+✅ Checkout completed.
+
+✅ Orders completed.
+
+✅ Profile completed.
+
+✅ Authentication structure exists.
+
+✅ Legal Center implemented.
+
+✅ 9 Legal Policy pages implemented.
+
+✅ About App implemented.
+
+✅ Delete Account implemented (backend integration pending).
+
+✅ Settings expanded.
+
+✅ TypeScript previously verified with zero errors.
+
+✅ Latest code has already been pushed to GitHub.
+
+==========================================================
+FIRST TASK
+==========================================================
+
+Before doing any coding:
+
+1. Clone/import the GitHub repository.
+
+2. Verify that commit 938610c is available.
+
+3. Run the project.
+
+4. Install dependencies if required.
+
+5. Ensure Metro starts successfully.
+
+6. Run TypeScript.
+
+7. Verify there are no build errors.
+
+8. Report any genuine issues.
+
+If everything is working correctly,
+
+STOP.
+
+Do NOT start implementing any new feature.
+
+Wait for my next instruction.
+
+==========================================================
+OUTPUT
+==========================================================
+
+Provide:
+
+• Import Status
+
+• Build Status
+
+• TypeScript Status
+
+• Latest Commit
+
+• Any Issues Found
+
+If everything is healthy, simply say:
+
+"Project successfully restored and ready for the next development phase."
