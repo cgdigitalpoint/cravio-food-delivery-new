@@ -360,10 +360,13 @@ function StickyCartBar({
         activeOpacity={0.92}
         style={styles.stickyCartBar}
       >
-        {/* Food icon circles */}
+        {/* Food emoji icons in white circles — matches reference */}
         <View style={styles.stickyCartIconRow}>
           <View style={styles.stickyCartIcon}>
-            <ShoppingCart size={14} color="#FF6B00" />
+            <Text style={{ fontSize: 15 }}>🍛</Text>
+          </View>
+          <View style={[styles.stickyCartIcon, { marginLeft: -8 }]}>
+            <Text style={{ fontSize: 15 }}>🧋</Text>
           </View>
         </View>
         <View style={styles.stickyCartCenter}>
@@ -839,14 +842,14 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
           </View>
         )}
 
-        {/* Coupon unlock banner — shown when cart has items */}
+        {/* Coupon unlock banner — shown when cart has items (matches reference) */}
         {itemCount > 0 && (
           <View style={styles.couponBanner}>
             <View style={styles.couponBadge}>
               <Tag size={12} color="#FFFFFF" />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.couponTitle}>You have unlocked a discount!</Text>
+              <Text style={styles.couponTitle}>You have unlocked Flat ₹100 OFF</Text>
               <Text style={styles.couponSubtitle}>Apply coupon on cart</Text>
             </View>
           </View>

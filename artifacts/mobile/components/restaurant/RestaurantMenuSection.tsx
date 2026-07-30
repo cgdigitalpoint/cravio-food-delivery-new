@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { RestaurantMenuItemCard } from './RestaurantMenuItemCard';
 import { useColors } from '@/hooks/useColors';
@@ -32,22 +32,37 @@ export function RestaurantMenuSection({
   onLayout,
 }: RestaurantMenuSectionProps) {
   const colors = useColors();
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
     <View onLayout={(event) => onLayout?.(event.nativeEvent.layout.y)}>
-      <View style={[styles.heading, { borderColor: colors.border }]}>
-        <View className="flex-row items-center">
+      {/* ── Section header with collapse toggle (▲/▼) — matches reference ── */}
+      <TouchableOpacity
+        activeOpacity={0.75}
+        onPress={() => setCollapsed((prev) => !prev)}
+        style={[styles.heading, { borderColor: colors.border }]}
+        accessibilityRole="button"
+        accessibilityLabel={collapsed ? `Expand ${category.name}` : `Collapse ${category.name}`}
+      >
+        <View style={styles.headingLeft}>
           <Text style={styles.emoji}>{category.emoji}</Text>
           <Text style={[PP.title, { color: colors.foreground, marginLeft: 7 }]}>
             {category.name}
           </Text>
         </View>
-        <Text style={[PP.caption, { color: colors.mutedForeground }]}>
-          {items.length} {items.length === 1 ? 'item' : 'items'}
-        </Text>
-      </View>
+        <View style={styles.headingRight}>
+          <Text style={[PP.caption, { color: colors.mutedForeground, marginRight: 8 }]}>
+            {items.length} {items.length === 1 ? 'item' : 'items'}
+          </Text>
+          {/* ▲ collapsed, ▼ expanded — matches Zomato reference */}
+          <Text style={[styles.collapseIcon, { color: colors.foreground }]}>
+            {collapsed ? '▼' : '▲'}
+          </Text>
+        </View>
+      </TouchableOpacity>
 
-      {items.map((item) => (
+      {/* ── Items — hidden when collapsed ── */}
+      {!collapsed && items.map((item) => (
         <RestaurantMenuItemCard
           key={item.id}
           item={item}
@@ -75,6 +90,8 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     borderBottomWidth: 1,
   },
+  headingLeft: { flexDirection: 'row', alignItems: 'center' },
+  headingRight: { flexDirection: 'row', alignItems: 'center' },
   emoji: { fontSize: 17 },
-  shareButton: { padding: 5 },
+  collapseIcon: { fontSize: 11, fontFamily: 'Poppins_600SemiBold' },
 });
