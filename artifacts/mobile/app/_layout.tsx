@@ -44,7 +44,7 @@ const queryClient = new QueryClient({
 });
 
 // Protected route segments — redirect to /welcome if unauthenticated
-const PROTECTED = new Set(['home', 'search', 'profile', 'profile-edit', 'orders', 'favorites', 'recently-viewed', 'address', 'restaurant', 'cart', 'checkout', 'order-success', 'order-failure', 'invoice', 'donations', 'donation-management', 'legal', 'about', 'delete-account']);
+const PROTECTED = new Set(['home', 'search', 'profile', 'profile-edit', 'change-password', 'notification-preferences', 'app-preferences', 'orders', 'favorites', 'recently-viewed', 'address', 'restaurant', 'cart', 'checkout', 'order-success', 'order-failure', 'invoice', 'donations', 'donation-management', 'legal', 'about', 'delete-account']);
 // Auth-only segments — redirect to /home if already authenticated
 const AUTH_ONLY = new Set(['auth']);
 
