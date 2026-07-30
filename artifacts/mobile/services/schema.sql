@@ -110,6 +110,16 @@ create policy "Users can insert their own orders"
   on public.orders for insert
   with check (auth.uid() = user_id);
 
+-- Phase 14: allow customers to cancel their own pending/confirmed orders.
+-- using() restricts which rows can be targeted; with check() restricts the new
+-- row state — together they ensure only the owner can update, and the only
+-- permitted write is setting status to 'cancelled'.
+drop policy if exists "Users can cancel their own orders" on public.orders;
+create policy "Users can cancel their own orders"
+  on public.orders for update
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id and status = 'cancelled');
+
 -- ── order_items ───────────────────────────────────────────────────────────────
 create table if not exists public.order_items (
   id         uuid    primary key default uuid_generate_v4(),
