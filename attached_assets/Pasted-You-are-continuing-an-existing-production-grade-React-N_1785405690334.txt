@@ -1,0 +1,149 @@
+You are continuing an existing production-grade React Native Expo project.
+
+==========================================================
+PROJECT
+==========================================================
+
+Project Name:
+Cravio Food Delivery
+
+Repository:
+https://github.com/cgdigitalpoint/cravio-food-delivery-new
+
+Branch:
+main
+
+Latest Commit:
+f1fb0a1
+
+Clone the repository and continue ONLY from this commit.
+
+==========================================================
+IMPORTANT
+==========================================================
+
+This is NOT a new project.
+
+DO NOT create a new Expo project.
+
+DO NOT redesign completed UI.
+
+DO NOT regenerate existing screens.
+
+DO NOT rewrite completed modules.
+
+DO NOT analyze the entire repository again.
+
+Read only the files required for the current task.
+
+Preserve the existing architecture, navigation, design system, reusable components, TypeScript structure and Supabase integration.
+
+==========================================================
+CURRENT PROJECT STATUS
+==========================================================
+
+✅ Customer UI completed
+
+✅ Authentication completed
+
+✅ Supabase integration completed
+
+✅ Legal Center completed
+
+✅ About App completed
+
+✅ Delete Account completed
+
+✅ Cart persistence completed
+
+✅ Customer Profile Completion has been partially implemented and saved in commit f1fb0a1.
+
+==========================================================
+CURRENT TASK
+==========================================================
+
+Review ONLY the Phase 13 changes introduced in commit f1fb0a1.
+
+Do NOT discard or rewrite them.
+
+First:
+
+• Run TypeScript.
+
+• Fix every compile error.
+
+• Verify all newly added routes.
+
+• Verify Edit Profile.
+
+• Verify Change Password.
+
+• Verify Notification Preferences.
+
+• Verify App Preferences.
+
+• Verify Theme Preference.
+
+• Verify Supabase profile synchronization.
+
+• Verify runtime.
+
+Only fix genuine issues.
+
+Do NOT redesign anything.
+
+==========================================================
+QUALITY CHECK
+==========================================================
+
+Verify:
+
+✓ TypeScript = 0 errors
+
+✓ Expo build successful
+
+✓ No runtime errors
+
+✓ All Profile routes open correctly
+
+✓ Dark Mode
+
+✓ Light Mode
+
+✓ Navigation
+
+==========================================================
+GIT
+==========================================================
+
+Only if everything passes:
+
+Commit.
+
+Push to GitHub.
+
+==========================================================
+FINAL REPORT
+==========================================================
+
+Provide:
+
+• Issues found
+
+• Issues fixed
+
+• Modified files
+
+• Build status
+
+• TypeScript status
+
+• Runtime status
+
+• Git commit hash
+
+• GitHub push confirmation
+
+Stop after Phase 13 is fully completed.
+
+Do NOT begin Phase 14 until instructed.
