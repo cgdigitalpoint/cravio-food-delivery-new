@@ -1,0 +1,439 @@
+Continue from the latest stable GitHub version.
+
+Repository:
+https://github.com/cgdigitalpoint/cravio-food-delivery-new
+
+Branch:
+main
+
+Latest Stable Commit:
+38803ba
+
+==========================================================
+IMPORTANT
+==========================================================
+
+The Customer App UI/UX is already completed.
+
+The application is already usable.
+
+DO NOT redesign existing screens.
+
+DO NOT change completed UI.
+
+DO NOT modify existing navigation.
+
+DO NOT recreate components.
+
+DO NOT perform full project analysis.
+
+Only read the files required for this task.
+
+Preserve the existing architecture, theme, animations and design.
+
+This task is ONLY for making the application production-ready.
+
+==========================================================
+CURRENT TASK
+==========================================================
+
+Complete only the following modules:
+
+1. Legal Center
+
+2. About App
+
+3. Delete Account
+
+4. Settings Screen Polish
+
+Do NOT start any other feature until these four modules are fully completed.
+
+==========================================================
+MODULE 1
+LEGAL CENTER
+==========================================================
+
+Create a premium Legal Center.
+
+Use reusable components.
+
+Modern cards.
+
+Premium typography.
+
+Scrollable content.
+
+Dark Mode.
+
+Light Mode.
+
+Responsive layout.
+
+Professional design.
+
+Create the following pages:
+
+• Privacy Policy
+
+• Terms & Conditions
+
+• Refund & Cancellation Policy
+
+• Shipping & Delivery Policy
+
+• Donation Policy
+
+• Data Deletion Policy
+
+• Community Guidelines
+
+• Copyright & Trademark Notice
+
+• Open Source Licenses
+
+==========================================================
+PRIVACY POLICY
+==========================================================
+
+Generate original professional content.
+
+Do NOT copy from any existing application.
+
+Include sections:
+
+Introduction
+
+Definitions
+
+Information We Collect
+
+Personal Information
+
+Device Information
+
+Location Information
+
+Payment Information
+
+Saved Addresses
+
+Restaurant Preferences
+
+Camera Permission
+
+Storage Permission
+
+Notification Permission
+
+Location Permission
+
+How We Use Information
+
+Order Processing
+
+Delivery Tracking
+
+Customer Support
+
+Marketing Communication
+
+Analytics
+
+Cookies
+
+Data Security
+
+Encryption
+
+Data Retention
+
+Third Party Services
+
+Firebase
+
+Supabase
+
+Google Maps
+
+Payment Gateway
+
+User Rights
+
+Download Personal Data
+
+Update Personal Data
+
+Delete Personal Data
+
+Delete Account
+
+Children's Privacy
+
+Legal Compliance
+
+Changes To Privacy Policy
+
+Contact Information
+
+==========================================================
+DONATION POLICY
+==========================================================
+
+Clearly mention:
+
+Donations are completely optional.
+
+Users are never required to donate.
+
+Donations are displayed separately from food orders.
+
+Donation amount is shown independently.
+
+Donations are generally non-refundable unless required by applicable law.
+
+Donation purpose must always be disclosed.
+
+Donation beneficiary must be clearly identified where applicable.
+
+Donation receipts may be issued.
+
+Fraudulent donation activity may result in account suspension.
+
+==========================================================
+TERMS & CONDITIONS
+==========================================================
+
+Generate original professional content.
+
+Include:
+
+Acceptance
+
+Eligibility
+
+User Accounts
+
+Account Security
+
+Restaurant Listings
+
+Menu Accuracy
+
+Pricing
+
+Taxes
+
+Payments
+
+UPI
+
+Cards
+
+Wallet
+
+Cash On Delivery
+
+Orders
+
+Cancellation
+
+Refund Policy
+
+Delivery
+
+Delivery Charges
+
+Estimated Delivery Time
+
+Delays
+
+Customer Responsibilities
+
+Restaurant Responsibilities
+
+Platform Responsibilities
+
+Donation Terms
+
+Fraud Prevention
+
+Fake Orders
+
+Fake Reviews
+
+Community Guidelines
+
+Copyright
+
+Trademark
+
+Intellectual Property
+
+Limitation of Liability
+
+Force Majeure
+
+Suspension
+
+Termination
+
+Governing Law
+
+Changes
+
+Contact Information
+
+==========================================================
+OTHER LEGAL PAGES
+==========================================================
+
+Create:
+
+Refund & Cancellation Policy
+
+Shipping & Delivery Policy
+
+Data Deletion Policy
+
+Community Guidelines
+
+Copyright & Trademark
+
+Open Source Licenses
+
+Write complete professional content for every page.
+
+==========================================================
+MODULE 2
+ABOUT APP
+==========================================================
+
+Create a premium About App screen.
+
+Application
+
+Cravio Food Delivery
+
+Version
+
+1.0.0
+
+Developer
+
+Adil Altaf
+
+Founder & Owner
+
+Adil Altaf
+
+Company
+
+CG Digital Point
+
+Copyright
+
+© 2026 CG Digital Point
+
+Design should match the rest of the application.
+
+==========================================================
+MODULE 3
+DELETE ACCOUNT
+==========================================================
+
+Add Delete Account.
+
+Show confirmation dialog.
+
+Explain that deleting an account permanently removes user information according to the Privacy Policy and Data Deletion Policy.
+
+Prepare the flow for future backend integration.
+
+==========================================================
+MODULE 4
+SETTINGS SCREEN POLISH
+==========================================================
+
+Do not redesign Settings.
+
+Only improve it.
+
+Add:
+
+About App
+
+Privacy Policy
+
+Terms & Conditions
+
+Refund Policy
+
+Shipping Policy
+
+Donation Policy
+
+Community Guidelines
+
+Copyright Notice
+
+Open Source Licenses
+
+Delete Account
+
+Contact Support
+
+Rate App
+
+Share App
+
+App Version
+
+Logout
+
+Maintain the existing design language.
+
+==========================================================
+QUALITY
+==========================================================
+
+Run TypeScript.
+
+Fix every error.
+
+Verify build.
+
+Verify navigation.
+
+Verify dark mode.
+
+Verify light mode.
+
+==========================================================
+GIT
+==========================================================
+
+Commit all changes.
+
+Push to GitHub.
+
+==========================================================
+FINAL REPORT
+==========================================================
+
+Provide:
+
+Completed modules
+
+Modified files
+
+TypeScript Status
+
+Build Status
+
+Git Commit Hash
+
+List of remaining work
+
+Do NOT continue to any new feature after completing these modules.
+Wait for the next instruction.

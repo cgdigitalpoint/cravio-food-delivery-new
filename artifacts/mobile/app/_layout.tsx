@@ -42,7 +42,7 @@ const queryClient = new QueryClient({
 });
 
 // Protected route segments — redirect to /welcome if unauthenticated
-const PROTECTED = new Set(['home', 'search', 'profile', 'profile-edit', 'orders', 'favorites', 'recently-viewed', 'address', 'restaurant', 'cart', 'checkout', 'order-success', 'order-failure', 'invoice', 'donations', 'donation-management']);
+const PROTECTED = new Set(['home', 'search', 'profile', 'profile-edit', 'orders', 'favorites', 'recently-viewed', 'address', 'restaurant', 'cart', 'checkout', 'order-success', 'order-failure', 'invoice', 'donations', 'donation-management', 'legal', 'about', 'delete-account']);
 // Auth-only segments — redirect to /home if already authenticated
 const AUTH_ONLY = new Set(['auth']);
 
@@ -177,6 +177,14 @@ function RootLayoutNav() {
         <Stack.Screen name="invoice/[id]" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="donations" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="donation-management" options={{ animation: 'slide_from_right' }} />
+
+        {/* ── Legal Center & Policy docs ── */}
+        <Stack.Screen name="legal/index" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="legal/[doc]" options={{ animation: 'slide_from_right' }} />
+
+        {/* ── About & Account ── */}
+        <Stack.Screen name="about" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="delete-account" options={{ animation: 'slide_from_right' }} />
 
         {/* ── Design system (dev only — hidden in production) ── */}
         <Stack.Screen name="design-system" options={{ animation: 'slide_from_right' }} />

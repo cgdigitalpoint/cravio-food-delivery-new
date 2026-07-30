@@ -36,3 +36,8 @@ export { SignupScreen } from './auth/SignupScreen';
 export { OTPScreen } from './auth/OTPScreen';
 export { ForgotPasswordScreen } from './auth/ForgotPasswordScreen';
 export { ResetPasswordScreen } from './auth/ResetPasswordScreen';
+
+// Legal Center, About, Delete Account
+export { LegalCenterScreen, LegalDocScreen } from './legal';
+export { AboutScreen } from './AboutScreen';
+export { DeleteAccountScreen } from './DeleteAccountScreen';

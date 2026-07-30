@@ -5,8 +5,10 @@
 import React from 'react';
 import {
   Alert,
+  Linking,
   Platform,
   ScrollView,
+  Share,
   StyleSheet,
   Switch,
   Text,
@@ -15,6 +17,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
+  BookOpen,
   Briefcase,
   ChevronRight,
   Coins,
@@ -22,23 +25,29 @@ import {
   Clock3,
   Crown,
   EyeOff,
+  FileText,
   Gift,
   Globe,
   Heart,
   HelpCircle,
+  Info,
   LogOut,
   MapPin,
   MessageCircle,
   Package,
   Palette,
+  PhoneCall,
   Receipt,
   RefreshCw,
+  Scale,
   Settings,
+  Share2,
   ShieldCheck,
   Star,
   Tag,
   Ticket,
   Train,
+  Trash2,
   User,
   Users,
   Wallet,
@@ -58,6 +67,20 @@ interface ProfileScreenProps {
   onDonations?: () => void;
   onEditProfile?: () => void;
   onLogout?: () => void;
+  // Settings — App
+  onAbout?: () => void;
+  // Legal
+  onLegalCenter?: () => void;
+  onPrivacyPolicy?: () => void;
+  onTerms?: () => void;
+  onRefundPolicy?: () => void;
+  onShippingPolicy?: () => void;
+  onDonationPolicy?: () => void;
+  onCommunityGuidelines?: () => void;
+  onCopyright?: () => void;
+  onOpenSourceLicenses?: () => void;
+  // Account
+  onDeleteAccount?: () => void;
 }
 
 // ─── Section group with left accent bar ──────────────────────────────────────
@@ -325,6 +348,17 @@ export function ProfileScreen({
   onDonations,
   onEditProfile,
   onLogout,
+  onAbout,
+  onLegalCenter,
+  onPrivacyPolicy,
+  onTerms,
+  onRefundPolicy,
+  onShippingPolicy,
+  onDonationPolicy,
+  onCommunityGuidelines,
+  onCopyright,
+  onOpenSourceLicenses,
+  onDeleteAccount,
 }: ProfileScreenProps) {
   const insets = useSafeAreaInsets();
   const colors = useColors();
@@ -348,6 +382,31 @@ export function ProfileScreen({
         },
       },
     ]);
+  };
+
+  const handleRateApp = () => {
+    // TODO: replace with real App Store / Play Store ID when published
+    const storeUrl =
+      Platform.OS === 'ios'
+        ? 'https://apps.apple.com/app/cravio'
+        : 'https://play.google.com/store/apps/details?id=in.cravioapp';
+    Linking.openURL(storeUrl).catch(() =>
+      Alert.alert('Store unavailable', 'Could not open the app store.'),
+    );
+  };
+
+  const handleShareApp = () => {
+    Share.share({
+      message:
+        'Order delicious food with Cravio! 🍽️ Download now: https://cravioapp.in',
+      title: 'Share Cravio',
+    }).catch(() => {});
+  };
+
+  const handleContactSupport = () => {
+    Linking.openURL('mailto:support@cravioapp.in?subject=Support Request').catch(() =>
+      Alert.alert('Unable to open email', 'Please email us at support@cravioapp.in'),
+    );
   };
 
   return (
@@ -525,24 +584,113 @@ export function ProfileScreen({
             onPress={() => {}}
           />
           <Row
-            icon={<ShieldCheck size={17} color="#6B7280" />}
-            iconBg={colors.muted}
-            label="Privacy policy"
-            onPress={() => {}}
-          />
-          <Row
-            icon={<Settings size={17} color="#6B7280" />}
-            iconBg={colors.muted}
-            label="Terms of service"
-            onPress={() => {}}
+            icon={<PhoneCall size={17} color="#22C55E" />}
+            iconBg="#F0FDF4"
+            label="Contact support"
+            onPress={handleContactSupport}
           />
           <Row
             icon={<Star size={17} color="#F59E0B" />}
             iconBg="#FFFBEB"
             label="Rate the app"
-            onPress={() => {}}
+            onPress={handleRateApp}
+          />
+          <Row
+            icon={<Share2 size={17} color="#8B5CF6" />}
+            iconBg="#F5F3FF"
+            label="Share app"
+            onPress={handleShareApp}
           />
         </SectionGroup>
+
+        {/* ── Legal & Policies ── */}
+        <SectionGroup title="Legal & policies">
+          <Row
+            icon={<Scale size={17} color="#FF6B00" />}
+            iconBg="#FFF7ED"
+            label="Legal Center"
+            onPress={onLegalCenter}
+          />
+          <Row
+            icon={<ShieldCheck size={17} color="#3B82F6" />}
+            iconBg="#EFF6FF"
+            label="Privacy Policy"
+            onPress={onPrivacyPolicy}
+          />
+          <Row
+            icon={<FileText size={17} color="#6B7280" />}
+            iconBg={colors.muted}
+            label="Terms & Conditions"
+            onPress={onTerms}
+          />
+          <Row
+            icon={<Receipt size={17} color="#14B8A6" />}
+            iconBg="#F0FDFA"
+            label="Refund & Cancellation"
+            onPress={onRefundPolicy}
+          />
+          <Row
+            icon={<Package size={17} color="#0EA5E9" />}
+            iconBg="#F0F9FF"
+            label="Shipping & Delivery Policy"
+            onPress={onShippingPolicy}
+          />
+          <Row
+            icon={<Heart size={17} color="#EC4899" />}
+            iconBg="#FDF2F8"
+            label="Donation Policy"
+            onPress={onDonationPolicy}
+          />
+          <Row
+            icon={<Users size={17} color="#8B5CF6" />}
+            iconBg="#F5F3FF"
+            label="Community Guidelines"
+            onPress={onCommunityGuidelines}
+          />
+          <Row
+            icon={<BookOpen size={17} color="#6B7280" />}
+            iconBg={colors.muted}
+            label="Copyright & Trademark"
+            onPress={onCopyright}
+          />
+          <Row
+            icon={<Settings size={17} color="#6B7280" />}
+            iconBg={colors.muted}
+            label="Open Source Licenses"
+            onPress={onOpenSourceLicenses}
+          />
+        </SectionGroup>
+
+        {/* ── App Info ── */}
+        <SectionGroup title="App">
+          <Row
+            icon={<Info size={17} color="#FF6B00" />}
+            iconBg="#FFF7ED"
+            label="About Cravio"
+            onPress={onAbout}
+          />
+          <Row
+            icon={<Info size={17} color="#6B7280" />}
+            iconBg={colors.muted}
+            label="App Version"
+            value="1.0.0"
+            hideChevron
+          />
+        </SectionGroup>
+
+        {/* ── Delete Account ── */}
+        <View style={[styles.logoutCard, { backgroundColor: colors.card }]}>
+          <TouchableOpacity
+            onPress={onDeleteAccount}
+            activeOpacity={0.75}
+            style={styles.logoutRow}
+          >
+            <Trash2 size={18} color={colors.destructive} />
+            <Text style={[PP.body, { color: colors.destructive, fontFamily: 'Poppins_600SemiBold' }]}>
+              Delete account
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         {/* ── Logout ── */}
         <View style={[styles.logoutCard, { backgroundColor: colors.card }]}>
