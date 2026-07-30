@@ -70,6 +70,20 @@ export const addressService = {
     if (error) throw new Error(error.message);
   },
 
+  /** Fetch a single address by ID (used when displaying order delivery address). */
+  async getAddressById(addressId: string): Promise<DbAddress | null> {
+    const { data, error } = await supabase
+      .from('addresses')
+      .select('*')
+      .eq('id', addressId)
+      .single();
+    if (error) {
+      if (error.code === 'PGRST116') return null;
+      throw new Error(error.message);
+    }
+    return data as DbAddress;
+  },
+
   /** Set an address as the default. */
   async setDefault(addressId: string, userId: string): Promise<void> {
     await supabase

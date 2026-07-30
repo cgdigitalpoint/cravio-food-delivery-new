@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowLeft, ChevronRight, Clock3, Package, Search, X } from 'lucide-react-native';
+import { AlertCircle, ArrowLeft, ChevronRight, Clock3, Package, RefreshCw, Search, X } from 'lucide-react-native';
 import { useColors } from '@/hooks/useColors';
 import { PP } from '@/theme/poppins';
 import { borderRadius, spacing } from '@/theme';
@@ -136,7 +136,7 @@ export function OrdersScreen({ onBack, onOrderPress }: OrdersScreenProps) {
   const insets = useSafeAreaInsets();
   const colors = useColors();
   const { supabaseUserId } = useAuthStore();
-  const { orders, isLoading, fetchOrders } = useOrderStore();
+  const { orders, isLoading, error, fetchOrders } = useOrderStore();
   const [activeTab, setActiveTab] = useState<TabKey>('active');
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -234,6 +234,24 @@ export function OrdersScreen({ onBack, onOrderPress }: OrdersScreenProps) {
         {isLoading && !refreshing ? (
           <View style={styles.centered}>
             <Text style={[PP.body, { color: colors.mutedForeground }]}>Loading orders…</Text>
+          </View>
+        ) : error && !refreshing ? (
+          <View style={styles.centered}>
+            <AlertCircle size={36} color="#EF4444" strokeWidth={1.5} />
+            <Text style={[PP.label, { color: colors.foreground, marginTop: 12, textAlign: 'center' }]}>
+              Could not load orders
+            </Text>
+            <Text style={[PP.caption, { color: colors.mutedForeground, marginTop: 4, textAlign: 'center', paddingHorizontal: 24 }]}>
+              {error}
+            </Text>
+            <TouchableOpacity
+              onPress={handleRefresh}
+              activeOpacity={0.8}
+              style={[styles.retryBtn, { backgroundColor: colors.primary }]}
+            >
+              <RefreshCw size={15} color="#fff" />
+              <Text style={[PP.label, { color: '#fff', marginLeft: 6 }]}>Retry</Text>
+            </TouchableOpacity>
           </View>
         ) : filteredOrders.length === 0 ? (
           <EmptyState
@@ -367,4 +385,12 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 60 },
+  retryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
 });

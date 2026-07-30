@@ -12,6 +12,7 @@ interface OrderStoreState {
   fetchOrders: (userId: string) => Promise<void>;
   fetchOrderById: (orderId: string) => Promise<void>;
   createOrder: (params: Parameters<typeof orderService.createOrder>[0]) => Promise<DbOrder>;
+  cancelOrder: (orderId: string) => Promise<void>;
   setSelectedOrder: (order: DbOrder | null) => void;
   clearOrders: () => void;
 }
@@ -55,6 +56,24 @@ export const useOrderStore = create<OrderStoreState>((set, get) => ({
       return order;
     } catch (err) {
       set({ error: err instanceof Error ? err.message : 'Failed to create order.', isLoading: false });
+      throw err;
+    }
+  },
+
+  cancelOrder: async (orderId) => {
+    set({ isLoading: true, error: null });
+    try {
+      await orderService.cancelOrder(orderId);
+      const patch = (o: DbOrder) => o.id === orderId ? { ...o, status: 'cancelled' as OrderStatus } : o;
+      set((state) => ({
+        orders: state.orders.map(patch),
+        selectedOrder: state.selectedOrder?.id === orderId
+          ? { ...state.selectedOrder, status: 'cancelled' as OrderStatus }
+          : state.selectedOrder,
+        isLoading: false,
+      }));
+    } catch (err) {
+      set({ error: err instanceof Error ? err.message : 'Failed to cancel order.', isLoading: false });
       throw err;
     }
   },

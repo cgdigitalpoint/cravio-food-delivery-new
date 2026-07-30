@@ -83,6 +83,15 @@ export const orderService = {
     return data as DbOrder;
   },
 
+  /** Cancel an order (sets status to 'cancelled'). */
+  async cancelOrder(orderId: string): Promise<void> {
+    const { error } = await supabase
+      .from('orders')
+      .update({ status: 'cancelled' })
+      .eq('id', orderId);
+    if (error) throw new Error(error.message);
+  },
+
   /** Update an order's status. */
   async updateStatus(orderId: string, status: OrderStatus): Promise<void> {
     const { error } = await supabase
@@ -90,6 +99,21 @@ export const orderService = {
       .update({ status })
       .eq('id', orderId);
     if (error) throw new Error(error.message);
+  },
+
+  /** Fetch the donation associated with an order, if any. */
+  async getDonationByOrderId(orderId: string): Promise<{ amount: number; payment_status: string } | null> {
+    const { data, error } = await supabase
+      .from('donation_wallet_entries')
+      .select('amount, payment_status')
+      .eq('order_id', orderId)
+      .single();
+    if (error) {
+      if (error.code === 'PGRST116') return null;
+      // Non-blocking: if table doesn't exist yet return null
+      return null;
+    }
+    return data as { amount: number; payment_status: string };
   },
 };
 

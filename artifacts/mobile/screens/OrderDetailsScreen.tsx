@@ -1,8 +1,8 @@
-// ─── Order Details Screen — Phase 10B ────────────────────────────────────────
+// ─── Order Details Screen — Phase 10B / Phase 14 ─────────────────────────────
 // Full order detail: restaurant, status tracker, map placeholder, items,
-// address, payment, bill breakdown, reorder, invoice.
+// address, payment, donation, bill breakdown, reorder, cancel, invoice.
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   ScrollView,
@@ -14,17 +14,18 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   ArrowLeft,
+  Ban,
   CheckCircle2,
   ChevronRight,
   Clock,
   CreditCard,
   FileText,
+  Heart,
   MapPin,
   Navigation,
   RefreshCw,
   XCircle,
 } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import { useColors } from '@/hooks/useColors';
@@ -32,8 +33,10 @@ import { PP } from '@/theme/poppins';
 import { borderRadius, spacing } from '@/theme';
 import { useOrderStore } from '@/store/useOrderStore';
 import { useCartStore } from '@/store/useCartStore';
+import { addressService } from '@/services/addressService';
+import { orderService } from '@/services/orderService';
 import { Skeleton } from '@/components/ui';
-import type { DbOrder, DbOrderItem, OrderStatus } from '@/types/db.types';
+import type { DbAddress, DbOrder, DbOrderItem, OrderStatus } from '@/types/db.types';
 import type { MenuItem } from '@/types';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -158,8 +161,12 @@ export function OrderDetailsScreen({ orderId, onBack }: OrderDetailsScreenProps)
   const insets = useSafeAreaInsets();
   const colors = useColors();
   const router = useRouter();
-  const { selectedOrder, isLoading, fetchOrderById } = useOrderStore();
+  const { selectedOrder, isLoading, fetchOrderById, cancelOrder } = useOrderStore();
   const { clearCart, addItem } = useCartStore();
+
+  const [deliveryAddress, setDeliveryAddress] = useState<DbAddress | null>(null);
+  const [donationEntry, setDonationEntry] = useState<{ amount: number; payment_status: string } | null>(null);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     fetchOrderById(orderId);
@@ -167,6 +174,24 @@ export function OrderDetailsScreen({ orderId, onBack }: OrderDetailsScreenProps)
 
   const order: DbOrder | null = selectedOrder?.id === orderId ? selectedOrder : null;
   const items: DbOrderItem[] = order?.order_items ?? [];
+
+  // ── Fetch address + donation when order loads ─────────────────────────────
+  useEffect(() => {
+    if (!selectedOrder || selectedOrder.id !== orderId) return;
+    const o = selectedOrder;
+    // Delivery address
+    if (o.address_id) {
+      addressService.getAddressById(o.address_id)
+        .then((addr) => setDeliveryAddress(addr))
+        .catch(() => setDeliveryAddress(null));
+    } else {
+      setDeliveryAddress(null);
+    }
+    // Donation
+    orderService.getDonationByOrderId(o.id)
+      .then((entry) => setDonationEntry(entry))
+      .catch(() => setDonationEntry(null));
+  }, [selectedOrder?.id, orderId]);
 
   // ── Bill computation ──────────────────────────────────────────────────────
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -191,6 +216,35 @@ export function OrderDetailsScreen({ orderId, onBack }: OrderDetailsScreenProps)
         minute: '2-digit',
       })
     : '—';
+
+  // ── Cancel order ──────────────────────────────────────────────────────────
+  const CANCELLABLE: OrderStatus[] = ['pending', 'confirmed'];
+  const canCancel = order && CANCELLABLE.includes(order.status);
+
+  const handleCancel = () => {
+    if (!order) return;
+    Alert.alert(
+      'Cancel Order',
+      'Are you sure you want to cancel this order? This cannot be undone.',
+      [
+        { text: 'Keep Order', style: 'cancel' },
+        {
+          text: 'Cancel Order',
+          style: 'destructive',
+          onPress: async () => {
+            setIsCancelling(true);
+            try {
+              await cancelOrder(order.id);
+            } catch {
+              Alert.alert('Error', 'Could not cancel the order. Please try again.');
+            } finally {
+              setIsCancelling(false);
+            }
+          },
+        },
+      ],
+    );
+  };
 
   // ── Reorder ───────────────────────────────────────────────────────────────
   const handleReorder = () => {
@@ -481,7 +535,7 @@ export function OrderDetailsScreen({ orderId, onBack }: OrderDetailsScreenProps)
           </View>
         </Animated.View>
 
-        {/* ── Delivery address placeholder ── */}
+        {/* ── Delivery address ── */}
         <Animated.View entering={FadeInDown.delay(190).duration(260).springify()}>
           <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <SectionLabel>DELIVERY ADDRESS</SectionLabel>
@@ -489,9 +543,25 @@ export function OrderDetailsScreen({ orderId, onBack }: OrderDetailsScreenProps)
               <View style={[styles.addressIcon, { backgroundColor: `${colors.primary}15` }]}>
                 <MapPin size={18} color={colors.primary} />
               </View>
-              <Text style={[PP.bodySM, { color: colors.mutedForeground, flex: 1 }]}>
-                Address saved at time of order
-              </Text>
+              {deliveryAddress ? (
+                <View style={{ flex: 1 }}>
+                  <Text style={[PP.label, { color: colors.foreground }]}>
+                    {deliveryAddress.title}
+                  </Text>
+                  <Text style={[PP.caption, { color: colors.mutedForeground, marginTop: 2 }]} numberOfLines={2}>
+                    {[deliveryAddress.house, deliveryAddress.street, deliveryAddress.city, deliveryAddress.state, deliveryAddress.pincode]
+                      .filter(Boolean).join(', ')}
+                  </Text>
+                </View>
+              ) : order?.address_id ? (
+                <Text style={[PP.bodySM, { color: colors.mutedForeground, flex: 1 }]}>
+                  Loading address…
+                </Text>
+              ) : (
+                <Text style={[PP.bodySM, { color: colors.mutedForeground, flex: 1 }]}>
+                  No address recorded
+                </Text>
+              )}
             </View>
           </View>
         </Animated.View>
@@ -512,6 +582,28 @@ export function OrderDetailsScreen({ orderId, onBack }: OrderDetailsScreenProps)
           </View>
         </Animated.View>
 
+        {/* ── Donation ── */}
+        {donationEntry && (
+          <Animated.View entering={FadeInDown.delay(240).duration(260).springify()}>
+            <View style={[styles.section, { backgroundColor: '#FDF2F8', borderColor: '#FBCFE8' }]}>
+              <View style={styles.donationRow}>
+                <View style={[styles.donationIcon, { backgroundColor: '#FCE7F3' }]}>
+                  <Heart size={16} color="#EC4899" fill="#EC4899" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[PP.label, { color: '#9D174D' }]}>Hunger Relief Donation</Text>
+                  <Text style={[PP.caption, { color: '#BE185D', marginTop: 2 }]}>
+                    Thank you for giving back 🙏
+                  </Text>
+                </View>
+                <Text style={[PP.label, { color: '#BE185D', fontFamily: 'Poppins_700Bold' }]}>
+                  +₹{Number(donationEntry.amount).toFixed(2)}
+                </Text>
+              </View>
+            </View>
+          </Animated.View>
+        )}
+
         {/* ── Action buttons ── */}
         <Animated.View
           entering={FadeInDown.delay(260).duration(260).springify()}
@@ -527,6 +619,26 @@ export function OrderDetailsScreen({ orderId, onBack }: OrderDetailsScreenProps)
             >
               <RefreshCw size={17} color="#fff" />
               <Text style={[PP.label, { color: '#fff', marginLeft: 8 }]}>Reorder</Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Cancel Order */}
+          {canCancel && (
+            <TouchableOpacity
+              onPress={handleCancel}
+              disabled={isCancelling}
+              activeOpacity={0.85}
+              style={[
+                styles.cancelBtn,
+                { borderColor: '#FECACA', backgroundColor: '#FEF2F2' },
+                isCancelling && { opacity: 0.6 },
+              ]}
+              accessibilityLabel="Cancel this order"
+            >
+              <Ban size={17} color="#DC2626" />
+              <Text style={[PP.label, { color: '#DC2626', marginLeft: 8 }]}>
+                {isCancelling ? 'Cancelling…' : 'Cancel Order'}
+              </Text>
             </TouchableOpacity>
           )}
 
@@ -662,6 +774,17 @@ const styles = StyleSheet.create({
   billRowTotal: { marginTop: 2 },
   billDivider: { height: 1, marginVertical: spacing.sm },
 
+  // Donation
+  donationRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md12 },
+  donationIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+
   // Actions
   actionsSection: {
     margin: spacing.md,
@@ -674,6 +797,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: spacing.md,
     borderRadius: borderRadius.lg,
+  },
+  cancelBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
   },
   invoiceFullBtn: {
     flexDirection: 'row',
