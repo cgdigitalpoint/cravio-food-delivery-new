@@ -1,0 +1,173 @@
+Continue from the latest GitHub commit.
+
+Do NOT redesign the UI.
+
+Do NOT modify completed screens unless required for backend integration.
+
+Preserve the existing architecture.
+
+==========================================================
+PHASE
+==========================================================
+
+Backend Integration – User Data & Order Foundation
+
+==========================================================
+OBJECTIVE
+==========================================================
+
+Connect the existing customer app with the backend so user data becomes persistent.
+
+Do NOT build Restaurant Panel or Admin Panel yet.
+
+==========================================================
+TASKS
+==========================================================
+
+Review the current Supabase database structure.
+
+Verify existing tables.
+
+Review all services.
+
+Review Zustand stores.
+
+Review API usage.
+
+Then implement only where required:
+
+1. User Profile Sync
+
+• Load profile after login
+
+• Update profile
+
+• Persist profile
+
+• Handle avatar placeholder
+
+----------------------------------------------------------
+
+2. Saved Addresses
+
+• Create database integration
+
+• Add address
+
+• Edit address
+
+• Delete address
+
+• Default address
+
+• Load automatically after login
+
+----------------------------------------------------------
+
+3. Favorites
+
+• Persist favorite restaurants
+
+• Persist favorite food items
+
+• Sync across devices
+
+----------------------------------------------------------
+
+4. Cart Persistence
+
+Current cart should survive:
+
+• App restart
+
+• Logout/Login
+
+• Device refresh
+
+Use backend where appropriate.
+
+----------------------------------------------------------
+
+5. Orders Foundation
+
+Prepare backend structure.
+
+Verify:
+
+• Orders table
+
+• Order Items
+
+• Order Status
+
+• User linkage
+
+Do NOT implement restaurant workflow yet.
+
+----------------------------------------------------------
+
+6. Database Review
+
+Verify:
+
+Foreign Keys
+
+Indexes
+
+RLS Policies
+
+Supabase Security
+
+Missing Tables
+
+Missing Columns
+
+==========================================================
+QUALITY
+==========================================================
+
+Run TypeScript.
+
+Run Build.
+
+Verify no runtime errors.
+
+==========================================================
+GIT
+==========================================================
+
+Commit.
+
+Push.
+
+==========================================================
+FINAL REPORT
+==========================================================
+
+Provide:
+
+• Tables reviewed
+
+• Tables created (if any)
+
+• Backend integrations completed
+
+• Modified files
+
+• Build Status
+
+• TypeScript Status
+
+• Git Commit Hash
+
+• GitHub Push Confirmation
+
+Stop after completing this backend integration.
+
+Do NOT start Payments.
+
+Do NOT start Notifications.
+
+Do NOT start Restaurant Panel.
+
+Do NOT start Admin Panel.
