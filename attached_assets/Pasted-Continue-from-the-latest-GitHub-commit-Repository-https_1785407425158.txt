@@ -1,0 +1,207 @@
+Continue from the latest GitHub commit.
+
+Repository:
+https://github.com/cgdigitalpoint/cravio-food-delivery-new
+
+Branch:
+main
+
+Latest Stable Commit:
+6b9e720
+
+==========================================================
+IMPORTANT
+==========================================================
+
+This is NOT a new project.
+
+DO NOT redesign any existing UI.
+
+DO NOT rebuild completed modules.
+
+DO NOT modify unrelated files.
+
+Read only the files required for this task.
+
+Preserve the current architecture, design system, navigation, TypeScript structure and Supabase integration.
+
+==========================================================
+CURRENT PROJECT STATUS
+==========================================================
+
+✅ Customer UI Complete
+
+✅ Authentication Complete
+
+✅ User Profile Complete
+
+✅ Favorites Complete
+
+✅ Addresses Complete
+
+✅ Cart Persistence Complete
+
+✅ Orders Foundation Complete
+
+✅ Legal Center Complete
+
+✅ Settings Complete
+
+==========================================================
+PHASE 14
+ORDER HISTORY & ORDER TRACKING
+==========================================================
+
+First audit the existing implementation.
+
+Determine exactly what is already completed.
+
+Implement ONLY the missing functionality.
+
+==========================================================
+TASKS
+==========================================================
+
+1. Order History
+
+Verify:
+
+• Fetch user orders
+
+• Pagination (if needed)
+
+• Empty state
+
+• Loading state
+
+• Error state
+
+----------------------------------------------------------
+
+2. Order Details
+
+Verify:
+
+• Items
+
+• Quantity
+
+• Prices
+
+• Address
+
+• Payment Method
+
+• Donation
+
+• Timeline
+
+----------------------------------------------------------
+
+3. Order Tracking
+
+Implement only if missing.
+
+Support statuses:
+
+• Order Placed
+
+• Confirmed
+
+• Preparing
+
+• Ready
+
+• Picked Up
+
+• On The Way
+
+• Delivered
+
+• Cancelled
+
+Show progress timeline.
+
+----------------------------------------------------------
+
+4. Reorder
+
+If missing:
+
+• Add all previous order items back into cart.
+
+----------------------------------------------------------
+
+5. Cancel Order
+
+Allow cancellation only for valid statuses.
+
+----------------------------------------------------------
+
+6. UX
+
+Improve:
+
+• Empty state
+
+• Loading
+
+• Retry
+
+• Pull to Refresh
+
+• Better status badges
+
+==========================================================
+QUALITY CHECK
+==========================================================
+
+Run TypeScript.
+
+Run the app.
+
+Verify Order History.
+
+Verify Tracking.
+
+Verify Reorder.
+
+Verify Runtime.
+
+==========================================================
+GIT
+==========================================================
+
+Commit only after everything passes.
+
+Push to GitHub.
+
+==========================================================
+FINAL REPORT
+==========================================================
+
+Provide:
+
+• Existing features found
+
+• New features implemented
+
+• Modified files
+
+• TypeScript status
+
+• Runtime status
+
+• Git commit
+
+• GitHub push confirmation
+
+Stop after Phase 14.
+
+Do NOT start Payments.
+
+Do NOT start Restaurant Panel.
+
+Do NOT start Delivery Partner.
+
+Do NOT start Admin Panel.
