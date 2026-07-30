@@ -16,6 +16,8 @@ export interface DbUser {
   email: string;
   phone: string | null;
   profile_image: string | null;
+  gender: string | null;
+  dob: string | null; // ISO date string YYYY-MM-DD
   created_at: string;
 }
 

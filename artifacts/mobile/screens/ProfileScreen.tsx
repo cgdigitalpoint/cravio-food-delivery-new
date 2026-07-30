@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
+  Bell,
   BookOpen,
   Briefcase,
   ChevronRight,
@@ -67,6 +68,10 @@ interface ProfileScreenProps {
   onDonations?: () => void;
   onEditProfile?: () => void;
   onLogout?: () => void;
+  // Settings — Account
+  onChangePassword?: () => void;
+  onNotificationPreferences?: () => void;
+  onAppPreferences?: () => void;
   // Settings — App
   onAbout?: () => void;
   // Legal
@@ -348,6 +353,9 @@ export function ProfileScreen({
   onDonations,
   onEditProfile,
   onLogout,
+  onChangePassword,
+  onNotificationPreferences,
+  onAppPreferences,
   onAbout,
   onLegalCenter,
   onPrivacyPolicy,
@@ -456,6 +464,28 @@ export function ProfileScreen({
         {/* ── App update ── */}
         <UpdateRow />
 
+        {/* ── Account settings ── */}
+        <SectionGroup title="Account settings">
+          <Row
+            icon={<Settings size={17} color="#6366F1" />}
+            iconBg="#EEF2FF"
+            label="Change Password"
+            onPress={onChangePassword}
+          />
+          <Row
+            icon={<Bell size={17} color="#F59E0B" />}
+            iconBg="#FFFBEB"
+            label="Notification preferences"
+            onPress={onNotificationPreferences}
+          />
+          <Row
+            icon={<Palette size={17} color="#8B5CF6" />}
+            iconBg="#F5F3FF"
+            label="App preferences"
+            onPress={onAppPreferences}
+          />
+        </SectionGroup>
+
         {/* ── Preferences ── */}
         <SectionGroup title="Your preferences">
           <Row
@@ -466,18 +496,11 @@ export function ProfileScreen({
             onPress={() => {}}
           />
           <Row
-            icon={<Palette size={17} color="#8B5CF6" />}
-            iconBg="#F5F3FF"
-            label="Appearance"
-            value="Light"
-            onPress={() => {}}
-          />
-          <Row
             icon={<Globe size={17} color="#0EA5E9" />}
             iconBg="#F0F9FF"
             label="Language"
             value="English"
-            onPress={() => {}}
+            onPress={onAppPreferences}
           />
           <Row
             icon={<CreditCard size={17} color="#10B981" />}

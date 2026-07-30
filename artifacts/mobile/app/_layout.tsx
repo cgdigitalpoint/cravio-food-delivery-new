@@ -26,6 +26,7 @@ import { supabase } from '@/services/supabase';
 import { authService } from '@/services/authService';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCartStore } from '@/store/useCartStore';
+import { usePreferencesStore } from '@/store/usePreferencesStore';
 
 // Prevent the native splash screen from auto-hiding before assets load.
 SplashScreen.preventAutoHideAsync();
@@ -193,6 +194,11 @@ function RootLayoutNav() {
         <Stack.Screen name="legal/index" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="legal/[doc]" options={{ animation: 'slide_from_right' }} />
 
+        {/* ── Phase 13: Account & App Preferences ── */}
+        <Stack.Screen name="change-password" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="notification-preferences" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="app-preferences" options={{ animation: 'slide_from_right' }} />
+
         {/* ── About & Account ── */}
         <Stack.Screen name="about" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="delete-account" options={{ animation: 'slide_from_right' }} />
@@ -205,6 +211,11 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
+  // Load persisted user preferences (theme, notification prefs) from AsyncStorage.
+  // Run once on mount — before rendering any screen that depends on these values.
+  const loadPreferences = usePreferencesStore((s) => s.load);
+  useEffect(() => { loadPreferences(); }, []);
+
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
     Inter_500Medium,

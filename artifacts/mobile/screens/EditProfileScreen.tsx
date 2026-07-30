@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowLeft, Mail, Phone, User } from 'lucide-react-native';
+import { ArrowLeft, Calendar, Mail, Phone, User } from 'lucide-react-native';
 import { useColors } from '@/hooks/useColors';
 import { PP } from '@/theme/poppins';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -23,6 +23,72 @@ interface EditProfileScreenProps {
   onSaved?: () => void;
 }
 
+type Gender = 'male' | 'female' | 'non_binary' | 'prefer_not_to_say';
+
+const GENDER_OPTIONS: { value: Gender; label: string }[] = [
+  { value: 'male', label: 'Male' },
+  { value: 'female', label: 'Female' },
+  { value: 'non_binary', label: 'Non-binary' },
+  { value: 'prefer_not_to_say', label: 'Prefer not to say' },
+];
+
+function GenderPicker({
+  value,
+  onChange,
+}: {
+  value: Gender | null;
+  onChange: (v: Gender) => void;
+}) {
+  const colors = useColors();
+  return (
+    <View style={genderStyles.wrap}>
+      <Text style={[PP.label, genderStyles.label, { color: colors.foreground }]}>
+        Gender <Text style={{ color: colors.mutedForeground, fontFamily: 'Poppins_400Regular' }}>(optional)</Text>
+      </Text>
+      <View style={genderStyles.chips}>
+        {GENDER_OPTIONS.map((opt) => {
+          const selected = value === opt.value;
+          return (
+            <TouchableOpacity
+              key={opt.value}
+              onPress={() => onChange(opt.value)}
+              activeOpacity={0.75}
+              style={[
+                genderStyles.chip,
+                {
+                  backgroundColor: selected ? colors.primary : colors.muted,
+                  borderColor: selected ? colors.primary : colors.border,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  PP.caption,
+                  { color: selected ? '#FFFFFF' : colors.mutedForeground, fontFamily: selected ? 'Poppins_600SemiBold' : 'Poppins_400Regular' },
+                ]}
+              >
+                {opt.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+const genderStyles = StyleSheet.create({
+  wrap: { gap: 10 },
+  label: { paddingHorizontal: 2 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  chip: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+});
+
 export function EditProfileScreen({ onBack, onSaved }: EditProfileScreenProps) {
   const insets = useSafeAreaInsets();
   const colors = useColors();
@@ -30,6 +96,8 @@ export function EditProfileScreen({ onBack, onSaved }: EditProfileScreenProps) {
 
   const [name, setName] = useState(user?.name ?? '');
   const [phone, setPhone] = useState(user?.phone ?? '');
+  const [gender, setGender] = useState<Gender | null>((user?.gender as Gender) ?? null);
+  const [dob, setDob] = useState(user?.dob ?? '');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,16 +107,29 @@ export function EditProfileScreen({ onBack, onSaved }: EditProfileScreenProps) {
   const isValid = name.trim().length >= 2;
   const hasChanges =
     name.trim() !== (user?.name ?? '') ||
-    phone.trim() !== (user?.phone ?? '');
+    phone.trim() !== (user?.phone ?? '') ||
+    gender !== ((user?.gender as Gender) ?? null) ||
+    dob.trim() !== (user?.dob ?? '');
+
+  const validateDob = (val: string): boolean => {
+    if (!val.trim()) return true; // optional
+    return /^\d{4}-\d{2}-\d{2}$/.test(val.trim());
+  };
 
   const handleSave = async () => {
     if (!supabaseUserId || !isValid || !hasChanges) return;
+    if (dob && !validateDob(dob)) {
+      setError('Date of birth must be in YYYY-MM-DD format (e.g. 1990-06-15).');
+      return;
+    }
     setError(null);
     setIsLoading(true);
     try {
       const updated = await userService.updateProfile(supabaseUserId, {
         name: name.trim(),
         phone: phone.trim() || null,
+        gender: gender ?? null,
+        dob: dob.trim() || null,
       });
       updateLocalUser(updated);
       Alert.alert('Profile Updated', 'Your profile has been saved successfully.', [
@@ -95,6 +176,9 @@ export function EditProfileScreen({ onBack, onSaved }: EditProfileScreenProps) {
         {/* Avatar */}
         <View style={styles.avatarWrap}>
           <Avatar name={name || user?.name || 'U'} size="xl" />
+          <Text style={[PP.caption, { color: colors.mutedForeground, marginTop: 8 }]}>
+            Profile picture support coming soon
+          </Text>
         </View>
 
         {/* Email (read-only) */}
@@ -111,7 +195,7 @@ export function EditProfileScreen({ onBack, onSaved }: EditProfileScreenProps) {
           </View>
         </View>
 
-        {/* Editable fields */}
+        {/* Name */}
         <InputField
           label="Full Name"
           placeholder="Your full name"
@@ -120,13 +204,28 @@ export function EditProfileScreen({ onBack, onSaved }: EditProfileScreenProps) {
           autoCapitalize="words"
           leftIcon={<User size={18} color="#9CA3AF" strokeWidth={1.8} />}
         />
+
+        {/* Phone */}
         <InputField
           label="Phone Number (optional)"
-          placeholder="+1 (555) 000-0000"
+          placeholder="+91 98765 43210"
           value={phone}
           onChangeText={setPhone}
           keyboardType="phone-pad"
           leftIcon={<Phone size={18} color="#9CA3AF" strokeWidth={1.8} />}
+        />
+
+        {/* Gender */}
+        <GenderPicker value={gender} onChange={setGender} />
+
+        {/* Date of Birth */}
+        <InputField
+          label="Date of Birth (optional)"
+          placeholder="YYYY-MM-DD  e.g. 1990-06-15"
+          value={dob}
+          onChangeText={(t) => { setDob(t); setError(null); }}
+          keyboardType="numeric"
+          leftIcon={<Calendar size={18} color="#9CA3AF" strokeWidth={1.8} />}
         />
 
         {error ? (

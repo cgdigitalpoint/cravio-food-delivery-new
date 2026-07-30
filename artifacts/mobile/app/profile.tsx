@@ -14,6 +14,10 @@ export default function ProfileRoute() {
       onAddresses={() => router.push('/address')}
       onEditProfile={() => router.push('/profile-edit')}
       onLogout={() => router.replace('/welcome')}
+      // Settings — Account
+      onChangePassword={() => router.push('/change-password')}
+      onNotificationPreferences={() => router.push('/notification-preferences')}
+      onAppPreferences={() => router.push('/app-preferences')}
       // Settings — App
       onAbout={() => router.push('/about')}
       // Legal

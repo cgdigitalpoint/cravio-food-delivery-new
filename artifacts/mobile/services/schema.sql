@@ -257,6 +257,13 @@ alter table public.favorites
 alter table public.cart
   alter column food_id type text using food_id::text;
 
+-- ── Phase 13 — User profile: gender & date of birth ─────────────────────────
+-- Optional fields added to the users table for enhanced profile editing.
+alter table public.users
+  add column if not exists gender text
+    check (gender in ('male', 'female', 'non_binary', 'prefer_not_to_say')),
+  add column if not exists dob    date;
+
 -- ── Phase 12 — Cart persistence metadata ─────────────────────────────────────
 -- Extend the cart table so CartItems can be fully reconstructed on login
 -- without a separate catalog lookup.  All new columns are nullable / defaulted

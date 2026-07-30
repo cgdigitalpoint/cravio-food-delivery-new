@@ -27,8 +27,11 @@ export type { OrderFailureScreenProps } from './OrderFailureScreen';
 export { InvoiceScreen } from './InvoiceScreen';
 export type { InvoiceScreenProps } from './InvoiceScreen';
 
-// Profile edit
+// Profile edit & Phase 13 screens
 export { EditProfileScreen } from './EditProfileScreen';
+export { ChangePasswordScreen } from './ChangePasswordScreen';
+export { NotificationPreferencesScreen } from './NotificationPreferencesScreen';
+export { AppPreferencesScreen } from './AppPreferencesScreen';
 
 // Auth screens
 export { LoginScreen } from './auth/LoginScreen';

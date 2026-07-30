@@ -7,3 +7,5 @@ export { useOrderStore } from './useOrderStore';
 export { useFavoriteStore } from './useFavoriteStore';
 export { useAddressStore } from './useAddressStore';
 export { useDonationStore } from './useDonationStore';
+export { usePreferencesStore } from './usePreferencesStore';
+export type { AppTheme, NotificationPrefs } from './usePreferencesStore';
