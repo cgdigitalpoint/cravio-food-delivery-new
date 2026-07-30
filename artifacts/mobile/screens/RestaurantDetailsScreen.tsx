@@ -30,6 +30,7 @@ import {
   Clock3,
   Heart,
   MapPin,
+  MoreVertical,
   Search,
   Share2,
   ShoppingCart,
@@ -150,18 +151,31 @@ function RestaurantHeader({
   onBack,
   onFavorite,
   onShare,
+  onSearchPress,
 }: {
   restaurant: (typeof RESTAURANTS)[number];
   isFavorite: boolean;
   onBack: () => void;
   onFavorite: () => void;
   onShare: () => void;
+  onSearchPress: () => void;
 }) {
-  const colors = useColors();
   const insets = useSafeAreaInsets();
+
+  const showMoreMenu = () => {
+    Alert.alert(restaurant.name, undefined, [
+      {
+        text: isFavorite ? 'Remove from favorites' : 'Save to favorites',
+        onPress: onFavorite,
+      },
+      { text: 'Share restaurant', onPress: onShare },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
+  };
 
   return (
     <View style={[styles.headerLayer, { paddingTop: insets.top + 10 }]}>
+      {/* Back */}
       <TouchableOpacity
         accessibilityRole="button"
         accessibilityLabel="Go back"
@@ -170,26 +184,24 @@ function RestaurantHeader({
       >
         <ArrowLeft size={21} color="#FFFFFF" strokeWidth={2.5} />
       </TouchableOpacity>
+
+      {/* Right actions: Search + More */}
       <View style={styles.headerActions}>
         <TouchableOpacity
           accessibilityRole="button"
-          accessibilityLabel={`Share ${restaurant.name}`}
-          onPress={onShare}
+          accessibilityLabel="Search this menu"
+          onPress={onSearchPress}
           style={styles.headerButton}
         >
-          <Share2 size={18} color="#FFFFFF" />
+          <Search size={18} color="#FFFFFF" />
         </TouchableOpacity>
         <TouchableOpacity
           accessibilityRole="button"
-          accessibilityLabel={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-          onPress={onFavorite}
+          accessibilityLabel="More options"
+          onPress={showMoreMenu}
           style={[styles.headerButton, styles.headerButtonGap]}
         >
-          <Heart
-            size={19}
-            color={isFavorite ? '#FF8C38' : '#FFFFFF'}
-            fill={isFavorite ? '#FF8C38' : 'transparent'}
-          />
+          <MoreVertical size={19} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
     </View>
@@ -872,6 +884,9 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
         onBack={() => router.back()}
         onFavorite={toggleRestaurantFavorite}
         onShare={shareRestaurant}
+        onSearchPress={() =>
+          scrollRef.current?.scrollTo({ y: COVER_HEIGHT + 10, animated: true })
+        }
       />
 
       {showStickyTabs ? (
@@ -885,12 +900,33 @@ export function RestaurantDetailsScreen({ restaurantId }: { restaurantId: string
             },
           ]}
         >
-          <Animated.Text
-            numberOfLines={1}
-            style={[PP.subtitle, { color: colors.foreground, marginHorizontal: 16 }, stickyTitleStyle]}
+          {/* Inline search bar — "Search in Restaurant Name..." (matches reference) */}
+          <View
+            style={[
+              styles.stickySearchRow,
+              { backgroundColor: `${colors.primary}14` },
+            ]}
           >
-            {restaurant.name}
-          </Animated.Text>
+            <Search size={14} color={colors.primary} />
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              placeholder={`Search in ${restaurant.name}...`}
+              placeholderTextColor={colors.mutedForeground}
+              style={[styles.stickySearchText, { color: colors.foreground }]}
+              returnKeyType="search"
+            />
+            {query ? (
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Clear search"
+                onPress={() => setQuery('')}
+              >
+                <X size={14} color={colors.mutedForeground} />
+              </TouchableOpacity>
+            ) : null}
+          </View>
+
           <CategoryTabs
             categories={categories}
             activeId={activeCategory}
@@ -1018,6 +1054,25 @@ const styles = StyleSheet.create({
   filterLabel: { fontFamily: 'Poppins_400Regular', fontSize: 13 },
   filterEggIcon: { fontSize: 12 },
   // Updated offer banner
+  // Sticky header search input
+  stickySearchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 2,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 10,
+    gap: 8,
+  },
+  stickySearchText: {
+    flex: 1,
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 13,
+    height: 22,
+    paddingVertical: 0,
+  },
   offerIconWrap: {
     width: 22,
     height: 22,

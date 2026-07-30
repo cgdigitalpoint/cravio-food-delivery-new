@@ -15,15 +15,20 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
+  Briefcase,
   ChevronRight,
+  Coins,
   CreditCard,
   Clock3,
   Crown,
+  EyeOff,
+  Gift,
   Globe,
   Heart,
   HelpCircle,
   LogOut,
   MapPin,
+  MessageCircle,
   Package,
   Palette,
   Receipt,
@@ -33,7 +38,9 @@ import {
   Star,
   Tag,
   Ticket,
+  Train,
   User,
+  Users,
   Wallet,
 } from 'lucide-react-native';
 import { useColors } from '@/hooks/useColors';
@@ -59,18 +66,20 @@ function SectionGroup({
   title,
   children,
 }: {
-  title: string;
+  title?: string;
   children: React.ReactNode;
 }) {
   const colors = useColors();
   return (
     <View style={[groupStyles.wrap, { backgroundColor: colors.card }]}>
-      <View style={groupStyles.titleRow}>
-        <View style={[groupStyles.accent, { backgroundColor: colors.primary }]} />
-        <Text style={[PP.label, groupStyles.title, { color: colors.foreground }]}>
-          {title}
-        </Text>
-      </View>
+      {title ? (
+        <View style={groupStyles.titleRow}>
+          <View style={[groupStyles.accent, { backgroundColor: colors.primary }]} />
+          <Text style={[PP.label, groupStyles.title, { color: colors.foreground }]}>
+            {title}
+          </Text>
+        </View>
+      ) : null}
       {children}
     </View>
   );
@@ -183,7 +192,7 @@ function TileGrid() {
           <Wallet size={20} color="#3B82F6" />
         </View>
         <Text style={[PP.label, { color: colors.foreground }]}>Cravio Wallet</Text>
-        <Text style={[PP.caption, { color: colors.mutedForeground }]}>$0.00</Text>
+        <Text style={[PP.caption, { color: colors.mutedForeground }]}>₹0</Text>
       </TouchableOpacity>
 
       {/* Divider */}
@@ -428,18 +437,6 @@ export function ProfileScreen({
             onPress={onOrders}
           />
           <Row
-            icon={<Heart size={17} color="#EF4444" />}
-            iconBg="#FFF1F2"
-            label="Favourites"
-            onPress={onFavorites}
-          />
-          <Row
-            icon={<Clock3 size={17} color="#F59E0B" />}
-            iconBg="#FFFBEB"
-            label="Recently viewed"
-            onPress={onRecentlyViewed}
-          />
-          <Row
             icon={<MapPin size={17} color="#6366F1" />}
             iconBg="#EEF2FF"
             label="Address book"
@@ -447,31 +444,74 @@ export function ProfileScreen({
           />
         </SectionGroup>
 
-        {/* ── Payments ── */}
-        <SectionGroup title="Payments">
+        {/* ── More options (unlabeled — matches reference screenshot) ── */}
+        <SectionGroup>
           <Row
-            icon={<Wallet size={17} color="#3B82F6" />}
-            iconBg="#EFF6FF"
-            label="Cravio Wallet"
-            value="$0.00"
+            icon={<Users size={17} color="#6B7280" />}
+            iconBg={colors.muted}
+            label="Manage recommendations"
             onPress={() => {}}
           />
           <Row
-            icon={<Ticket size={17} color="#FF6B00" />}
-            iconBg="#FFF7ED"
-            label="Your coupons"
+            icon={<Train size={17} color="#6B7280" />}
+            iconBg={colors.muted}
+            label="Order on train"
+            onPress={() => {}}
+          />
+          <Row
+            icon={<HelpCircle size={17} color="#6B7280" />}
+            iconBg={colors.muted}
+            label="Online ordering help"
+            onPress={() => {}}
+          />
+          <Row
+            icon={<EyeOff size={17} color="#6B7280" />}
+            iconBg={colors.muted}
+            label="Hidden Restaurants"
+            onPress={() => {}}
+          />
+          <Row
+            icon={<MessageCircle size={17} color="#6B7280" />}
+            iconBg={colors.muted}
+            label="Hear from restaurants"
+            onPress={() => {}}
+          />
+        </SectionGroup>
+
+        {/* ── Gift cards & credits ── */}
+        <SectionGroup title="Gift cards & credits">
+          <Row
+            icon={<Gift size={17} color="#EC4899" />}
+            iconBg="#FDF2F8"
+            label="Buy Gift Card"
             onPress={() => {}}
           />
           <Row
             icon={<Tag size={17} color="#8B5CF6" />}
             iconBg="#F5F3FF"
-            label="Gift cards"
+            label="Claim Gift Card"
+            onPress={() => {}}
+          />
+          <Row
+            icon={<Coins size={17} color="#F59E0B" />}
+            iconBg="#FFFBEB"
+            label="Cravio Credits"
+            onPress={() => {}}
+          />
+        </SectionGroup>
+
+        {/* ── Cravio For Enterprise ── */}
+        <SectionGroup title="Cravio For Enterprise">
+          <Row
+            icon={<Briefcase size={17} color="#0EA5E9" />}
+            iconBg="#F0F9FF"
+            label="Corporate accounts"
             onPress={() => {}}
           />
           <Row
             icon={<Receipt size={17} color="#14B8A6" />}
             iconBg="#F0FDFA"
-            label="Transaction history"
+            label="Expense management"
             onPress={() => {}}
           />
         </SectionGroup>

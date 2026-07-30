@@ -10,7 +10,7 @@ export default function LoginRoute() {
   const handleLogin = async (email: string, password: string) => {
     try {
       await login(email, password);
-      router.replace('/(tabs)/');
+      router.replace('/(tabs)');
     } catch {
       // Error stored in usePartnerAuthStore
     }

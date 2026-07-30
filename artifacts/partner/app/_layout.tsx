@@ -59,7 +59,7 @@ function AuthGuard() {
     const seg0 = segments[0] as string | undefined;
     if (!seg0) return;
     if (isAuthenticated && AUTH_ONLY.has(seg0)) {
-      router.replace('/(tabs)/');
+      router.replace('/(tabs)');
     } else if (!isAuthenticated && PROTECTED.has(seg0)) {
       router.replace('/auth/login');
     }

@@ -10,7 +10,7 @@ export default function SignupRoute() {
   const handleRegister = async (email: string, password: string, name: string, phone: string) => {
     try {
       await register(email, password, name, phone);
-      router.replace('/(tabs)/');
+      router.replace('/(tabs)');
     } catch {
       // Error stored in usePartnerAuthStore
     }

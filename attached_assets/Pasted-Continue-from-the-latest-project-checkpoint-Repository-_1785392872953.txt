@@ -1,0 +1,75 @@
+Continue from the latest project checkpoint.
+
+Repository:
+https://github.com/cgdigitalpoint/cravio-food-delivery-new
+
+Branch:
+main
+
+Latest Git Commit:
+17cc9d3
+
+==================================================
+IMPORTANT
+==================================================
+
+The uploaded screenshots are the PRIMARY design reference.
+
+Study every uploaded screenshot carefully before making any UI changes.
+
+Compare the current Cravio UI with the screenshots and match the layout, spacing, cards, banners, filters, typography, icons and interactions as closely as possible.
+
+Keep 100% Cravio branding.
+Do NOT copy Zomato logos, colours or branding.
+
+==================================================
+DO NOT
+==================================================
+
+- Do NOT restart the project.
+- Do NOT analyse the entire codebase again.
+- Do NOT read every file again.
+- Do NOT recreate completed work.
+- Do NOT modify Authentication, Firebase, Backend, Database, APIs or Navigation unless required to support the UI.
+
+Read only the files needed for the screen you are currently working on.
+
+Spend this session mostly on implementation, not analysis.
+
+==================================================
+IMPLEMENT IN THIS ORDER
+==================================================
+
+1. Home Screen (complete polish)
+2. Restaurant Details Screen
+3. Search Screen
+4. Profile Screen
+5. Settings Screen
+6. Global UI polish (animations, spacing, responsiveness)
+
+==================================================
+QUALITY
+==================================================
+
+After each completed screen:
+
+- Run TypeScript
+- Fix every error
+- Verify the build
+- Commit changes
+- Push to GitHub
+
+Continue automatically until the remaining UI has been completed or the session quota ends.
+
+==================================================
+FINAL REPORT
+==================================================
+
+Before stopping, provide:
+
+- Completed screens
+- Remaining screens
+- Files modified
+- Build status
+- TypeScript status
+- Latest Git commit hash
