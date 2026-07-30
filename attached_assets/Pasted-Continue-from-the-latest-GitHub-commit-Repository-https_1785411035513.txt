@@ -1,0 +1,253 @@
+Continue from the latest GitHub commit.
+
+Repository:
+https://github.com/cgdigitalpoint/cravio-food-delivery-new
+
+Branch:
+main
+
+Latest Stable Commit:
+f11257e
+
+==========================================================
+IMPORTANT
+==========================================================
+
+This is NOT a new project.
+
+Phases 1–15B are already completed.
+
+DO NOT redesign any existing screens.
+
+DO NOT modify completed modules unless required for integration.
+
+Read only the files necessary for this phase.
+
+==========================================================
+PHASE 16
+MAPS & LIVE ORDER TRACKING
+==========================================================
+
+First audit the current codebase.
+
+Identify any existing map, location or tracking related files.
+
+Reuse existing architecture wherever possible.
+
+Implement ONLY what is missing.
+
+==========================================================
+IMPLEMENT
+==========================================================
+
+1. Tracking Screen
+
+Create a dedicated Order Tracking screen.
+
+Show:
+
+• Delivery status timeline
+
+• Estimated delivery time
+
+• Delivery address
+
+• Restaurant information
+
+• Driver information (placeholder)
+
+• Call Driver button (disabled placeholder)
+
+• Chat button (placeholder)
+
+----------------------------------------------------------
+
+2. Map Integration
+
+Integrate Google Maps (Expo compatible).
+
+Display:
+
+• Restaurant Marker
+
+• Customer Marker
+
+• Driver Marker (mock location)
+
+Draw route placeholders if available.
+
+Use mock coordinates.
+
+No live backend.
+
+----------------------------------------------------------
+
+3. Live Tracking Architecture
+
+Create a reusable tracking service.
+
+Support:
+
+• Driver location
+
+• Restaurant location
+
+• Customer location
+
+• ETA
+
+• Route updates
+
+Use mock updates.
+
+No websocket.
+
+No realtime backend.
+
+----------------------------------------------------------
+
+4. Location Models
+
+Create reusable types for:
+
+• Coordinates
+
+• Driver
+
+• Tracking State
+
+• Route
+
+• ETA
+
+----------------------------------------------------------
+
+5. Tracking Simulator
+
+Create a mock tracking simulator.
+
+It should simulate:
+
+Preparing
+
+Picked Up
+
+On The Way
+
+Nearby
+
+Delivered
+
+Driver marker should move using mock coordinates.
+
+----------------------------------------------------------
+
+6. Tracking Store
+
+Create Zustand store for tracking.
+
+Persist only required data.
+
+Support:
+
+• Current status
+
+• ETA
+
+• Driver
+
+• Coordinates
+
+• Route state
+
+----------------------------------------------------------
+
+7. Order Details Integration
+
+From Order Details screen:
+
+"Track Order"
+
+should navigate to the new Tracking Screen.
+
+----------------------------------------------------------
+
+8. UI Quality
+
+Use existing theme.
+
+Responsive layout.
+
+Dark Mode.
+
+Loading states.
+
+Error states.
+
+Skeleton where required.
+
+==========================================================
+DO NOT IMPLEMENT
+==========================================================
+
+❌ Real GPS tracking
+
+❌ Firebase realtime database
+
+❌ Supabase realtime
+
+❌ WebSockets
+
+❌ Delivery Partner App
+
+❌ Google Directions paid API
+
+❌ Payment Gateway
+
+❌ Restaurant Panel
+
+==========================================================
+QUALITY CHECK
+==========================================================
+
+Run TypeScript.
+
+Fix every TS error.
+
+Verify runtime.
+
+Verify navigation.
+
+Verify tracking simulator.
+
+Commit.
+
+Push.
+
+==========================================================
+FINAL REPORT
+==========================================================
+
+Provide:
+
+• Existing tracking architecture
+
+• New files created
+
+• Modified files
+
+• Tracking flow
+
+• Map integration summary
+
+• TypeScript status
+
+• Runtime status
+
+• Git commit
+
+• GitHub push confirmation
+
+STOP after Phase 16.
+
+Do NOT start Phase 17.
