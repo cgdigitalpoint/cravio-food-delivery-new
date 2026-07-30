@@ -1,0 +1,203 @@
+Continue from the latest GitHub commit.
+
+Repository:
+https://github.com/cgdigitalpoint/cravio-food-delivery-new
+
+Branch:
+main
+
+Latest Stable Commit:
+4b04f56
+
+==========================================================
+IMPORTANT
+==========================================================
+
+This is NOT a new project.
+
+Phase 15A has already been completed successfully.
+
+DO NOT redesign the UI.
+
+DO NOT rebuild Notification Center.
+
+DO NOT modify completed modules.
+
+Read only the files required for this phase.
+
+==========================================================
+PHASE 15B
+PUSH NOTIFICATION INFRASTRUCTURE
+==========================================================
+
+First audit the existing notification implementation.
+
+Implement ONLY what is missing.
+
+==========================================================
+IMPLEMENT ONLY IF MISSING
+==========================================================
+
+1. Create a provider-independent Push Notification interface.
+
+Support future providers:
+
+• Firebase Cloud Messaging (FCM)
+
+• Expo Notifications
+
+• OneSignal
+
+No provider should be integrated yet.
+
+----------------------------------------------------------
+
+2. Create Push Provider abstraction.
+
+Examples:
+
+registerDevice()
+
+requestPermission()
+
+getPushToken()
+
+subscribeTopic()
+
+unsubscribeTopic()
+
+sendLocalNotification()
+
+These methods may contain placeholder implementations.
+
+----------------------------------------------------------
+
+3. Notification Permission Manager
+
+Support:
+
+• Permission Status
+
+• Request Permission
+
+• Denied State
+
+• Granted State
+
+• Open App Settings helper
+
+No provider registration.
+
+----------------------------------------------------------
+
+4. Push Token Architecture
+
+Prepare storage structure.
+
+Do NOT register any real token.
+
+Do NOT contact Firebase.
+
+Do NOT contact Expo servers.
+
+----------------------------------------------------------
+
+5. Deep Link Payload Parser
+
+Prepare parsing support for:
+
+Order Details
+
+Restaurant
+
+Offer
+
+Profile
+
+Settings
+
+Only parsing.
+
+No backend integration.
+
+----------------------------------------------------------
+
+6. Notification Routing
+
+Prepare future routing.
+
+No actual push delivery.
+
+----------------------------------------------------------
+
+7. Testing Utilities
+
+Create mock push payload generator.
+
+Allow testing different notification payloads locally.
+
+==========================================================
+DO NOT IMPLEMENT
+==========================================================
+
+❌ Firebase Project
+
+❌ FCM SDK setup
+
+❌ OneSignal SDK
+
+❌ Expo Push registration
+
+❌ Backend notification server
+
+❌ Payment Gateway
+
+❌ Maps
+
+❌ Restaurant Panel
+
+❌ Delivery App
+
+==========================================================
+QUALITY CHECK
+==========================================================
+
+Run TypeScript.
+
+Fix all TS errors.
+
+Verify runtime.
+
+Verify Notification Center.
+
+Verify mock notifications.
+
+Commit.
+
+Push.
+
+==========================================================
+FINAL REPORT
+==========================================================
+
+Provide:
+
+Existing infrastructure
+
+New infrastructure added
+
+Modified files
+
+Architecture summary
+
+TypeScript status
+
+Runtime status
+
+Git commit
+
+GitHub push confirmation
+
+STOP after Phase 15B.
+
+Do NOT start Phase 16.
