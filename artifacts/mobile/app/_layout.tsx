@@ -45,7 +45,7 @@ const queryClient = new QueryClient({
 });
 
 // Protected route segments — redirect to /welcome if unauthenticated
-const PROTECTED = new Set(['home', 'search', 'profile', 'profile-edit', 'change-password', 'notification-preferences', 'notifications', 'app-preferences', 'orders', 'favorites', 'recently-viewed', 'address', 'restaurant', 'cart', 'checkout', 'order-success', 'order-failure', 'invoice', 'donations', 'donation-management', 'legal', 'about', 'delete-account']);
+const PROTECTED = new Set(['home', 'search', 'profile', 'profile-edit', 'change-password', 'notification-preferences', 'notifications', 'app-preferences', 'orders', 'favorites', 'recently-viewed', 'address', 'restaurant', 'cart', 'checkout', 'order-success', 'order-failure', 'invoice', 'donations', 'donation-management', 'legal', 'about', 'delete-account', 'support']);
 // Auth-only segments — redirect to /home if already authenticated
 const AUTH_ONLY = new Set(['auth']);
 
@@ -206,6 +206,13 @@ function RootLayoutNav() {
         {/* ── About & Account ── */}
         <Stack.Screen name="about" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="delete-account" options={{ animation: 'slide_from_right' }} />
+
+        {/* ── Phase 17: Customer Support ── */}
+        <Stack.Screen name="support/index" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="support/contact" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="support/raise-ticket" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="support/tickets" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="support/ticket/[id]" options={{ animation: 'slide_from_right' }} />
 
         {/* ── Design system (dev only — hidden in production) ── */}
         <Stack.Screen name="design-system" options={{ animation: 'slide_from_right' }} />

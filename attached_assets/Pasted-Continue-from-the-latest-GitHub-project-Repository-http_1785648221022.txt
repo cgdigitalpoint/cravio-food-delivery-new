@@ -1,0 +1,297 @@
+Continue from the latest GitHub project.
+
+Repository:
+https://github.com/cgdigitalpoint/cravio-food-delivery-new
+
+Branch:
+main
+
+Latest Stable Commit:
+0655e0b
+
+==========================================================
+IMPORTANT
+==========================================================
+
+This is NOT a new project.
+
+Phases 1–17 are already completed.
+
+DO NOT redesign any existing UI.
+
+DO NOT rebuild completed screens.
+
+DO NOT implement any new features.
+
+DO NOT modify business logic unless required to fix bugs.
+
+Read only the files required for this phase.
+
+Preserve the existing architecture, reusable components, navigation, TypeScript structure and Supabase integration.
+
+==========================================================
+PHASE 18A
+PRODUCTION QA & PERFORMANCE OPTIMIZATION
+==========================================================
+
+FIRST perform a focused audit.
+
+Identify performance issues, runtime issues, memory issues, UX inconsistencies and production-readiness gaps.
+
+Implement ONLY the required improvements.
+
+DO NOT duplicate code.
+
+==========================================================
+PERFORMANCE
+==========================================================
+
+Optimize only where required.
+
+Improve:
+
+• Component rendering
+
+• React memoization
+
+• useMemo
+
+• useCallback
+
+• FlatList optimization
+
+• Image rendering
+
+• Lazy loading
+
+• Navigation performance
+
+• Bundle performance
+
+==========================================================
+IMAGE OPTIMIZATION
+==========================================================
+
+Audit all images.
+
+Implement:
+
+• Proper caching
+
+• Lazy loading
+
+• Placeholder while loading
+
+• Error fallback
+
+• Optimized rendering
+
+==========================================================
+LOADING EXPERIENCE
+==========================================================
+
+Audit every screen.
+
+Ensure consistent:
+
+• Loading indicators
+
+• Skeleton loaders
+
+• Empty states
+
+• Error states
+
+• Retry buttons
+
+==========================================================
+OFFLINE EXPERIENCE
+==========================================================
+
+Improve handling for:
+
+• No Internet
+
+• Slow Internet
+
+• API timeout
+
+• Request retry
+
+• Friendly offline UI
+
+==========================================================
+ERROR HANDLING
+==========================================================
+
+Audit the complete app.
+
+Improve:
+
+• Global error handling
+
+• Error boundaries
+
+• Async error handling
+
+• API failure handling
+
+• Graceful fallback UI
+
+==========================================================
+ACCESSIBILITY
+==========================================================
+
+Improve:
+
+• Accessibility labels
+
+• Touch target sizes
+
+• Screen reader compatibility
+
+• Keyboard navigation where applicable
+
+==========================================================
+ANIMATIONS
+==========================================================
+
+Optimize existing animations.
+
+Remove unnecessary re-renders.
+
+Ensure smooth transitions.
+
+==========================================================
+MEMORY OPTIMIZATION
+==========================================================
+
+Review:
+
+• Event listeners
+
+• Timers
+
+• Subscriptions
+
+• Cleanup
+
+• Memory leaks
+
+==========================================================
+CODE QUALITY
+==========================================================
+
+Audit:
+
+• Duplicate code
+
+• Dead code
+
+• Unused imports
+
+• Unused components
+
+• Unused services
+
+• Console logs
+
+• TODO comments
+
+Remove only what is safe.
+
+==========================================================
+SECURITY
+==========================================================
+
+Review:
+
+• Environment variables
+
+• Secrets usage
+
+• Supabase access
+
+• Route protection
+
+• Sensitive data exposure
+
+==========================================================
+DO NOT IMPLEMENT
+==========================================================
+
+❌ Payment Gateway
+
+❌ Restaurant Panel
+
+❌ Delivery Partner App
+
+❌ Admin Panel
+
+❌ Live Chat
+
+❌ AI Chatbot
+
+❌ New Features
+
+==========================================================
+QUALITY CHECK
+==========================================================
+
+Before completion:
+
+✓ Run TypeScript
+
+✓ Fix every TypeScript error
+
+✓ Verify Expo runtime
+
+✓ Verify all screens
+
+✓ Verify navigation
+
+✓ Verify authentication
+
+✓ Verify notifications
+
+✓ Verify tracking
+
+✓ Verify customer support
+
+✓ Verify performance improvements
+
+==========================================================
+GIT
+==========================================================
+
+Commit ONLY after everything passes.
+
+Push to GitHub.
+
+==========================================================
+FINAL REPORT
+==========================================================
+
+Provide:
+
+• Performance issues found
+
+• Bugs fixed
+
+• Optimizations applied
+
+• Files modified
+
+• Runtime verification
+
+• TypeScript status
+
+• Git Commit Hash
+
+• GitHub Push Confirmation
+
+STOP after Phase 18A.
+
+DO NOT START Phase 18B.
+
+DO NOT START Phase 19.

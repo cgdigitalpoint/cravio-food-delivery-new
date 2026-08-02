@@ -19,6 +19,8 @@ export interface IconButtonProps extends TouchableOpacityProps {
   size?: IconButtonSize;
   rounded?: boolean;
   style?: StyleProp<ViewStyle>;
+  /** Strongly recommended for accessibility: describe the action this button performs. */
+  accessibilityLabel?: string;
 }
 
 export function IconButton({

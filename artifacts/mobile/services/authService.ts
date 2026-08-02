@@ -196,7 +196,7 @@ export const authService = {
         console.error('[Cravio] Deep-link session error:', error.message);
         return false;
       }
-      console.log('[Cravio] Deep-link auth success, type:', type ?? 'unknown');
+      // Deep-link auth success — session established
       return true;
     }
 

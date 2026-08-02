@@ -27,17 +27,17 @@ export interface FoodCardProps {
 }
 
 // ─── Veg / Non-veg indicator ─────────────────────────────────────────────────
-function VegIndicator({ isVeg }: { isVeg: boolean }) {
+const VegIndicator = React.memo(function VegIndicator({ isVeg }: { isVeg: boolean }) {
   const color = isVeg ? '#16A34A' : '#DC2626';
   return (
     <View style={[styles.vegBox, { borderColor: color }]}>
       <View style={[styles.vegDot, { backgroundColor: color }]} />
     </View>
   );
-}
+});
 
 // ─── "Highly reordered" badge ────────────────────────────────────────────────
-function ReorderBadge() {
+const ReorderBadge = React.memo(function ReorderBadge() {
   return (
     <View style={styles.reorderRow}>
       <View style={styles.reorderTrack}>
@@ -46,10 +46,10 @@ function ReorderBadge() {
       <Text style={styles.reorderText}>Highly reordered</Text>
     </View>
   );
-}
+});
 
 // ─── Main FoodCard ────────────────────────────────────────────────────────────
-export function FoodCard({
+export const FoodCard = React.memo(function FoodCard({
   name,
   description,
   price,
@@ -167,6 +167,8 @@ export function FoodCard({
             onPress={onFavoritePress}
             style={styles.favOverlay}
             hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            accessibilityRole="button"
+            accessibilityLabel={isFavorite ? `Remove ${name} from saved` : `Save ${name}`}
           >
             <Text style={{ fontSize: 16, color: isFavorite ? '#EF4444' : '#FFFFFF' }}>
               {isFavorite ? '♥' : '♡'}
@@ -190,7 +192,7 @@ export function FoodCard({
       </View>
     </TouchableOpacity>
   );
-}
+});
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 

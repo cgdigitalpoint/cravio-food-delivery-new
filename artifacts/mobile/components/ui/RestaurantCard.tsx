@@ -23,7 +23,7 @@ export interface RestaurantCardProps {
   onFavoritePress?: () => void;
 }
 
-export function RestaurantCard({
+export const RestaurantCard = React.memo(function RestaurantCard({
   name,
   cuisine,
   rating,
@@ -44,12 +44,20 @@ export function RestaurantCard({
     <TouchableOpacity
       activeOpacity={0.92}
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${name}, ${cuisine}, ${rating.toFixed(1)} stars, ${deliveryTime} min delivery`}
       style={[styles.card, { backgroundColor: colors.card }]}
     >
       {/* ── Image area ── */}
       <View style={styles.imageWrapper}>
         {imageUri ? (
-          <Image source={{ uri: imageUri }} style={styles.image} contentFit="cover" />
+          <Image
+            source={{ uri: imageUri }}
+            style={styles.image}
+            contentFit="cover"
+            transition={200}
+            recyclingKey={imageUri}
+          />
         ) : (
           <LinearGradient
             colors={['#FF8C38', '#FF6B00']}
@@ -152,7 +160,7 @@ export function RestaurantCard({
       </View>
     </TouchableOpacity>
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {
