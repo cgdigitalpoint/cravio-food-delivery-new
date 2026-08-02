@@ -52,3 +52,13 @@ export type { NotificationCenterScreenProps } from './NotificationCenterScreen';
 export { LegalCenterScreen, LegalDocScreen } from './legal';
 export { AboutScreen } from './AboutScreen';
 export { DeleteAccountScreen } from './DeleteAccountScreen';
+
+// Phase 17 — Customer Support
+export {
+  HelpCenterScreen,
+  ContactSupportScreen,
+  RaiseTicketScreen,
+  TicketHistoryScreen,
+  TicketDetailsScreen,
+} from './support';
+export type { TicketDetailsScreenProps } from './support';

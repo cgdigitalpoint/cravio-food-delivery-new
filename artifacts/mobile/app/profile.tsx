@@ -30,6 +30,11 @@ export default function ProfileRoute() {
       onCommunityGuidelines={() => router.push('/legal/community-guidelines')}
       onCopyright={() => router.push('/legal/copyright')}
       onOpenSourceLicenses={() => router.push('/legal/open-source-licenses')}
+      // Customer Support
+      onHelpCenter={() => router.push('/support')}
+      onContactSupport={() => router.push('/support/contact')}
+      onRaiseTicket={() => router.push('/support/raise-ticket')}
+      onTicketHistory={() => router.push('/support/tickets')}
       // Account
       onDeleteAccount={() => router.push('/delete-account')}
     />

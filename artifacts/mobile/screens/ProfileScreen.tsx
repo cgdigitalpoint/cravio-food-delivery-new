@@ -84,6 +84,11 @@ interface ProfileScreenProps {
   onCommunityGuidelines?: () => void;
   onCopyright?: () => void;
   onOpenSourceLicenses?: () => void;
+  // Customer Support
+  onHelpCenter?: () => void;
+  onContactSupport?: () => void;
+  onRaiseTicket?: () => void;
+  onTicketHistory?: () => void;
   // Account
   onDeleteAccount?: () => void;
 }
@@ -366,6 +371,10 @@ export function ProfileScreen({
   onCommunityGuidelines,
   onCopyright,
   onOpenSourceLicenses,
+  onHelpCenter,
+  onContactSupport,
+  onRaiseTicket,
+  onTicketHistory,
   onDeleteAccount,
 }: ProfileScreenProps) {
   const insets = useSafeAreaInsets();
@@ -601,16 +610,28 @@ export function ProfileScreen({
         {/* ── Help & Support ── */}
         <SectionGroup title="Help & support">
           <Row
-            icon={<HelpCircle size={17} color="#6B7280" />}
-            iconBg={colors.muted}
-            label="Help centre"
-            onPress={() => {}}
+            icon={<HelpCircle size={17} color="#FF6B00" />}
+            iconBg="#FFF7ED"
+            label="Help Centre"
+            onPress={onHelpCenter}
           />
           <Row
             icon={<PhoneCall size={17} color="#22C55E" />}
             iconBg="#F0FDF4"
             label="Contact support"
-            onPress={handleContactSupport}
+            onPress={onContactSupport ?? handleContactSupport}
+          />
+          <Row
+            icon={<MessageCircle size={17} color="#3B82F6" />}
+            iconBg="#EFF6FF"
+            label="Raise a ticket"
+            onPress={onRaiseTicket}
+          />
+          <Row
+            icon={<Ticket size={17} color="#8B5CF6" />}
+            iconBg="#F5F3FF"
+            label="My tickets"
+            onPress={onTicketHistory}
           />
           <Row
             icon={<Star size={17} color="#F59E0B" />}
